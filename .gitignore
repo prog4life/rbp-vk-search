@@ -1,0 +1,10 @@
+**/node_modules/
+**/.idea/
+config/
+
+public/bundle.js
+public/bundle.js.map
+
+.eslintrc.json
+.eslintignore
+npm-debug.log
