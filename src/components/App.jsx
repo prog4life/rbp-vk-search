@@ -4,9 +4,8 @@ import SearchForm from './SearchForm';
 import ResultsPanel from './ResultsPanel';
 import ResultsFilter from './ResultsFilter';
 import ResultsList from './ResultsList';
-import {clientID, display, redirectURI, scope, responseType, apiVersion,
-  state, accessToken, tokenExpiresAt, userID, tokenRequestURL
-} from '../vk/config';
+import vk from '../vk/config';
+import handleHash from '../helpers/url-hash-parser';
 
 class App extends React.Component {
   constructor(props) {
@@ -14,38 +13,49 @@ class App extends React.Component {
 
     this.state = {
       filterText: '',
-      // temporary state part:
-      clientID,
-      display,
-      redirectURI,
-      scope,
-      responseType,
-      apiVersion,
-      state,
-      accessToken,
-      tokenExpiresAt,
-      // individual user id (vk user id)
-      userID
+      // temporary state part? :
+      accessToken: '',
+      tokenExpiresAt: null,
+      userID: null
     };
   }
   componentDidMount() {
-    const localToken = localStorage.getItem('accessToken');
+    // const localToken = localStorage.getItem('accessToken');
 
-    if (localToken) {
-      console.info('localToken ', localToken);
+    // if (localToken) {
+    //   console.info('localToken ', localToken);
+    //   return;
+    // }
+    
+    const hash = document.location.hash.substr(1);
+    
+    const parsedHash = handleHash(hash);
+    
+    if (!parsedHash) {
+      setInterval(() => {
+        console.log('requesting new token');
+        document.location.replace(vk.tokenRequestURL);
+      }, 2000);
       return;
     }
+    
+    console.info(parsedHash);
 
-    // const {clientID,
-    //   display,
-    //   redirectURI,
-    //   scope,
-    //   responseType,
-    //   apiVersion,
-    //   state} = this.state;
+    const {access_token, expires_in, user_id} = parsedHash;
+    
+    if(access_token) {
+      let time = new Date();
 
-    console.info(this.state);
-    console.warn(tokenRequestURL);
+      this.setState({
+        accessToken: access_token,
+        tokenExpiresAt: time.setSeconds(time.getSeconds() + expires_in),
+        userID: user_id
+      }, () => console.info(this.state));
+    } else {
+      console.warn(parsedHash);
+    }
+
+    // console.info(vk);
 
     // fetch(requestURL, {
     //   method: 'GET',

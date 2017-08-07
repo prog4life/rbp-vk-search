@@ -1,7 +1,7 @@
 {
   "name": "rbp-vk-search",
   "version": "1.0.0",
-  "description": "vk.com search app with usual bootstrap",
+  "description": "vk.com search app with react bootstrap",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
