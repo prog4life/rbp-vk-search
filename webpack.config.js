@@ -9,7 +9,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
+        test: /\.(js|jsx)?$/,
         include: [
           path.resolve(__dirname, 'src')
         ],
@@ -36,7 +36,7 @@ module.exports = {
       }
       // {
       //   test: /\.(eot|woff|woff2|ttf|svg|png|jpe?g|gif)(\?\S*)?$/,
-      //   loader: 'url?limit=100000@name=[name][ext]'
+      //   loader: 'url-loader?limit=100000@name=[name][ext]'
       // }
     ]
   },

@@ -4,6 +4,9 @@ import SearchForm from './SearchForm';
 import ResultsPanel from './ResultsPanel';
 import ResultsFilter from './ResultsFilter';
 import ResultsList from './ResultsList';
+import {clientID, display, redirectURI, scope, responseType, apiVersion,
+  state, accessToken, tokenExpiresAt, userID, tokenRequestURL
+} from '../vk/config';
 
 class App extends React.Component {
   constructor(props) {
@@ -12,44 +15,37 @@ class App extends React.Component {
     this.state = {
       filterText: '',
       // temporary state part:
-      clientID: 5931563,
-      display: 'popup',
-      redirectURI: 'https://main-dev2get.c9users.io',
-      // redirectURI: 'https://nameless-sea-73563.herokuapp.com',
-      scope: 'friends',
-      responseType: 'token',
-      apiVersion: 5.62,
-      state: 55555,
-      authData: null,
-      accessToken: '',
-      tokenExpiresAt: null,
-      // TODO: choose one
-      // serverTokenURL: 'https://main-dev2get.c9users.io/auth',
-      // serverTokenURL: 'https://nameless-sea-73563.herokuapp.com/auth',
+      clientID,
+      display,
+      redirectURI,
+      scope,
+      responseType,
+      apiVersion,
+      state,
+      accessToken,
+      tokenExpiresAt,
       // individual user id (vk user id)
-      userID: null
+      userID
     };
   }
   componentDidMount() {
     const localToken = localStorage.getItem('accessToken');
 
     if (localToken) {
-      console.warn('localToken ', localToken);
+      console.info('localToken ', localToken);
       return;
     }
 
-    const {clientID,
-      display,
-      redirectURI,
-      scope,
-      responseType,
-      apiVersion,
-      state} = this.state;
+    // const {clientID,
+    //   display,
+    //   redirectURI,
+    //   scope,
+    //   responseType,
+    //   apiVersion,
+    //   state} = this.state;
 
-    const requestURL = `https://oauth.vk.com/authorize?client_id=${clientID}&` +
-        `display=${display}&redirect_uri=${redirectURI}&` +
-        `scope=${scope}&response_type=${responseType}&` +
-        `v=${apiVersion}&state=${state}`;
+    console.info(this.state);
+    console.warn(tokenRequestURL);
 
     // fetch(requestURL, {
     //   method: 'GET',
