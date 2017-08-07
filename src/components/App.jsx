@@ -51,10 +51,12 @@ class App extends React.Component {
         `scope=${scope}&response_type=${responseType}&` +
         `v=${apiVersion}&state=${state}`;
 
-    fetch(requestURL, {
-      method: 'GET'
-    }).then((response) => console.warn('vk api response ', response))
-    .catch((error) => console.error('vk api returned error', error));
+    // fetch(requestURL, {
+    //   method: 'GET',
+    //   mode: 'same-origin'
+    // }).then((response) => console.warn('vk api response ', response))
+    // .catch((error) => console.error('vk api returned error', error));
+    // document.location.replace(requestURL);
   }
   render() {
     return (
