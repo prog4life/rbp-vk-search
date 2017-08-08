@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 
 const port = process.env.PORT || '7031';
-const hostname = process.env.IP || 'localhost';
+// const hostname = process.env.IP || 'localhost';
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -15,6 +15,6 @@ app.get('/favicon.ico', (req, res) => {
 
 app.set('port', port);
 
-app.listen(port, hostname, () => {
+app.listen(port, () => {
   console.log(`Server is listening at ${app.get('port')} port`);
 });
