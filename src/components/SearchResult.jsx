@@ -9,7 +9,7 @@ function SearchResult({result, number}) {
       <span>{postId} </span>
       <span>{fromId} </span>
       <span>{text} </span>
-      <span>{link}</span>
+      <a href={link} target="_blank">Link to post at wall</a>
     </ListGroupItem>
   );
 }
