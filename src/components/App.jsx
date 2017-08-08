@@ -11,6 +11,8 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
+    this.handleSearch = this.handleSearch.bind(this);
+
     this.state = {
       filterText: '',
       // temporary state part? :
@@ -66,10 +68,13 @@ class App extends React.Component {
     // .catch((error) => console.error('vk api returned error', error));
     // document.location.replace(requestURL);
   }
+  handleSearch(event) {
+    console.log('submit event ', event);
+  }
   render() {
     return (
       <div id="App">
-        <SearchForm />
+        <SearchForm handleSearch={this.handleSearch}/>
         <ResultsPanel header="This is a panel with search results">
           <ResultsFilter filterText={'looking'} />
           <ResultsList results={this.props.results} />

@@ -4,11 +4,15 @@ import {Form, FormGroup, Checkbox, Button, Grid, Row, Col} from 'react-bootstrap
 import FormFieldGroup from './FormFieldGroup';
 
 class SearchForm extends React.Component {
+  onSubmit(event) {
+    event.preventDefault();
 
+    this.props.handleSearch(event);
+  }
   render() {
     return (
       <Grid>
-        <form>
+        <form onSubmit={this.onSubmit}>
           <Row>
             <Col sm={6} lg={4}>
               <FormFieldGroup
@@ -66,6 +70,7 @@ class SearchForm extends React.Component {
               {/* <Button bsStyle="info" disabled={isLoading}>
                     Start Search
                   </Button> */}
+              {/* Perhaps it's reasonable to add type="submit" */}
               <Button bsStyle="info">Start Search</Button>
             </Col>
           </Row>
