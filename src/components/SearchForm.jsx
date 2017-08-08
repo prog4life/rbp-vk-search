@@ -70,8 +70,8 @@ class SearchForm extends React.Component {
               {/* <Button bsStyle="info" disabled={isLoading}>
                     Start Search
                   </Button> */}
-              {/* Perhaps it's reasonable to add type="submit" */}
-              <Button bsStyle="info">Start Search</Button>
+              {/* Pay attention to using type="submit" */}
+              <Button type="submit" bsStyle="info">Start Search</Button>
             </Col>
           </Row>
         </form>
