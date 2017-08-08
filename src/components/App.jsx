@@ -26,11 +26,11 @@ class App extends React.Component {
     //   console.info('localToken ', localToken);
     //   return;
     // }
-    
+
     const hash = document.location.hash.substr(1);
-    
+
     const parsedHash = handleHash(hash);
-    
+
     if (!parsedHash) {
       setInterval(() => {
         console.log('requesting new token');
@@ -38,18 +38,22 @@ class App extends React.Component {
       }, 2000);
       return;
     }
-    
+
     console.info(parsedHash);
 
-    const {access_token, expires_in, user_id} = parsedHash;
-    
-    if(access_token) {
-      let time = new Date();
+    const {
+      access_token: accessToken,
+      expires_in: expiresIn,
+      user_id: userID
+    } = parsedHash;
+
+    if (accessToken) {
+      const time = new Date();
 
       this.setState({
-        accessToken: access_token,
-        tokenExpiresAt: time.setSeconds(time.getSeconds() + expires_in),
-        userID: user_id
+        accessToken,
+        tokenExpiresAt: time.setSeconds(time.getSeconds() + expiresIn),
+        userID
       }, () => console.info(this.state));
     } else {
       console.warn(parsedHash);
