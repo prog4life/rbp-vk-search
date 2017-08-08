@@ -4,6 +4,11 @@ import {Form, FormGroup, Checkbox, Button, Grid, Row, Col} from 'react-bootstrap
 import FormFieldGroup from './FormFieldGroup';
 
 class SearchForm extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.onSubmit = this.onSubmit.bind(this);
+  }
   onSubmit(event) {
     event.preventDefault();
 
