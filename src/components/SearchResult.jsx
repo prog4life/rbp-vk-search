@@ -2,12 +2,13 @@ import React from 'react';
 import {ListGroupItem} from 'react-bootstrap';
 
 function SearchResult({result, number}) {
-  const {content, link} = result;
+  const {postId, fromId, text, link} = result;
 
   return (
     <ListGroupItem>
-      <span>{number}</span>
-      <span>{content}</span>
+      <span>{postId} </span>
+      <span>{fromId} </span>
+      <span>{text} </span>
       <span>{link}</span>
     </ListGroupItem>
   );

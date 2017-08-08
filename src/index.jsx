@@ -10,12 +10,18 @@ import main from './styles/main.css';
 
 const RESULTS = [
   {
-    content: 'some found content',
-    link: 'https://vk.com/wall-4242/post-5252'
+    postId: 37844,
+    fromId: 413870329,
+    text: 'Мне 29 лет симпатичная девушка. Ищу партнёра для интим отношений ' +
+    'только постоянно, за материальную поддержку',
+    link: 'https://vk.com/club75465366?w=wall-75465366_37844%2Fall'
   },
   {
-    content: 'yet another found content',
-    link: 'https://vk.com/wall-4242/post-7081'
+    postId: 37824,
+    fromId: 247772351,
+    text: 'Я ищу спонсора на длительные отношения, я без опыта, полненькая ' +
+    'но не сильно, общительная. Пишите в л/с',
+    link: 'https://vk.com/club75465366?w=wall-75465366_37824%2Fall'
   }
 ];
 

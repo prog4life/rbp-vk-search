@@ -5,7 +5,7 @@
 //   redirectURI: 'https://nameless-sea-73563.herokuapp.com',
 //   scope: 'friends',
 //   responseType: 'token',
-//   apiVersion: 5.62,
+//   apiVersion: 5.67,
 //   state: 55555,
 //   // TODO: choose one
 //   // serverTokenURL: 'https://main-dev2get.c9users.io/auth',
@@ -24,7 +24,7 @@ const display = 'popup';
 const redirectURI = 'https://nameless-sea-73563.herokuapp.com';
 const scope = 'friends';
 const responseType = 'token';
-const apiVersion = 5.62;
+const apiVersion = 5.67;
 const state = 55555;
 // TODO: choose one
 // serverTokenURL: 'https://main-dev2get.c9users.io/auth',

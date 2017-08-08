@@ -22,7 +22,7 @@ function handleNoToken(parsedHash) {
     const errorFromHash = parsedHash.error;
 
     const errorMessage = errorFromHash
-        ? `Token request error: ${errorFromHash}. ${parsedHash.errorDesc}.`
+        ? `Token request error: ${errorFromHash}. ${parsedHash.error_description}.`
         : 'Failed to extract token data from hash';
 // TODO: hidded for testing
     // alert('Authorization failed. Try to reload page later');

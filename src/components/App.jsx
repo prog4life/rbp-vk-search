@@ -20,12 +20,10 @@ class App extends React.Component {
     };
   }
   componentDidMount() {
-    // const localToken = localStorage.getItem('accessToken');
-
-    // if (localToken) {
-    //   console.info('localToken ', localToken);
-    //   return;
-    // }
+    if (this.state.accessToken) {
+      console.info('accessToken ', this.state.accessToken);
+      return;
+    }
 
     const hash = document.location.hash.substr(1);
 
