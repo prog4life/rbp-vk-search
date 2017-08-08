@@ -69,7 +69,8 @@ class App extends React.Component {
     // document.location.replace(requestURL);
   }
   handleSearch(event) {
-    console.log('submit event ', event);
+    console.log('submit event target', event.target);
+    console.log('submit event currentTarget', event.currentTarget);
   }
   render() {
     return (
