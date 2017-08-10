@@ -1,15 +1,24 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
-  entry: './src/index.jsx',
+  entry: [
+    'babel-polyfill',
+    // 'react-hot-loader/patch', // for react-hot-loader
+    './src/index.jsx'
+  ],
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'public')
+    path: path.resolve(__dirname, 'public'),
+    publicPath: '/'
   },
+  plugins: [
+    // new webpack.HotModuleReplacementPlugin()
+  ],
   module: {
     rules: [
       {
-        test: /\.(js|jsx)?$/,
+        test: /\.(js|jsx)$/,
         include: [
           path.resolve(__dirname, 'src')
         ],
@@ -19,7 +28,8 @@ module.exports = {
         ],
         loader: 'babel-loader',
         options: {
-          presets: ['react', 'env']
+          presets: ['react', 'es2015', 'stage-0']
+          // plugins: ['react-hot-loader/babel'] // for react-hot-loader
         }
       },
       {
@@ -49,6 +59,13 @@ module.exports = {
       'node_modules'
     ],
     extensions: ['.js', '.json', '.jsx', '.css']
+  },
+  devServer: {
+    contentBase: path.join(__dirname, 'public'), // or "dist" or "build"
+    compress: true,
+    port: 7031, // 9000, default: 8080
+    // hot: true,
+    clientLogLevel: 'info' // none, error, warning or info (default)
   },
   devtool: 'source-map'
 };

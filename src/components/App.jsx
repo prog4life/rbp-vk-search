@@ -1,24 +1,26 @@
 import React from 'react';
+import fetchJsonp from 'fetch-jsonp';
 
 import SearchForm from './SearchForm';
 import ResultsPanel from './ResultsPanel';
 import ResultsFilter from './ResultsFilter';
 import ResultsList from './ResultsList';
-import vk from '../vk/config';
-import handleHash from '../helpers/url-hash-parser';
+import config from '../vk/config';
+import {parseHash, handleErrorHash} from '../helpers/res-hash-handler';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
 
-    this.handleSearch = this.handleSearch.bind(this);
+    this.handleWallGet = this.handleWallGet.bind(this);
 
     this.state = {
+      results: [],
       filterText: '',
-      // temporary state part? :
+      // temp part of state? :
       accessToken: '',
       tokenExpiresAt: null,
-      userID: null
+      userId: null
     };
   }
   componentDidMount() {
@@ -26,56 +28,75 @@ class App extends React.Component {
       console.info('accessToken ', this.state.accessToken);
       return;
     }
+    // console.info(vk);
 
     const hash = document.location.hash.substr(1);
+    const parsedHash = parseHash(hash);
 
-    const parsedHash = handleHash(hash);
+    // TODO: try pushState or replaceState
+    // document.location.hash = '';
+    history.pushState('', document.title, document.location.pathname);
 
+    // TODO: remove this temp redirect later and try sign in on search start
     if (!parsedHash) {
       setInterval(() => {
-        console.log('requesting new token');
-        document.location.replace(vk.tokenRequestURL);
+        document.location.replace(config.tokenRequestURL);
       }, 2000);
-      return;
     }
 
+    if (parsedHash.access_token) {
+      this.handleIncomingToken(parsedHash);
+    } else if (parsedHash.error) {
+      handleErrorHash(parsedHash);
+    }
+  }
+  handleIncomingToken(parsedHash) {
     console.info(parsedHash);
 
     const {
       access_token: accessToken,
       expires_in: expiresIn,
-      user_id: userID
+      user_id: userId
     } = parsedHash;
+    const time = new Date();
 
-    if (accessToken) {
-      const time = new Date();
-
-      this.setState({
-        accessToken,
-        tokenExpiresAt: time.setSeconds(time.getSeconds() + expiresIn),
-        userID
-      }, () => console.info(this.state));
-    } else {
-      console.warn(parsedHash);
-    }
-
-    // console.info(vk);
-
-    // fetch(requestURL, {
-    //   method: 'GET',
-    //   mode: 'same-origin'
-    // }).then((response) => console.warn('vk api response ', response))
-    // .catch((error) => console.error('vk api returned error', error));
-    // document.location.replace(requestURL);
+    this.setState({
+      accessToken,
+      tokenExpiresAt: time.setSeconds(time.getSeconds() + expiresIn),
+      userId
+    }, () => console.info(this.state));
   }
-  handleSearch(event) {
-    console.log('submit event target', event.target);
-    console.log('submit event currentTarget', event.currentTarget);
+  handleWallGet(inputValues) {
+    console.log(inputValues);
+
+    this.processCallsToAPI(false, 'wall.get', inputValues);
+  }
+  processCallsToAPI(execute, method,  callParams) {
+    const {wallOwner, wallDomain, searchQuery, authorId, searchOffset,
+      postAmount} = callParams;
+    const apiCallUrl = `https://api.vk.com/method/${method}?` +
+      `owner_id=${wallOwner}&domain=${wallDomain}&offset=${searchOffset}` +
+      `&count=${postAmount}&access_token=${this.state.accessToken}` +
+      `&v=${config.apiVersion}`;
+
+    fetchJsonp(apiCallUrl, {
+      // to set custom callback param name (default - callback)
+      // jsonpCallback: 'custom_callback',
+      // to specify custom function name that will be used as callback,
+      // default - jsonp_some-number
+      // jsonpCallbackFunction: 'function_name_of_jsonp_response',
+      // timeout: 3000 // default - 5000
+    })
+    .then((response) => response.json())
+    .then((json) => {
+      console.log('parsed json', json);
+    })
+    .catch((ex) => console.log('parsing failed', ex));
   }
   render() {
     return (
       <div id="App">
-        <SearchForm handleSearch={this.handleSearch}/>
+        <SearchForm handleSearch={this.handleWallGet}/>
         <ResultsPanel header="This is a panel with search results">
           <ResultsFilter filterText={'looking'} />
           <ResultsList results={this.props.results} />

@@ -1,5 +1,6 @@
 import React from 'react';
-import {Form, FormGroup, Checkbox, Button, Grid, Row, Col} from 'react-bootstrap';
+import PropTypes from 'prop-types';
+import {FormGroup, Checkbox, Button, Grid, Row, Col} from 'react-bootstrap';
 
 import FormFieldGroup from './FormFieldGroup';
 
@@ -7,66 +8,112 @@ class SearchForm extends React.Component {
   constructor(props) {
     super(props);
 
-    this.onSubmit = this.onSubmit.bind(this);
-  }
-  onSubmit(event) {
-    event.preventDefault();
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleTextInputChange = this.handleTextInputChange.bind(this);
 
-    this.props.handleSearch(event);
+    this.state = {
+      wallOwner: '',
+      wallDomain: '',
+      searchQuery: '',
+      authorId: '',
+      searchOffset: '',
+      postAmount: ''
+    };
+  }
+  handleSubmit(event) {
+    event.preventDefault();
+    const {wallOwner, wallDomain, searchQuery, authorId, searchOffset,
+      postAmount} = event.target.elements;
+
+    this.props.handleSearch({
+      wallOwner: wallOwner.value,
+      wallDomain: wallDomain.value,
+      searchQuery: searchQuery.value,
+      authorId: authorId.value,
+      searchOffset: searchOffset.value,
+      postAmount: postAmount.value
+    });
+  }
+  handleTextInputChange(event) {
+    this.setState({
+      [event.target.id]: event.target.value
+    }, () => console.info('New searchform state: ', this.state));
   }
   render() {
+    const {wallOwner, wallDomain, searchQuery, authorId, searchOffset,
+      postAmount} = this.state;
+
     return (
       <Grid>
-        <form onSubmit={this.onSubmit}>
+        <form onSubmit={this.handleSubmit}>
           <Row>
+            {/*  TODO: use names instead of id's */}
             <Col sm={6} lg={4}>
               <FormFieldGroup
-                id="wall-owner"
+                onChange={this.handleTextInputChange}
+                id="wallOwner"
                 type="text"
-                label="ID of wall owner (user or group)"
-                placeholder="wall owner id" />
+                value={wallOwner}
+                label="Wall owner id (user or group)"
+                placeholder="wall owner id"
+              />
             </Col>
             <Col sm={6} lg={4}>
               <FormFieldGroup
-                id="wall-domain"
+                onChange={this.handleTextInputChange}
+                id="wallDomain"
                 type="text"
-                label="Short name of wall owner (instead of ID)"
-                placeholder="wall owner textual id" />
+                value={wallDomain}
+                label="Short name of wall owner (instead of id)"
+                placeholder="wall owner textual id"
+              />
             </Col>
             <Col sm={6} lg={4}>
               <FormFieldGroup
-                id="search-query"
+                onChange={this.handleTextInputChange}
+                id="searchQuery"
                 type="text"
+                value={searchQuery}
                 label="Text to search in post (optional, disabled)"
                 placeholder="text to search"
-                disabled={true} />
+                disabled
+              />
             </Col>
             <Col sm={6} lg={4}>
               <FormFieldGroup
-                id="author-id"
+                onChange={this.handleTextInputChange}
+                id="authorId"
                 type="text"
-                label="ID of author, which posts search for (required)"
+                value={authorId}
+                label="Post author id, which posts to search (required)"
                 placeholder="post author id"
-                required={true} />
+                required
+              />
             </Col>
             <Col sm={6} lg={4}>
               <FormFieldGroup
-                id="search-offset"
+                onChange={this.handleTextInputChange}
+                id="searchOffset"
                 type="text"
+                value={searchOffset}
                 label="Show posts starting from this number of result"
-                placeholder="start from post number" />
+                placeholder="start from post number"
+              />
             </Col>
             <Col sm={6} lg={4}>
               <FormFieldGroup
-                id="post-amount"
+                onChange={this.handleTextInputChange}
+                id="postAmount"
                 type="text"
+                value={postAmount}
                 label="Amount of search results to show"
-                placeholder="number of results" />
+                placeholder="number of results"
+              />
             </Col>
             <Col xs={8} sm={6} md={8}>
-              <FormGroup controlId="only-owner">
-                <Checkbox readOnly disabled={true}>
-                  Search among owner's posts only
+              <FormGroup controlId="onlyOwner">
+                <Checkbox readOnly disabled>
+                  Search among owner{'\''}s posts only
                 </Checkbox>
               </FormGroup>
             </Col>
@@ -76,7 +123,9 @@ class SearchForm extends React.Component {
                     Start Search
                   </Button> */}
               {/* Pay attention to using type="submit" */}
-              <Button type="submit" bsStyle="info">Start Search</Button>
+              <Button type="submit" bsStyle="info">
+                Start Search
+              </Button>
             </Col>
           </Row>
         </form>
@@ -86,3 +135,7 @@ class SearchForm extends React.Component {
 }
 
 export default SearchForm;
+
+SearchForm.propTypes = {
+  handleSearch: PropTypes.func.isRequired
+};

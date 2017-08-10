@@ -1,9 +1,11 @@
 import React from 'react';
-import {FormGroup, FormControl, ControlLabel} from 'react-bootstrap';
+import PropTypes from 'prop-types';
+import {FormGroup, FormControl, ControlLabel, HelpBlock} from 'react-bootstrap';
 
 // function FormFieldGroup({ id, label, help, ...props }) {
 function FormFieldGroup(props) {
-  const { id, label, help, type, placeholder, disabled, required } = props;
+  const {id, label, help, type, placeholder, disabled, required, value,
+    onChange} = props;
 
   return (
     <FormGroup controlId={id}>
@@ -11,9 +13,9 @@ function FormFieldGroup(props) {
       {/* <FormControl {...props} /> */}
       <FormControl
         type={type}
-        // value={}
+        value={value}
         placeholder={placeholder}
-        // onChange={null}
+        onChange={onChange}
         disabled={disabled || null}
         required={required || null} />
       {help && <HelpBlock>{help}</HelpBlock>}
@@ -24,14 +26,7 @@ function FormFieldGroup(props) {
   //   <FormGroup controlId={id}>
   //     <Col md={4}>
   //       <ControlLabel>{label}</ControlLabel>
-  //       {/* <FormControl {...props} /> */}
-  //       <FormControl
-  //         type={type}
-  //         // value={}
-  //         placeholder={placeholder}
-  //         // onChange={null}
-  //         disabled={disabled || null}
-  //         required={required || null} />
+  //       <FormControl {...props} />
   //       {help && <HelpBlock>{help}</HelpBlock>}
   //     </Col>
   //   </FormGroup>
@@ -43,14 +38,7 @@ function FormFieldGroup(props) {
   //       {label}
   //     </Col>
   //     <Col sm={5}>
-  //       {/* <FormControl {...props} /> */}
-  //       <FormControl
-  //         type={type}
-  //         // value={}
-  //         placeholder={placeholder}
-  //         // onChange={null}
-  //         disabled={disabled || null}
-  //         required={required || null} />
+  //       <FormControl {...props} />
   //     </Col>
   //     {help && <HelpBlock>{help}</HelpBlock>}
   //   </FormGroup>
@@ -59,15 +47,21 @@ function FormFieldGroup(props) {
 
 export default FormFieldGroup;
 
-// <FormGroup> will already serve as a grid row in a horizontal form
+FormFieldGroup.propTypes = {
+  id: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  help: PropTypes.any,
+  type: PropTypes.string.isRequired,
+  placeholder: PropTypes.string,
+  disabled: PropTypes.boolean,
+  required: PropTypes.boolean,
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired
+};
 
-// Uses controlId from <FormGroup> if not explicitly specified:
-// <FormControl
-//   type="text"
-//   value={this.state.value}
-//   placeholder="Enter text"
-//   onChange={this.handleChange}
-// />
+// <FormGroup> will already serve as a grid row in a <Form horizontal>
+
+// FormControl will get controlId from <FormGroup> if not explicitly specified
 
 // <FormGroup controlId={id} validationState={this.getValidationState}>
 

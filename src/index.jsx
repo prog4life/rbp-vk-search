@@ -13,7 +13,7 @@ const RESULTS = [
     postId: 37844,
     fromId: 413870329,
     text: 'Мне 29 лет симпатичная девушка. Ищу партнёра для интим отношений ' +
-    'только постоянно, за материальную поддержку',
+    'только постоянного, за материальную поддержку',
     link: 'https://vk.com/club75465366?w=wall-75465366_37844%2Fall'
   },
   {
@@ -25,4 +25,18 @@ const RESULTS = [
   }
 ];
 
-ReactDOM.render(<App results={RESULTS}/>, document.getElementById('root'));
+ReactDOM.render(<App results={RESULTS} />, document.getElementById('root'));
+
+// for react-hot-loader
+// if (module.hot) {
+//   module.hot.accept('./components/App', () => {
+//     const App = require('./components/App').default;
+//
+//     ReactDOM.render(
+//       <AppContainer>
+//         <App/>
+//       </AppContainer>,
+//       document.getElementById('root')
+//     );
+//   });
+// }
