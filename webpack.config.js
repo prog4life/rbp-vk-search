@@ -41,6 +41,21 @@ module.exports = {
         ]
       },
       {
+        test: /\.scss$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              includePaths: [
+                path.resolve(__dirname, 'src/styles')
+              ]
+            }
+          }
+        ]
+      },
+      {
         test: /\.woff($|\?)|\.woff2($|\?)|\.ttf($|\?)|\.eot($|\?)|\.svg($|\?)/,
         loader: 'url-loader'
       }
@@ -58,7 +73,7 @@ module.exports = {
       path.resolve(__dirname, 'src'),
       'node_modules'
     ],
-    extensions: ['.js', '.json', '.jsx', '.css']
+    extensions: ['.js', '.json', '.jsx', '.css', 'scss', '*']
   },
   devServer: {
     contentBase: path.join(__dirname, 'public'), // or "dist" or "build"

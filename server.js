@@ -30,10 +30,9 @@ app.get('/favicon.ico', (req, res) => {
 
 app.set('port', port);
 
-app.listen(port, (error) => {
-  if (error) {
-    console.error(error);
-    return;
-  }
+app.listen(port, () => {
   console.log(`Server is up at http://localhost:${app.get('port')}`);
+})
+.on('error', (error) => {
+  console.log(error);
 });
