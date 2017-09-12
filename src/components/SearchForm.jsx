@@ -113,7 +113,7 @@ class SearchForm extends React.Component {
             <Col xs={8} sm={6} md={8}>
               <FormGroup controlId="onlyOwner">
                 <Checkbox readOnly disabled>
-                  Search among owner{'\''}s posts only
+                  Search among owner{"'"}s posts only
                 </Checkbox>
               </FormGroup>
             </Col>
@@ -122,7 +122,6 @@ class SearchForm extends React.Component {
               {/* <Button bsStyle="info" disabled={isLoading}>
                     Start Search
                   </Button> */}
-              {/* Pay attention to using type="submit" */}
               <Button type="submit" bsStyle="info">
                 Start Search
               </Button>

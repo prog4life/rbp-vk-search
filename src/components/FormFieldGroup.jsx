@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {FormGroup, FormControl, ControlLabel, HelpBlock} from 'react-bootstrap';
+import {FormGroup, FormControl, ControlLabel} from 'react-bootstrap';
 
 // function FormFieldGroup({ id, label, help, ...props }) {
 function FormFieldGroup(props) {
-  const {id, label, help, type, placeholder, disabled, required, value,
-    onChange} = props;
+  const {id, label, type, placeholder, disabled, required, value, onChange} =
+    props;
 
   return (
     <FormGroup controlId={id}>
@@ -16,9 +16,10 @@ function FormFieldGroup(props) {
         value={value}
         placeholder={placeholder}
         onChange={onChange}
-        disabled={disabled || null}
-        required={required || null} />
-      {help && <HelpBlock>{help}</HelpBlock>}
+        disabled={disabled}
+        required={required}
+      />
+      {/* {help && <HelpBlock>{help}</HelpBlock>} */}
     </FormGroup>
   );
 
@@ -48,15 +49,21 @@ function FormFieldGroup(props) {
 export default FormFieldGroup;
 
 FormFieldGroup.propTypes = {
+  disabled: PropTypes.bool,
   id: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
-  help: PropTypes.any,
-  type: PropTypes.string.isRequired,
+  // help: PropTypes.any,
+  onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
-  disabled: PropTypes.boolean,
-  required: PropTypes.boolean,
-  value: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired
+  required: PropTypes.bool,
+  type: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired
+};
+
+FormFieldGroup.defaultProps = {
+  disabled: false,
+  placeholder: '',
+  required: false
 };
 
 // <FormGroup> will already serve as a grid row in a <Form horizontal>
