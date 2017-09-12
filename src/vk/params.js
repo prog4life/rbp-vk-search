@@ -21,7 +21,7 @@ const display = 'popup';
 const redirectURI = 'http://localhost:7031';
 const scope = 'friends';
 const responseType = 'token';
-const apiVersion = 5.67;
+const apiVersion = 5.68;
 const state = 55555;
 // serverTokenURL: 'https://nameless-sea-73563.herokuapp.com/auth',
 const tokenRequestURL =
@@ -30,7 +30,7 @@ const tokenRequestURL =
   `scope=${scope}&response_type=${responseType}&` +
   `v=${apiVersion}&state=${state}`;
 
-const config = {
+const init = {
   clientID,
   display,
   redirectURI,
@@ -41,4 +41,4 @@ const config = {
   tokenRequestURL
 };
 
-export default config;
+export default init;

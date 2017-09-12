@@ -15,8 +15,8 @@ export function parseHash(hash) {
     const [key, value] = chunk.split('=');
 
     // TODO: consider saving empty string value
-    if (!key || !value) {
-      return false;
+    if (!key || value.length < 1) {
+      return;
     }
     result[key] = value;
   });

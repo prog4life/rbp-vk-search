@@ -5,7 +5,7 @@ import SearchForm from './SearchForm';
 import ResultsPanel from './ResultsPanel';
 import ResultsFilter from './ResultsFilter';
 import ResultsList from './ResultsList';
-import config from '../vk/config';
+import init from '../vk/params';
 import {parseHash, handleErrorHash} from '../helpers/res-hash-handler';
 
 class App extends React.Component {
@@ -25,7 +25,8 @@ class App extends React.Component {
   }
   componentDidMount() {
     if (this.state.accessToken) {
-      console.info('accessToken ', this.state.accessToken);
+      // TODO: check if token expires
+      console.info('accessToken is already present: ', this.state.accessToken);
       return;
     }
     // console.info(vk);
@@ -40,7 +41,7 @@ class App extends React.Component {
     // TODO: remove this temp redirect later and try sign in on search start
     if (!parsedHash) {
       setInterval(() => {
-        document.location.replace(config.tokenRequestURL);
+        document.location.replace(init.tokenRequestURL);
       }, 2000);
     }
 
@@ -71,13 +72,13 @@ class App extends React.Component {
 
     this.processCallsToAPI(false, 'wall.get', inputValues);
   }
-  processCallsToAPI(execute, method,  callParams) {
+  processCallsToAPI(execute, method, callParams) {
     const {wallOwner, wallDomain, searchQuery, authorId, searchOffset,
       postAmount} = callParams;
     const apiCallUrl = `https://api.vk.com/method/${method}?` +
       `owner_id=${wallOwner}&domain=${wallDomain}&offset=${searchOffset}` +
       `&count=${postAmount}&access_token=${this.state.accessToken}` +
-      `&v=${config.apiVersion}`;
+      `&v=${init.apiVersion}`;
 
     fetchJsonp(apiCallUrl, {
       // to set custom callback param name (default - callback)
@@ -96,7 +97,7 @@ class App extends React.Component {
   render() {
     return (
       <div id="App">
-        <SearchForm handleSearch={this.handleWallGet}/>
+        <SearchForm onSearch={this.handleWallGet} />
         <ResultsPanel header="This is a panel with search results">
           <ResultsFilter filterText={'looking'} />
           <ResultsList results={this.props.results} />

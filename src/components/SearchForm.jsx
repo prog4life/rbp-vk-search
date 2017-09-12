@@ -25,7 +25,7 @@ class SearchForm extends React.Component {
     const {wallOwner, wallDomain, searchQuery, authorId, searchOffset,
       postAmount} = event.target.elements;
 
-    this.props.handleSearch({
+    this.props.onSearch({
       wallOwner: wallOwner.value,
       wallDomain: wallDomain.value,
       searchQuery: searchQuery.value,
@@ -136,5 +136,5 @@ class SearchForm extends React.Component {
 export default SearchForm;
 
 SearchForm.propTypes = {
-  handleSearch: PropTypes.func.isRequired
+  onSearch: PropTypes.func.isRequired
 };
