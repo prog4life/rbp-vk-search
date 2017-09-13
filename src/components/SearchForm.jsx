@@ -17,13 +17,13 @@ class SearchForm extends React.Component {
       searchQuery: '',
       authorId: '',
       searchOffset: '',
-      postAmount: ''
+      postsAmount: ''
     };
   }
   handleSubmit(event) {
     event.preventDefault();
     const {wallOwner, wallDomain, searchQuery, authorId, searchOffset,
-      postAmount} = event.target.elements;
+      postsAmount} = event.target.elements;
 
     this.props.onSearch({
       wallOwner: wallOwner.value,
@@ -31,7 +31,7 @@ class SearchForm extends React.Component {
       searchQuery: searchQuery.value,
       authorId: authorId.value,
       searchOffset: searchOffset.value,
-      postAmount: postAmount.value
+      postsAmount: postsAmount.value
     });
   }
   handleTextInputChange(event) {
@@ -41,7 +41,7 @@ class SearchForm extends React.Component {
   }
   render() {
     const {wallOwner, wallDomain, searchQuery, authorId, searchOffset,
-      postAmount} = this.state;
+      postsAmount} = this.state;
 
     return (
       <Grid>
@@ -103,9 +103,9 @@ class SearchForm extends React.Component {
             <Col sm={6} lg={4}>
               <FormFieldGroup
                 onChange={this.handleTextInputChange}
-                id="postAmount"
+                id="postsAmount"
                 type="text"
-                value={postAmount}
+                value={postsAmount}
                 label="Amount of search results to show"
                 placeholder="number of results"
               />
