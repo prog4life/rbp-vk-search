@@ -5,8 +5,8 @@ import SearchForm from './SearchForm';
 import ResultsPanel from './ResultsPanel';
 import ResultsFilter from './ResultsFilter';
 import ResultsList from './ResultsList';
-import init from '../vk/params';
-import {parseHash, handleErrorHash} from '../helpers/res-hash-handler';
+import init from '../api/vk';
+import {parseHash, handleErrorHash} from '../utils/res-hash-handler';
 
 class App extends React.Component {
   constructor(props) {
