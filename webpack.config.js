@@ -5,7 +5,7 @@ module.exports = {
   entry: [
     'babel-polyfill',
     // 'react-hot-loader/patch', // for react-hot-loader
-    './src/index.jsx'
+    './src/index.js'
   ],
   output: {
     filename: 'bundle.js',
@@ -67,7 +67,7 @@ module.exports = {
   },
   resolve: {
     alias: {
-      App: path.resolve(__dirname, 'src/components/App.jsx')
+      App: path.resolve(__dirname, 'src/components/App.js')
     },
     modules: [
       path.resolve(__dirname, 'src'),
