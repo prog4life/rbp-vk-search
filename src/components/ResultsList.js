@@ -1,5 +1,6 @@
 import React from 'react';
 import {ListGroup} from 'react-bootstrap';
+import uuidv1 from 'uuid/v1';
 import SearchResult from './SearchResult';
 
 function ResultsList({results}) {
@@ -7,8 +8,15 @@ function ResultsList({results}) {
 
   return (
     <ListGroup>
-      <SearchResult number="1" result={result1} />
-      <SearchResult number="2" result={result2} />
+      {/* <SearchResult number="1" result={result1} /> */}
+      {/* <SearchResult number="2" result={result2} /> */}
+      {results.map((result, index) => (
+        <SearchResult
+          key={uuidv1()}
+          number={++index}
+          result={result}
+        />
+      ))}
     </ListGroup>
   );
 }

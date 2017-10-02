@@ -15,7 +15,15 @@ class App extends React.Component {
     this.handleWallGet = this.handleWallGet.bind(this);
 
     this.state = {
-      results: [],
+      results: [
+        {
+          date: 132357458,
+          from_id: 247772351,
+          text: 'Я ищу спонсора на длительные отношения, я без опыта, ' +
+          'полненькая но не сильно, общительная. Пишите в л/с',
+          link: 'https://vk.com/club75465366?w=wall-75465366_37824%2Fall'
+        }
+      ],
       filterText: '',
       // temp part of state? :
       accessToken: '',
@@ -82,7 +90,7 @@ class App extends React.Component {
 
     this.findUserPosts(inputValues);
   }
-  processCallsToAPI(execute, apiCallUrl) {
+  processCallsToAPI(apiCallUrl) {
     console.log('api call url: ', apiCallUrl);
 
     return fetchJsonp(apiCallUrl, {
@@ -100,14 +108,19 @@ class App extends React.Component {
     //   console.log('response from parsed json', responseData);
     //   return responseData;
     // })
-    .catch((ex) => console.log('parsing failed', ex));
+    .catch((ex) => {
+      console.log('parsing failed', ex, 'ex name ', ex.name);
+      // TODO: resolve, executes at the end
+      return this.processCallsToAPI(apiCallUrl);
+    });
   }
   findUserPosts(inputValues) {
-    let searchResult = [];
+    let searchResults = [];
     let {postsAmount} = inputValues;
     let offset = 0;
-    let overall = 100;
-    const {wallOwner, wallDomain, searchQuery, authorId} = inputValues;
+    let total = 1000;
+    const authorId = Number(inputValues.authorId);
+    const {wallOwner, wallDomain, searchQuery} = inputValues;
     const apiCallUrl = `https://api.vk.com/method/wall.get?` +
       `owner_id=${wallOwner}&domain=${wallDomain}&count=100` +
       `&access_token=${this.state.accessToken}` +
@@ -116,37 +129,45 @@ class App extends React.Component {
 
     postsAmount = postsAmount || 10;
 
+    // NOTE: for situation when user press "Start Search" button again
+    clearInterval(this.userPostSearchIntervalId);
     // TODO: create external handler func and pass it to setInterval;
     // consider collecting all posts at first or some amount of posts and
     // search among them at the intervals end
     this.userPostSearchIntervalId = setInterval(() => {
-      if (searchResult.length < postsAmount && offset < overall) {
+      if (searchResults.length < postsAmount && offset < total) {
         const tempApiCallUrl = `${apiCallUrl}&offset=${offset}`;
 
-        this.processCallsToAPI(false, tempApiCallUrl)
+        this.processCallsToAPI(tempApiCallUrl)
         .then((resJSON) => {
           const responseData = resJSON.response;
           // TODO: add stop condition when no more data
           // if (responseData.items.length = 0) {
-          //   overall = 0:
+          //   total = 0:
           // }
-          const searchResultChunk = responseData.items.filter((item) => {
-            // TODO: convert to number outside of interval func
-            return item.from_id === Number(authorId);
+          const searchResultsChunk = responseData.items.filter((item) => {
+            return item.from_id === authorId;
           });
+
           // TODO: add only if not empty
-          searchResult = searchResult.concat(searchResultChunk);
+          searchResults = searchResults.concat(searchResultsChunk);
+          this.setState({
+            results: searchResultsChunk.length > 0
+              ? searchResults
+              : this.state.results
+          });
           console.log('response from parsed json ', responseData);
-          console.log('searchResultChunk ', searchResultChunk);
-          offset += 100;
-          overall = responseData.count;
+          console.log('searchResultsChunk ', searchResultsChunk);
+          total = responseData.count;
         })
         .catch((err) => console.warn(err));
+
+        offset += 100;
         return;
       }
-      // searchResult.length = 10; // FIXME: cut excess results
+      // searchResults.length = 10; // FIXME: cut excess results
       clearInterval(this.userPostSearchIntervalId);
-      console.log('userPostSearchResult: ', searchResult);
+      console.log('userPostSearchResults: ', searchResults);
     }, 500);
   }
   render() {
@@ -155,7 +176,7 @@ class App extends React.Component {
         <SearchForm onSearch={this.handleWallGet} />
         <ResultsPanel header="This is a panel with search results">
           <ResultsFilter filterText={'looking'} />
-          <ResultsList results={this.props.results} />
+          <ResultsList results={this.state.results} />
         </ResultsPanel>
       </div>
     );
