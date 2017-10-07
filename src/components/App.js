@@ -1,4 +1,5 @@
 import React from 'react';
+import {connect} from 'react-redux';
 import fetchJsonp from 'fetch-jsonp';
 
 import SearchForm from './SearchForm';
@@ -7,6 +8,7 @@ import ResultsFilter from './ResultsFilter';
 import ResultsList from './ResultsList';
 import init from '../api/vk';
 import {parseHash, handleErrorHash} from '../utils/res-hash-handler';
+import * as actions from '../actions/AuthActions';
 
 class App extends React.Component {
   constructor(props) {
@@ -69,11 +71,13 @@ class App extends React.Component {
     } = parsedHash;
     const time = new Date();
 
-    this.setState({
-      accessToken,
-      tokenExpiresAt: time.setSeconds(time.getSeconds() + expiresIn),
-      userId
-    }, () => console.info('New state after handling inc token: ', this.state));
+    // this.setState({
+    //   accessToken,
+    //   tokenExpiresAt: time.setSeconds(time.getSeconds() + expiresIn),
+    //   userId
+    // }, () => console.info('New state after handling inc token: ', this.state));
+
+
   }
   handleWallGet(inputValues) {
     console.log(inputValues);
@@ -183,4 +187,12 @@ class App extends React.Component {
   }
 }
 
-export default App;
+function mapState(state) {
+  return {
+    accessToken: state.accessToken,
+    // tokenExpiresAt: state.tokenExpiresAt,
+    userId: state.userId
+  }
+}
+
+export default connect()(App);

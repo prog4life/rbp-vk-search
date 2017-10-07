@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {Provider} from 'react-redux';
+// import {AppContainer} from 'react-hot-loader';
 import App from 'App';
+import configureStore from 'store/configureStore';
 
 // import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -25,7 +28,12 @@ const RESULTS = [
   }
 ];
 
-ReactDOM.render(<App results={RESULTS} />, document.getElementById('root'));
+ReactDOM.render(
+  <Provider store={configureStore()}>
+    <App results={RESULTS} />
+  </Provider>,
+  document.getElementById('root')
+);
 
 // for react-hot-loader
 // if (module.hot) {
@@ -34,7 +42,9 @@ ReactDOM.render(<App results={RESULTS} />, document.getElementById('root'));
 //
 //     ReactDOM.render(
 //       <AppContainer>
-//         <App/>
+//         <Provider store={configureStore()}>
+//           <App results={RESULTS} />
+//         </Provider>
 //       </AppContainer>,
 //       document.getElementById('root')
 //     );
