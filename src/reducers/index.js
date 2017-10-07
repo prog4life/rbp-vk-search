@@ -5,7 +5,7 @@ import {tokenReducer, userIdReducer} from './auth';
 // exporting of rootReducer
 export default combineReducers({
   accessToken: tokenReducer,
-  // tokenExpiresAt: tokenReducer,
+  tokenExpiresAt: tokenReducer,
   userId: userIdReducer
   // results: resultsReducer
 });

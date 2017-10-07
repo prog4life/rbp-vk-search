@@ -13,24 +13,28 @@ import main from './styles/main.css';
 
 const RESULTS = [
   {
-    postId: 37844,
-    fromId: 413870329,
+    date: 1582357458,
+    from_id: 413870329,
     text: 'Мне 29 лет симпатичная девушка. Ищу партнёра для интим отношений ' +
     'только постоянного, за материальную поддержку',
     link: 'https://vk.com/club75465366?w=wall-75465366_37844%2Fall'
   },
   {
-    postId: 37824,
-    fromId: 247772351,
-    text: 'Я ищу спонсора на длительные отношения, я без опыта, полненькая ' +
-    'но не сильно, общительная. Пишите в л/с',
+    date: 132357458,
+    from_id: 247772351,
+    text: 'Я ищу спонсора на длительные отношения, я без опыта, ' +
+    'полненькая но не сильно, общительная. Пишите в л/с',
     link: 'https://vk.com/club75465366?w=wall-75465366_37824%2Fall'
   }
 ];
 
+const store = configureStore({
+  results: RESULTS
+});
+
 ReactDOM.render(
-  <Provider store={configureStore()}>
-    <App results={RESULTS} />
+  <Provider store={store}>
+    <App />
   </Provider>,
   document.getElementById('root')
 );
@@ -43,7 +47,7 @@ ReactDOM.render(
 //     ReactDOM.render(
 //       <AppContainer>
 //         <Provider store={configureStore()}>
-//           <App results={RESULTS} />
+//           <App />
 //         </Provider>
 //       </AppContainer>,
 //       document.getElementById('root')
