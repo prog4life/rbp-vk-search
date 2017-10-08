@@ -3,6 +3,11 @@ const path = require('path');
 const express = require('express');
 const app = express();
 
+/* alternative to in-package.json's "npm run remotedev" solution:
+const remotedev = require('remotedev-server');
+remotedev({ hostname: 'localhost', port: 8000 }); 
+*/
+
 // const webpack = require('webpack');
 // const webpackDevMiddleware = require('webpack-dev-middleware');
 // const webpackHotMiddleware = require('webpack-hot-middleware');

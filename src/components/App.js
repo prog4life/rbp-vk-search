@@ -35,6 +35,7 @@ class App extends React.Component {
     // };
   }
   componentDidMount() {
+    /* eslint max-statements: 0 */
     if (this.props.accessToken) {
       // TODO: check if token expires
       console.info('accessToken is already present: ', this.props.accessToken);
@@ -100,11 +101,11 @@ class App extends React.Component {
     //   `&v=${initialConfig.apiVersion}` +
     //   `&extended=1`;
     //
-    // this.processCallsToAPI(false, apiCallUrl);
+    // this.makeCallToAPI(false, apiCallUrl);
 
     this.findUserPosts(inputValues);
   }
-  processCallsToAPI(apiCallUrl) {
+  makeCallToAPI(apiCallUrl) {
     console.log('api call url: ', apiCallUrl);
 
     return fetchJsonp(apiCallUrl, {
@@ -125,7 +126,7 @@ class App extends React.Component {
     .catch((ex) => {
       console.log('parsing failed', ex, 'ex name ', ex.name);
       // TODO: resolve, executes at the end
-      return this.processCallsToAPI(apiCallUrl);
+      return this.makeCallToAPI(apiCallUrl);
     });
   }
   findUserPosts(inputValues) {
@@ -152,7 +153,7 @@ class App extends React.Component {
       if (searchResults.length < postsAmount && offset < total) {
         const tempApiCallUrl = `${apiCallUrl}&offset=${offset}`;
 
-        this.processCallsToAPI(tempApiCallUrl)
+        this.makeCallToAPI(tempApiCallUrl)
         .then((resJSON) => {
           const responseData = resJSON.response;
           // TODO: add stop condition when no more data
@@ -205,7 +206,8 @@ function mapState(state) {
     results: state.results
   };
 }
-
+// NOTE: wrap each action creator into a dispatch call, to be invoked directly
+// witthout using this.props.dispatch(actions.actionName());
 function mapDispatch(dispatch) {
   return {
     actions: bindActionCreators(AuthActions, dispatch)

@@ -13,8 +13,23 @@ module.exports = {
     publicPath: '/'
   },
   plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development')
+      }
+    })
     // new webpack.HotModuleReplacementPlugin()
   ],
+  resolve: {
+    alias: {
+      App: path.resolve(__dirname, 'src/components/App.js')
+    },
+    modules: [
+      path.resolve(__dirname, 'src'),
+      'node_modules'
+    ],
+    extensions: ['.js', '.json', '.jsx', '.css', 'scss', '*']
+  },
   module: {
     rules: [
       {
@@ -64,16 +79,6 @@ module.exports = {
       //   loader: 'url-loader?limit=100000@name=[name][ext]'
       // }
     ]
-  },
-  resolve: {
-    alias: {
-      App: path.resolve(__dirname, 'src/components/App.js')
-    },
-    modules: [
-      path.resolve(__dirname, 'src'),
-      'node_modules'
-    ],
-    extensions: ['.js', '.json', '.jsx', '.css', 'scss', '*']
   },
   devServer: {
     contentBase: path.join(__dirname, 'public'), // or "dist" or "build"
