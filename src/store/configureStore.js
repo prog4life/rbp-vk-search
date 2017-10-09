@@ -2,8 +2,8 @@ import {createStore, compose, applyMiddleware} from 'redux';
 import thunk from 'redux-thunk';
 import rootReducer from '../reducers';
 // to use with Chrome Extension 
-// import {composeWithDevtools} from 'redux-devtools-extension';
-import {composeWithDevtools} from 'remote-redux-devtools';
+// import {composeWithDevTools} from 'redux-devtools-extension';
+import {composeWithDevTools} from 'remote-redux-devtools';
 
 export default (preloadedState = {}) => {
   /* eslint-disable no-underscore-dangle */
@@ -18,14 +18,14 @@ export default (preloadedState = {}) => {
   /* eslint-enable */
 
   // devTools options object is optional, without it replace "composeEnhancers"
-  // call with "composeWithDevtools"
-  const composeEnhancers = composeWithDevtools({
-    realtime: true, // instead of setting process.env.NODE_ENV as 'development'
-    // required if using remotedev-server 
-    port: 8031, // the port your remotedev server is running at
+  // call with "composeWithDevTools"
+  const composeEnhancers = composeWithDevTools({
+    realtime: true, // if process.env.NODE_ENV not set as 'development'
+    // required to use local "remotedev-server", OR use remotedev.io/local alt
+    // set same port in any monitor app (browser/Atom/VS Code extension)
+    port: 8031 // the port local "remotedev-server" is running at
   });
 
-  // if using 'redux-devtools-extension' package:
   const store = createStore(rootReducer, preloadedState, composeEnhancers(
     applyMiddleware(thunk)
   ));

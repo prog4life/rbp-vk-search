@@ -6,7 +6,6 @@ import {resultsReducer} from './search';
 // exporting of rootReducer
 export default combineReducers({
   userId: userIdReducer,
-  accessToken: tokenReducer,
-  tokenExpiresAt: tokenReducer,
+  tokenData: tokenReducer,
   results: resultsReducer
 });

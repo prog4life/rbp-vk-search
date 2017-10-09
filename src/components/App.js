@@ -2,6 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import fetchJsonp from 'fetch-jsonp';
+import PropTypes from 'prop-types';
 
 import SearchForm from './SearchForm';
 import ResultsPanel from './ResultsPanel';
@@ -36,9 +37,9 @@ class App extends React.Component {
   }
   componentDidMount() {
     /* eslint max-statements: 0 */
-    if (this.props.accessToken) {
+    if (this.props.tokenData.token) {
       // TODO: check if token expires
-      console.info('accessToken is already present: ', this.props.accessToken);
+      console.info('accessToken is already present: ', this.props.tokenData.token);
       return;
     }
     // console.info(vk);
@@ -74,21 +75,20 @@ class App extends React.Component {
 
     const {
       setUserId,
-      saveNewAccessToken,
-      setTokenExpiry
+      saveAccessTokenData
     } = this.props.actions;
 
-    const time = new Date();
+    const date = new Date();
+    const expiry = date.setSeconds(date.getSeconds() + expiresIn);
 
     // this.setState({
     //   accessToken,
-    //   tokenExpiresAt: time.setSeconds(time.getSeconds() + expiresIn),
+    //   tokenExpiresAt: date.setSeconds(date.getSeconds() + expiresIn),
     //   userId
     // }, () => console.info('New state after handling inc token: ', this.state));
 
     setUserId(userId);
-    saveNewAccessToken(accessToken);
-    setTokenExpiry(time.setSeconds(time.getSeconds() + expiresIn));
+    saveAccessTokenData(accessToken, expiry);
   }
   handleWallGet(inputValues) {
     console.log(inputValues);
@@ -138,7 +138,7 @@ class App extends React.Component {
     const {wallOwner, wallDomain, searchQuery} = inputValues;
     const apiCallUrl = `https://api.vk.com/method/wall.get?` +
       `owner_id=${wallOwner}&domain=${wallDomain}&count=100` +
-      `&access_token=${this.state.accessToken}` +
+      `&access_token=${this.state.tokenData.token}` +
       `&v=${initialConfig.apiVersion}` +
       `&extended=1`;
 
@@ -190,7 +190,7 @@ class App extends React.Component {
       <div id="App">
         <SearchForm onSearch={this.handleWallGet} />
         <ResultsPanel header="This is a panel with search results">
-          <ResultsFilter filterText={'looking'} />
+          <ResultsFilter filterText="Here will be filter text" />
           <ResultsList results={this.props.results} />
         </ResultsPanel>
       </div>
@@ -201,8 +201,7 @@ class App extends React.Component {
 function mapState(state) {
   return {
     userId: state.userId,
-    accessToken: state.accessToken,
-    tokenExpiresAt: state.tokenExpiresAt,
+    tokenData: state.tokenData,
     results: state.results
   };
 }
@@ -215,3 +214,12 @@ function mapDispatch(dispatch) {
 }
 
 export default connect(mapState, mapDispatch)(App);
+
+App.propTypes = {
+  actions: PropTypes.objectOf(PropTypes.func).isRequired,
+  results: PropTypes.arrayOf(PropTypes.object).isRequired,
+  tokenData: PropTypes.shape({
+    token: PropTypes.string,
+    expiresAt: PropTypes.number
+  }).isRequired
+};
