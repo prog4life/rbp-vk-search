@@ -1,9 +1,10 @@
 export function resultsReducer(state = [], action) {
   switch (action.type) {
-    case 'ADD_RESULT':
-      return {
-        ...action.result
-      };
+    case 'ADD_RESULTS':
+      return [
+        ...state,
+        ...action.results
+      ];
     default:
       return state;
   }

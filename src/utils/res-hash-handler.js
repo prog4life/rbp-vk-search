@@ -29,5 +29,5 @@ export function parseHash(hash) {
 export function handleErrorHash({error, error_description}) {
   const errorMessage = `Token request error: ${error}. ${error_description}.`;
 
-  throw new Error(errorMessage);
+  console.error(errorMessage);
 }

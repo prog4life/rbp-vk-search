@@ -8,15 +8,15 @@ import SearchForm from './SearchForm';
 import ResultsPanel from './ResultsPanel';
 import ResultsFilter from './ResultsFilter';
 import ResultsList from './ResultsList';
-import initialConfig from '../api/vk';
+import initialConfig from '../api/initial';
 import {parseHash, handleErrorHash} from '../utils/res-hash-handler';
-import * as AuthActions from '../actions/AuthActions';
+import * as allActions from '../actions';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
 
-    this.handleWallGet = this.handleWallGet.bind(this);
+    this.handleUserPostsSearch = this.handleUserPostsSearch.bind(this);
 
     // this.state = {
     //   results: [
@@ -42,7 +42,6 @@ class App extends React.Component {
       console.info('accessToken is already present: ', this.props.tokenData.token);
       return;
     }
-    // console.info(vk);
 
     const hash = document.location.hash.substr(1);
     const parsedHash = parseHash(hash);
@@ -81,29 +80,8 @@ class App extends React.Component {
     const date = new Date();
     const expiry = date.setSeconds(date.getSeconds() + expiresIn);
 
-    // this.setState({
-    //   accessToken,
-    //   tokenExpiresAt: date.setSeconds(date.getSeconds() + expiresIn),
-    //   userId
-    // }, () => console.info('New state after handling inc token: ', this.state));
-
     setUserId(userId);
     saveAccessTokenData(accessToken, expiry);
-  }
-  handleWallGet(inputValues) {
-    console.log(inputValues);
-
-    // const {wallOwner, wallDomain, searchQuery, authorId, searchOffset,
-    //   postsAmount} = inputValues;
-    // const apiCallUrl = `https://api.vk.com/method/wall.get?` +
-    //   `owner_id=${wallOwner}&domain=${wallDomain}&offset=${searchOffset}` +
-    //   `&count=${postsAmount}&access_token=${this.state.accessToken}` +
-    //   `&v=${initialConfig.apiVersion}` +
-    //   `&extended=1`;
-    //
-    // this.makeCallToAPI(false, apiCallUrl);
-
-    this.findUserPosts(inputValues);
   }
   makeCallToAPI(apiCallUrl) {
     console.log('api call url: ', apiCallUrl);
@@ -124,71 +102,20 @@ class App extends React.Component {
     //   return responseData;
     // })
     .catch((ex) => {
-      console.log('parsing failed', ex, 'ex name ', ex.name);
+      console.log('parsing failed', ex);
       // TODO: resolve, executes at the end
       return this.makeCallToAPI(apiCallUrl);
     });
   }
-  findUserPosts(inputValues) {
-    let searchResults = [];
-    let {postsAmount} = inputValues;
-    let offset = 0;
-    let total = 1000;
-    const authorId = Number(inputValues.authorId);
-    const {wallOwner, wallDomain, searchQuery} = inputValues;
-    const apiCallUrl = `https://api.vk.com/method/wall.get?` +
-      `owner_id=${wallOwner}&domain=${wallDomain}&count=100` +
-      `&access_token=${this.state.tokenData.token}` +
-      `&v=${initialConfig.apiVersion}` +
-      `&extended=1`;
+  handleUserPostsSearch(inputValues) {
+    const {findUserPostsAtWall} = this.props.actions;
 
-    postsAmount = postsAmount || 10;
-
-    // NOTE: for situation when user press "Start Search" button again
-    clearInterval(this.userPostSearchIntervalId);
-    // TODO: create external handler func and pass it to setInterval;
-    // consider collecting all posts at first or some amount of posts and
-    // search among them at the intervals end
-    this.userPostSearchIntervalId = setInterval(() => {
-      if (searchResults.length < postsAmount && offset < total) {
-        const tempApiCallUrl = `${apiCallUrl}&offset=${offset}`;
-
-        this.makeCallToAPI(tempApiCallUrl)
-        .then((resJSON) => {
-          const responseData = resJSON.response;
-          // TODO: add stop condition when no more data
-          // if (responseData.items.length = 0) {
-          //   total = 0:
-          // }
-          const searchResultsChunk = responseData.items.filter((item) => {
-            return item.from_id === authorId;
-          });
-
-          // TODO: add only if not empty
-          searchResults = searchResults.concat(searchResultsChunk);
-          this.setState({
-            results: searchResultsChunk.length > 0
-              ? searchResults
-              : this.state.results
-          });
-          console.log('response from parsed json ', responseData);
-          console.log('searchResultsChunk ', searchResultsChunk);
-          total = responseData.count;
-        })
-        .catch((err) => console.warn(err));
-
-        offset += 100;
-        return;
-      }
-      // searchResults.length = 10; // FIXME: cut excess results
-      clearInterval(this.userPostSearchIntervalId);
-      console.log('userPostSearchResults: ', searchResults);
-    }, 500);
+    findUserPostsAtWall(inputValues);
   }
   render() {
     return (
       <div id="App">
-        <SearchForm onSearch={this.handleWallGet} />
+        <SearchForm onSearch={this.handleUserPostsSearch} />
         <ResultsPanel header="This is a panel with search results">
           <ResultsFilter filterText="Here will be filter text" />
           <ResultsList results={this.props.results} />
@@ -205,11 +132,11 @@ function mapState(state) {
     results: state.results
   };
 }
-// NOTE: wrap each action creator into a dispatch call, to be invoked directly
-// witthout using this.props.dispatch(actions.actionName());
+// NOTE: wraps each action creator into a dispatch call, to be invoked directly
+// as this.props.actName() instead of this.props.dispatch(actions.actionName())
 function mapDispatch(dispatch) {
   return {
-    actions: bindActionCreators(AuthActions, dispatch)
+    actions: bindActionCreators(allActions, dispatch)
   };
 }
 
