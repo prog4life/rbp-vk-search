@@ -66,18 +66,9 @@ class App extends React.Component {
     saveAccessTokenData(accessToken, expiry);
   }
   handleUserPostsSearch(inputValues) {
-    const {prepareUserPostsSearch, fetchUserPosts} = this.props.actions;
+    const {searchUserPosts} = this.props.actions;
 
-    // NOTE: for situation when user press "Stop" button
-    clearInterval(this.userPostsSearchIntervalId);
-
-    const requestParams = prepareUserPostsSearch(inputValues);
-
-    this.userPostsSearchIntervalId = setInterval(() => {
-      fetchUserPosts(requestParams, this.userPostsSearchIntervalId);
-    // TODO: add default for interval value and get it from config
-    }, 500);
-    fetchUserPosts(requestParams, this.userPostsSearchIntervalId);
+    searchUserPosts(inputValues);
   }
   render() {
     return (

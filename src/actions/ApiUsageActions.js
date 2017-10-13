@@ -1,38 +1,48 @@
 import fetchJsonp from 'fetch-jsonp';
 import initialConfig from '../api/initial';
 
-// let userPostsSearchIntervalId = null;
+let userPostsSearchIntervalId = null;
 
-export function prepareUserPostsSearch(inputValues) {
-  /* eslint-disable max-statements */
-  return (dispatch, getState) => {
-    console.log(inputValues);
-    const offset = 0;
-    const totalPosts = 5000;
-    const {token} = getState().tokenData;
-    // TODO: make postsAmount default value to be one of app config params
-    const authorId = Number(inputValues.authorId);
-    const postsAmount = inputValues.postsAmount || 10;
-    const {wallOwner, wallDomain, searchQuery} = inputValues;
-    const apiReqUrl = `https://api.vk.com/method/wall.get?` +
-      `owner_id=${wallOwner}&domain=${wallDomain}&count=100` +
-      `&access_token=${token}` +
-      `&v=${initialConfig.apiVersion}` +
-      `&extended=1`;
+// export function prepareUserSearch(inputValues) {
+//   handle user input, create api request params and place them to store  
+// }
 
-    // TODO: replace this stuff to in-store searchParams
+/* eslint-disable max-statements */
+export const searchUserPosts = (inputValues) => (dispatch, getState) => {
+  console.log(inputValues);
+  const offset = 0;
+  const totalPosts = 5000;
+  const {token} = getState().tokenData;
+  // TODO: make postsAmount default value to be one of app config params
+  const authorId = Number(inputValues.authorId);
+  const postsAmount = inputValues.postsAmount || 10;
+  const {wallOwner, wallDomain, searchQuery} = inputValues;
+  const apiReqUrl = `https://api.vk.com/method/wall.get?` +
+    `owner_id=${wallOwner}&domain=${wallDomain}&count=100` +
+    `&access_token=${token}` +
+    `&v=${initialConfig.apiVersion}` +
+    `&extended=1`;
 
-    return {
-      apiReqUrl,
-      authorId,
-      offset,
-      totalPosts,
-      postsAmount
-    };
+  // TODO: replace this stuff to store searchParams
+  const requestParams = {
+    apiReqUrl,
+    authorId,
+    offset,
+    totalPosts,
+    postsAmount
   };
-}
 
-export function fetchUserPosts(requestParams, userPostsSearchIntervalId) {
+  // NOTE: for situation when user press "Stop" button
+  clearInterval(userPostsSearchIntervalId);
+
+  userPostsSearchIntervalId = setInterval(() => {
+    dispatch(fetchWallPosts(requestParams));
+  // TODO: add default for interval value and get it from config
+  }, 500);
+  dispatch(fetchWallPosts(requestParams));
+};
+
+export const fetchWallPosts = (requestParams) => (dispatch, getState) => {
   const {
     apiReqUrl,
     authorId,
@@ -41,82 +51,63 @@ export function fetchUserPosts(requestParams, userPostsSearchIntervalId) {
     postsAmount
   } = requestParams;
 
-  return (dispatch, getState) => {
-    if (getState().results.length < postsAmount && offset < totalPosts) {
-      const currentApiReqUrl = `${apiReqUrl}&offset=${offset}`;
+  if (getState().results.length < postsAmount && offset < totalPosts) {
+    const currentApiReqUrl = `${apiReqUrl}&offset=${offset}`;
 
-      dispatch(makeFetchJsonpRequest(currentApiReqUrl))
-      // TODO: increase offset only if response.ok, count attempts here        !!!
-      .then((resJSON) => {
-        // TODO: replace it to makeFetchJsonpRequest
-        dispatch(filterUserPosts(resJSON, authorId, totalPosts));
-      })
-      .catch((err) => {
-        console.log('from catch state: ', getState());
-        console.warn(err);
-      });
+    console.log('api request url: ', currentApiReqUrl);
 
-      requestParams.offset += 100;
-      return;
-    }
-    // searchResults.length = 10; // FIXME: cut excess results
-    clearInterval(userPostsSearchIntervalId);
-    console.log('userPostSearchResults: ', getState().results);
-  };
-}
-
-export function makeFetchJsonpRequest(apiReqUrl) {
-  return (dispatch) => {
-    console.log('api call url: ', apiReqUrl);
-
-    return fetchJsonp(apiReqUrl, {
-      // to set custom callback param name (default - callback)
+    // TODO: add "performUserPostsRequst" thunk:
+    fetchJsonp(currentApiReqUrl, {
+      // to set custom callback param name (default - callback):
       // jsonpCallback: 'custom_callback',
       // to specify custom function name that will be used as callback,
-      // default - jsonp_some-number
+      // (default - jsonp_some-number):
       // jsonpCallbackFunction: 'function_name_of_jsonp_response',
       // timeout: 3000 // default - 5000
     })
     .then((response) => (
       response.json()
     ))
-    // .then((json) => {
-    //   const responseData = json.response;
-    //
-    //   console.log('response from parsed json', responseData);
-    //   return responseData;
-    // })
+    .then((resJSON) => {
+      const {items: posts, count} = resJSON.response;
+
+      dispatch(filterUserPosts(posts, authorId));
+
+      // TODO: increase offset only if response.ok, count attempts here        !!!
+      requestParams.offset += 100;
+
+      // FIXME: temporarily hidden
+      // requestParams.totalPosts = count;
+    })
     .catch((ex) => {
-      console.log('parsing failed', ex);
+      console.warn('Parsing failed', ex);
       // TODO: resolve, executes at the end
       // return makeFetchJsonpRequest(apiReqUrl);
     });
-  };
-}
 
-export function filterUserPosts(resJSON, authorId, totalPosts) {
-  return (dispatch) => {
-    const responseData = resJSON.response;
     // TODO: add stop condition when no more data
     // if (responseData.items.length = 0) {
-    //   totalPosts = 0:
+    //   requestParams.totalPosts = 0:
     // }
-    const searchResultsChunk = responseData.items.filter((item) => {
-      return item.from_id === authorId;
-    });
+    return;
+  }
+  // searchResults.length = 10; // FIXME: cut excess results
+  clearInterval(userPostsSearchIntervalId);
+};
 
-    if (searchResultsChunk.length > 0) {
-      // TODO: add formatResults;
-      dispatch(addResults(searchResultsChunk));
-    }
-    console.log('response from parsed json ', responseData);
-    console.log('searchResultsChunk ', searchResultsChunk);
-    // FIXME: temporarily hidden
-    // totalPosts = responseData.count;
+export const filterUserPosts = (posts, authorId) => (dispatch) => {
+  const userPostsChunk = posts.filter((post) => {
+    return post.from_id === authorId;
+  });
 
-    return searchResultsChunk;
-  };
-}
+  if (userPostsChunk.length > 0) {
+    // TODO: add formatResults;
+    dispatch(addResults(userPostsChunk));
+  }
+  console.log('userPostsChunk ', userPostsChunk);
+
+  return userPostsChunk;
+};
 
 export function addResults(results) {
   return {
