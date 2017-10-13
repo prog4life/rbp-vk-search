@@ -1,7 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import fetchJsonp from 'fetch-jsonp';
 import PropTypes from 'prop-types';
 
 import SearchForm from './SearchForm';
@@ -17,23 +16,6 @@ class App extends React.Component {
     super(props);
 
     this.handleUserPostsSearch = this.handleUserPostsSearch.bind(this);
-
-    // this.state = {
-    //   results: [
-    //     {
-    //       date: 132357458,
-    //       from_id: 247772351,
-    //       text: 'Я ищу спонсора на длительные отношения, я без опыта, ' +
-    //       'полненькая но не сильно, общительная. Пишите в л/с',
-    //       link: 'https://vk.com/club75465366?w=wall-75465366_37824%2Fall'
-    //     }
-    //   ],
-    //   filterText: '',
-    //   // temp part of state? :
-    //   accessToken: '',
-    //   tokenExpiresAt: null,
-    //   userId: null
-    // };
   }
   componentDidMount() {
     /* eslint max-statements: 0 */
@@ -46,8 +28,8 @@ class App extends React.Component {
     const hash = document.location.hash.substr(1);
     const parsedHash = parseHash(hash);
 
-    // TODO: try pushState or replaceState
-    // document.location.hash = '';
+    // TODO: try replaceState
+    // NOTE: document.location.hash = ''; was used before
     history.pushState('', document.title, document.location.pathname);
 
     // TODO: remove this temp redirect later and try sign in on search start
@@ -83,34 +65,19 @@ class App extends React.Component {
     setUserId(userId);
     saveAccessTokenData(accessToken, expiry);
   }
-  makeCallToAPI(apiCallUrl) {
-    console.log('api call url: ', apiCallUrl);
-
-    return fetchJsonp(apiCallUrl, {
-      // to set custom callback param name (default - callback)
-      // jsonpCallback: 'custom_callback',
-      // to specify custom function name that will be used as callback,
-      // default - jsonp_some-number
-      // jsonpCallbackFunction: 'function_name_of_jsonp_response',
-      // timeout: 3000 // default - 5000
-    })
-    .then((response) => response.json())
-    // .then((json) => {
-    //   const responseData = json.response;
-    //
-    //   console.log('response from parsed json', responseData);
-    //   return responseData;
-    // })
-    .catch((ex) => {
-      console.log('parsing failed', ex);
-      // TODO: resolve, executes at the end
-      return this.makeCallToAPI(apiCallUrl);
-    });
-  }
   handleUserPostsSearch(inputValues) {
-    const {findUserPostsAtWall} = this.props.actions;
+    const {prepareUserPostsSearch, fetchUserPosts} = this.props.actions;
 
-    findUserPostsAtWall(inputValues);
+    // NOTE: for situation when user press "Stop" button
+    clearInterval(this.userPostsSearchIntervalId);
+
+    const requestParams = prepareUserPostsSearch(inputValues);
+
+    this.userPostsSearchIntervalId = setInterval(() => {
+      fetchUserPosts(requestParams, this.userPostsSearchIntervalId);
+    // TODO: add default for interval value and get it from config
+    }, 500);
+    fetchUserPosts(requestParams, this.userPostsSearchIntervalId);
   }
   render() {
     return (
@@ -127,6 +94,7 @@ class App extends React.Component {
 
 function mapState(state) {
   return {
+    // TODO: try to disconnect userId and tokenData and see what happens
     userId: state.userId,
     tokenData: state.tokenData,
     results: state.results

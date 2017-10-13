@@ -1,20 +1,3 @@
-// export default {
-//   clientID: 5931563,
-//   display: 'popup',
-//   redirectURI: 'https://nameless-sea-73563.herokuapp.com',
-//   scope: 'friends',
-//   responseType: 'token',
-//   apiVersion: 5.67,
-//   state: 55555,
-//   // serverTokenURL: 'https://nameless-sea-73563.herokuapp.com/auth',
-//   get tokenRequestURL() {
-//     return `https://oauth.vk.com/authorize?client_id=${this.clientID}&` +
-//       `display=${this.display}&redirect_uri=${this.redirectURI}&` +
-//       `scope=${this.scope}&response_type=${this.responseType}&` +
-//       `v=${this.apiVersion}&state=${this.state}`;
-//   }
-// };
-
 const clientID = 5931563;
 const display = 'popup';
 // const redirectURI = 'https://nameless-sea-73563.herokuapp.com';

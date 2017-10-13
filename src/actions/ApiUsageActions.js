@@ -1,75 +1,75 @@
 import fetchJsonp from 'fetch-jsonp';
 import initialConfig from '../api/initial';
 
-let userPostsSearchTimerId = null;
+// let userPostsSearchIntervalId = null;
 
-export function findUserPostsAtWall(inputValues) {
+export function prepareUserPostsSearch(inputValues) {
   /* eslint-disable max-statements */
   return (dispatch, getState) => {
     console.log(inputValues);
-    let searchResults = [];
-    let offset = 0;
-    let total = 5000;
+    const offset = 0;
+    const totalPosts = 5000;
     const {token} = getState().tokenData;
     // TODO: make postsAmount default value to be one of app config params
     const authorId = Number(inputValues.authorId);
     const postsAmount = inputValues.postsAmount || 10;
     const {wallOwner, wallDomain, searchQuery} = inputValues;
-    const apiCallUrl = `https://api.vk.com/method/wall.get?` +
+    const apiReqUrl = `https://api.vk.com/method/wall.get?` +
       `owner_id=${wallOwner}&domain=${wallDomain}&count=100` +
       `&access_token=${token}` +
       `&v=${initialConfig.apiVersion}` +
       `&extended=1`;
 
-    // NOTE: for situation when user press "Stop" button
-    clearInterval(userPostsSearchTimerId);
-    // TODO: create external handler func and pass it to setInterval;
-    // consider collecting all posts at first or some amount of posts and
-    // search among them at the intervals end
-    userPostsSearchTimerId = setInterval(() => {
-      if (searchResults.length < postsAmount && offset < total) {
-        const tempApiCallUrl = `${apiCallUrl}&offset=${offset}`;
+    // TODO: replace this stuff to in-store searchParams
 
-        dispatch(makeCallToAPI(tempApiCallUrl))
-        .then((resJSON) => {
-          const responseData = resJSON.response;
-          // TODO: add stop condition when no more data
-          // if (responseData.items.length = 0) {
-          //   total = 0:
-          // }
-          const searchResultsChunk = responseData.items.filter((item) => {
-            return item.from_id === authorId;
-          });
-
-          if (searchResultsChunk.length > 0) {
-            console.log('addResults ', addResults(searchResultsChunk));
-            console.log('dispatch addResults ', dispatch(addResults(searchResultsChunk)));
-          }
-          console.log('response from parsed json ', responseData);
-          console.log('searchResultsChunk ', searchResultsChunk);
-          // FIXME: temporarily hidden
-          // total = responseData.count;
-        })
-        .catch((err) => {
-          console.log('from catch state: ', getState());
-          console.warn(err);
-        });
-
-        offset += 100;
-        return;
-      }
-      // searchResults.length = 10; // FIXME: cut excess results
-      clearInterval(userPostsSearchTimerId);
-      console.log('userPostSearchResults: ', searchResults);
-    }, 500);
+    return {
+      apiReqUrl,
+      authorId,
+      offset,
+      totalPosts,
+      postsAmount
+    };
   };
 }
 
-export function makeCallToAPI(apiCallUrl) {
-  return (dispatch) => {
-    console.log('api call url: ', apiCallUrl);
+export function fetchUserPosts(requestParams, userPostsSearchIntervalId) {
+  const {
+    apiReqUrl,
+    authorId,
+    offset,
+    totalPosts,
+    postsAmount
+  } = requestParams;
 
-    return fetchJsonp(apiCallUrl, {
+  return (dispatch, getState) => {
+    if (getState().results.length < postsAmount && offset < totalPosts) {
+      const currentApiReqUrl = `${apiReqUrl}&offset=${offset}`;
+
+      dispatch(makeFetchJsonpRequest(currentApiReqUrl))
+      // TODO: increase offset only if response.ok, count attempts here        !!!
+      .then((resJSON) => {
+        // TODO: replace it to makeFetchJsonpRequest
+        dispatch(filterUserPosts(resJSON, authorId, totalPosts));
+      })
+      .catch((err) => {
+        console.log('from catch state: ', getState());
+        console.warn(err);
+      });
+
+      requestParams.offset += 100;
+      return;
+    }
+    // searchResults.length = 10; // FIXME: cut excess results
+    clearInterval(userPostsSearchIntervalId);
+    console.log('userPostSearchResults: ', getState().results);
+  };
+}
+
+export function makeFetchJsonpRequest(apiReqUrl) {
+  return (dispatch) => {
+    console.log('api call url: ', apiReqUrl);
+
+    return fetchJsonp(apiReqUrl, {
       // to set custom callback param name (default - callback)
       // jsonpCallback: 'custom_callback',
       // to specify custom function name that will be used as callback,
@@ -89,17 +89,17 @@ export function makeCallToAPI(apiCallUrl) {
     .catch((ex) => {
       console.log('parsing failed', ex);
       // TODO: resolve, executes at the end
-      // return makeCallToAPI(apiCallUrl);
+      // return makeFetchJsonpRequest(apiReqUrl);
     });
   };
 }
 
-export function filterUserPostsFromResJSON(resJSON) {
+export function filterUserPosts(resJSON, authorId, totalPosts) {
   return (dispatch) => {
     const responseData = resJSON.response;
     // TODO: add stop condition when no more data
     // if (responseData.items.length = 0) {
-    //   total = 0:
+    //   totalPosts = 0:
     // }
     const searchResultsChunk = responseData.items.filter((item) => {
       return item.from_id === authorId;
@@ -110,6 +110,8 @@ export function filterUserPostsFromResJSON(resJSON) {
     }
     console.log('response from parsed json ', responseData);
     console.log('searchResultsChunk ', searchResultsChunk);
+    // FIXME: temporarily hidden
+    // totalPosts = responseData.count;
 
     return searchResultsChunk;
   };
