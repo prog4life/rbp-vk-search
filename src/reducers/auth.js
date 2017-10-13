@@ -7,7 +7,8 @@ export function tokenReducer(state = defaultTokenState, action) {
   switch (action.type) {
     case 'SAVE_TOKEN_DATA':
       return {
-        ...action.tokenData
+        token: action.token,
+        expiresAt: action.expiresAt
       };
     default:
       return state;

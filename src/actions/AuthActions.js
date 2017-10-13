@@ -1,10 +1,8 @@
 export function saveAccessTokenData(token, expiresAt) {
   return {
     type: 'SAVE_TOKEN_DATA',
-    tokenData: {
-      token,
-      expiresAt
-    }
+    token,
+    expiresAt
   };
 }
 
