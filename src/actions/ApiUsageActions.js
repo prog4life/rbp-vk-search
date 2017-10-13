@@ -106,6 +106,7 @@ export function filterUserPosts(resJSON, authorId, totalPosts) {
     });
 
     if (searchResultsChunk.length > 0) {
+      // TODO: add formatResults;
       dispatch(addResults(searchResultsChunk));
     }
     console.log('response from parsed json ', responseData);

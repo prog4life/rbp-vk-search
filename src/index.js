@@ -32,6 +32,8 @@ const store = configureStore({
   results: RESULTS
 });
 
+store.subscribe(() => console.log('Updated state ', store.getState()));
+
 ReactDOM.render(
   <Provider store={store}>
     <App />
