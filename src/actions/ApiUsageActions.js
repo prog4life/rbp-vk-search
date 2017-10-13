@@ -73,14 +73,15 @@ export const fetchWallPosts = (requestParams) => (dispatch, getState) => {
 
       dispatch(filterUserPosts(posts, authorId));
 
-      // TODO: increase offset only if response.ok, count attempts here        !!!
+      // TODO: it makes requests with same offset, RESOLVE                       !!!
+      // TODO: increase offset only if response.ok, count attempts here
       requestParams.offset += 100;
 
       // FIXME: temporarily hidden
       // requestParams.totalPosts = count;
     })
     .catch((ex) => {
-      console.warn('Parsing failed', ex);
+      console.warn('Parsing failed ', ex);
       // TODO: resolve, executes at the end
       // return makeFetchJsonpRequest(apiReqUrl);
     });

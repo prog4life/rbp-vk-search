@@ -59,8 +59,7 @@ class App extends React.Component {
       saveAccessTokenData
     } = this.props.actions;
 
-    const date = new Date();
-    const expiry = date.setSeconds(date.getSeconds() + expiresIn);
+    const expiry = Date.now() + (expiresIn * 1000);
 
     setUserId(userId);
     saveAccessTokenData(accessToken, expiry);

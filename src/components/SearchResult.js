@@ -7,7 +7,7 @@ function SearchResult({result, number}) {
   return (
     <ListGroupItem>
       <span>[{number}] </span>
-      <span>{new Date(timestamp).toGMTString()} </span>
+      <span>{new Date(timestamp * 1000).toLocaleString()} </span>
       <span>{fromId} </span>
       <span>{text} </span>
       <a href={link} target="_blank">Link to post at wall</a>
