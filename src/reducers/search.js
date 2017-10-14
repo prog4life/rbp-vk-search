@@ -9,3 +9,4 @@ export function resultsReducer(state = [], action) {
       return state;
   }
 }
+

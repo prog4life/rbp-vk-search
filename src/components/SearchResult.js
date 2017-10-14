@@ -2,15 +2,23 @@ import React from 'react';
 import {ListGroupItem} from 'react-bootstrap';
 
 function SearchResult({result, number}) {
-  const {date: timestamp, from_id: fromId, text, link} = result;
+  const {timestamp, fromId, text, link} = result;
 
   return (
     <ListGroupItem>
       <span>[{number}] </span>
-      <span>{new Date(timestamp * 1000).toLocaleString()} </span>
-      <span>{fromId} </span>
-      <span>{text} </span>
-      <a href={link} target="_blank">Link to post at wall</a>
+      <span className="post-timestamp">
+        {new Date(timestamp).toLocaleString()}
+      </span>
+      <span>{' '}
+        <a href={`https://vk.com/id${fromId}`} target="_blank">
+          [id{fromId}]
+        </a>
+      </span>
+      <p>
+        {text}{' '}
+        <a href={link} target="_blank">Link to post at wall</a>  
+      </p>
     </ListGroupItem>
   );
 }

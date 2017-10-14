@@ -7,7 +7,7 @@ import SearchForm from './SearchForm';
 import ResultsPanel from './ResultsPanel';
 import ResultsFilter from './ResultsFilter';
 import ResultsList from './ResultsList';
-import initialConfig from '../api/initial';
+import {tokenRequestURL} from '../api/initial';
 import {parseHash, handleErrorHash} from '../utils/res-hash-handler';
 import * as allActions from '../actions';
 
@@ -35,7 +35,7 @@ class App extends React.Component {
     // TODO: remove this temp redirect later and try sign in on search start
     if (!parsedHash) {
       setInterval(() => {
-        document.location.replace(initialConfig.tokenRequestURL);
+        document.location.replace(tokenRequestURL);
       }, 2000);
     }
 
