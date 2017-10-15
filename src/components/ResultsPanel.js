@@ -1,7 +1,7 @@
 import React from 'react';
-import {Panel, Grid} from 'react-bootstrap';
+import { Panel, Grid } from 'react-bootstrap';
 
-function ResultsPanel({children, header}) {
+function ResultsPanel({ children, header }) {
   return (
     <Grid>
       <Panel header={header} bsStyle="info">

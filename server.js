@@ -1,6 +1,7 @@
 const http = require('http');
 const path = require('path');
 const express = require('express');
+
 const app = express();
 
 // const webpack = require('webpack');
@@ -33,6 +34,6 @@ app.set('port', port);
 app.listen(port, () => {
   console.log(`Server is up at http://localhost:${app.get('port')}`);
 })
-.on('error', (error) => {
-  console.log(error);
-});
+  .on('error', (error) => {
+    console.log(error);
+  });

@@ -1,14 +1,14 @@
 import React from 'react';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 
 import SearchForm from './SearchForm';
 import ResultsPanel from './ResultsPanel';
 import ResultsFilter from './ResultsFilter';
 import ResultsList from './ResultsList';
-import {tokenRequestURL} from '../api/initial';
-import {parseHash, handleErrorHash} from '../utils/res-hash-handler';
+import { tokenRequestURL } from '../api/initial';
+import { parseHash, handleErrorHash } from '../utils/res-hash-handler';
 import * as allActions from '../actions';
 
 class App extends React.Component {
@@ -65,7 +65,7 @@ class App extends React.Component {
     saveAccessTokenData(accessToken, expiry);
   }
   handleUserPostsSearch(inputValues) {
-    const {searchUserPosts} = this.props.actions;
+    const { searchUserPosts } = this.props.actions;
 
     searchUserPosts(inputValues);
   }

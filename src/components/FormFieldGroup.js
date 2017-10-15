@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {FormGroup, FormControl, ControlLabel} from 'react-bootstrap';
+import { FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
 
 // function FormFieldGroup({ id, label, help, ...props }) {
 function FormFieldGroup(props) {
-  const {id, label, type, placeholder, disabled, required, value, onChange} =
-    props;
+  const {
+    id, label, type, placeholder, disabled, required, value, onChange
+  } = props;
 
   return (
     <FormGroup controlId={id}>

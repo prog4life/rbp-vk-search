@@ -1,9 +1,9 @@
 import React from 'react';
 
-function ResultsFilter({filterText}) {
+function ResultsFilter({ filterText }) {
   return (
     <p>
-      Here will be search results filter with search query:
+      <span>Here will be search results filter with search query:</span>
       {filterText}
     </p>
   );

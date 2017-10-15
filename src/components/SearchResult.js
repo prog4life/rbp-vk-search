@@ -1,8 +1,10 @@
 import React from 'react';
-import {ListGroupItem} from 'react-bootstrap';
+import { ListGroupItem } from 'react-bootstrap';
 
-function SearchResult({result, number}) {
-  const {timestamp, fromId, text, link} = result;
+function SearchResult({ result, number }) {
+  const {
+    timestamp, fromId, text, link
+  } = result;
 
   return (
     <ListGroupItem>
@@ -17,7 +19,7 @@ function SearchResult({result, number}) {
       </span>
       <p>
         {text}{' '}
-        <a href={link} target="_blank">Link to post at wall</a>  
+        <a href={link} target="_blank">Link to post at wall</a>
       </p>
     </ListGroupItem>
   );

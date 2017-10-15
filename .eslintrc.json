@@ -33,6 +33,10 @@
       "devDependencies": true,
       "optionalDependencies": false,
       "peerDependencies": false
-    }]
+    }],
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }]
+  },
+  "settings": {
+    "import/resolver": "webpack"
   }
 }

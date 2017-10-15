@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {FormGroup, Checkbox, Button, Grid, Row, Col} from 'react-bootstrap';
+import { FormGroup, Checkbox, Button, Grid, Row, Col } from 'react-bootstrap';
 
 import FormFieldGroup from './FormFieldGroup';
 
@@ -22,8 +22,9 @@ class SearchForm extends React.Component {
   }
   handleSubmit(event) {
     event.preventDefault();
-    const {wallOwner, wallDomain, searchQuery, authorId, searchOffset,
-      postsAmount} = event.target.elements;
+    const {
+      wallOwner, wallDomain, searchQuery, authorId, searchOffset, postsAmount
+    } = event.target.elements;
 
     this.props.onSearch({
       wallOwner: wallOwner.value,
@@ -40,8 +41,9 @@ class SearchForm extends React.Component {
     }, () => console.info('New searchform state: ', this.state));
   }
   render() {
-    const {wallOwner, wallDomain, searchQuery, authorId, searchOffset,
-      postsAmount} = this.state;
+    const {
+      wallOwner, wallDomain, searchQuery, authorId, searchOffset, postsAmount
+    } = this.state;
 
     return (
       <Grid>
