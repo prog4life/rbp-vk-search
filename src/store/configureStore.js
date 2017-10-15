@@ -1,9 +1,9 @@
-import {createStore, compose, applyMiddleware} from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
+// to use with Chrome Extension
+// import { composeWithDevTools } from 'redux-devtools-extension';
+import { composeWithDevTools } from 'remote-redux-devtools';
 import rootReducer from '../reducers';
-// to use with Chrome Extension 
-// import {composeWithDevTools} from 'redux-devtools-extension';
-import {composeWithDevTools} from 'remote-redux-devtools';
 
 export default (preloadedState = {}) => {
   /* eslint-disable no-underscore-dangle */
@@ -13,7 +13,7 @@ export default (preloadedState = {}) => {
 
   const store = createStore(rootReducer, preloadedState, composeEnhancers(
     applyMiddleware(thunk))
-  );                                                                    
+  );
   */
   /* eslint-enable */
 
@@ -26,9 +26,11 @@ export default (preloadedState = {}) => {
     port: 8031 // the port local "remotedev-server" is running at
   });
 
-  const store = createStore(rootReducer, preloadedState, composeEnhancers(
-    applyMiddleware(thunk)
-  ));
+  const store = createStore(
+    rootReducer,
+    preloadedState,
+    composeEnhancers(applyMiddleware(thunk))
+  );
 
   return store;
 };

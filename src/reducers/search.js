@@ -10,3 +10,14 @@ export function resultsReducer(state = [], action) {
   }
 }
 
+export function requestsReducer(state = [], action) {
+  switch (action.type) {
+    case 'FETCH_WALL_POSTS_FAIL':
+      return [
+        ...state,
+        action.offset
+      ];
+    default:
+      return state;
+  }
+}
