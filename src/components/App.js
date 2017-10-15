@@ -7,7 +7,7 @@ import SearchForm from './SearchForm';
 import ResultsPanel from './ResultsPanel';
 import ResultsFilter from './ResultsFilter';
 import ResultsList from './ResultsList';
-import { tokenRequestURL } from '../api/initial';
+import { tokenRequestURL } from '../config/api';
 import { parseHash, handleErrorHash } from '../utils/res-hash-handler';
 import * as allActions from '../actions';
 

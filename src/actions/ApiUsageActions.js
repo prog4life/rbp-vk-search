@@ -1,5 +1,5 @@
 import fetchJsonp from 'fetch-jsonp';
-import { apiVersion, requestInterval } from '../api/initial';
+import { apiVersion, requestInterval } from '../config/api';
 
 let userPostsSearchIntervalId = null;
 
