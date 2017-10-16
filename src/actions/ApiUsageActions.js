@@ -4,17 +4,15 @@ import { apiVersion, requestInterval } from '../config/api';
 let userPostsSearchIntervalId = null;
 
 // export function prepareUserSearch(inputValues) {
-//   handle user input, create api request params and place them to store
+//   IDEA: handle user input, create api request params and place them to store
 // }
 
-export function parseUserPosts(posts, authorId) {
-  const userPostsChunk = posts.filter(post => post.from_id === authorId);
+export function parseUserPosts(response, authorId) {
+  const { items: posts } = response;
 
-  // if (userPostsChunk.length > 0) {
-  //   return userPostsChunk;
-  // }
-  console.log('userPostsChunk ', userPostsChunk);
-  return userPostsChunk;
+  return Array.isArray(posts)
+    ? posts.filter(post => post.from_id === authorId)
+    : Promise.reject(response); // NOTE: or throw?
 }
 
 export function formatUserPosts(posts) {
@@ -23,13 +21,8 @@ export function formatUserPosts(posts) {
     timestamp: post.date * 1000,
     postId: post.id,
     text: post.text,
-    // TODO: add post id from result
     link: `https://vk.com/wall${post.owner_id}_${post.id}`
   }));
-}
-
-export function sortUserPosts(posts) {
-  return posts.sort((a, b) => (a.timestamp > b.timestamp ? 0 : 1));
 }
 
 export function addResults(results) {
@@ -39,59 +32,51 @@ export function addResults(results) {
   };
 }
 
-export const fetchWallPosts = (baseApiReqUrl, offset) => (dispatch) => {
+export function clearResults() {
+  return {
+    type: 'CLEAR_RESULTS'
+  };
+}
+
+export const fetchWallData = (baseApiReqUrl, offset) => (dispatch, getState) => {
   const currentApiReqUrl = `${baseApiReqUrl}&offset=${offset}`;
 
-  // console.log('api request url: ', currentApiReqUrl);
-  // dispatch({ type: 'FETCH_WALL_POSTS_REQUEST', offset });
+  console.log('api request url offset: ', offset);
+  // dispatch({ type: 'FETCH_WALL_DATA_REQUEST', offset });
 
-  // TODO: add "performUserPostsRequst" thunk:
   return fetchJsonp(currentApiReqUrl, {
-    // to set custom callback param name (default - callback):
-    // jsonpCallback: 'custom_callback',
-    // to specify custom function name that will be used as callback,
-    // (default - jsonp_some-number):
-    // jsonpCallbackFunction: 'function_name_of_jsonp_response',
     // timeout: 3000 // default - 5000
   })
-    .then(response => (
-      response.json()
-    ))
+    .then(response => response.json())
     .then((resJSON) => {
-      const { items: posts, count } = resJSON.response;
-
-      // dispatch({ type: 'FETCH_WALL_POSTS_SUCCESS', offset });
-      return posts;
+      // dispatch({ type: 'FETCH_WALL_DATA_SUCCESS', offset });
+      return resJSON.response;
     })
     .catch((ex) => {
-      console.warn('Parsing failed ', ex);
-      dispatch({ type: 'FETCH_WALL_POSTS_FAIL', offset });
+      console.warn('Parsing failed ', offset, ex);
+      dispatch({ type: 'FETCH_WALL_DATA_FAIL', offset });
 
-    // return new Promise((resolve) => {
-    //   setTimeout(() => {
-    //     resolve(dispatch(fetchWallPosts(baseApiReqUrl, offset)));
-    //   }, requestInterval);
-    // });
-    // throw ex;
+      const offsets = getState().failedRequestsOffsets;
+
+      console.log('Failed requests offsets ', offsets);
+
+      // return new Promise((resolve) => {
+      //   setTimeout(() => {
+      //     resolve(dispatch(fetchWallData(baseApiReqUrl, offset)));
+      //   }, requestInterval);
+      // });
+      throw ex;
     });
-
-  // TODO: add stop condition when no more data
-  // if (responseData.items.length = 0) {
-  //   requestParams.totalPosts = 0:
-  // }
-  // searchResults.length = 10; // FIXME: cut excess results
 };
 
 /* eslint-disable max-statements */
 export const searchUserPosts = inputValues => (dispatch, getState) => {
-  console.log(inputValues);
   let offset = 0;
-  let totalPosts = 5000;
-  let searchDuration = 0;
+  let totalPosts;
   const searchStart = performance.now();
   const { token } = getState().tokenData;
-  // TODO: make postsAmount default value to be one of app config params
   const authorId = Number(inputValues.authorId);
+  // TODO: make postsAmount default value to be one of app config params
   const postsAmount = inputValues.postsAmount || 100;
   const { wallOwner, wallDomain, searchQuery } = inputValues;
   const baseApiReqUrl = 'https://api.vk.com/method/wall.get?' +
@@ -100,43 +85,41 @@ export const searchUserPosts = inputValues => (dispatch, getState) => {
     `&v=${apiVersion}` +
     '&extended=1';
 
-  // NOTE: for situation when user press "Stop" button
+  // NOTE: for situation when user press "Start/Stop" button
   clearInterval(userPostsSearchIntervalId);
+  dispatch({ type: 'CLEAR_RESULTS' });
 
   const handleRequest = (currentOffset) => {
-    return dispatch(fetchWallPosts(baseApiReqUrl, currentOffset))
-      .then((posts) => {
-        return parseUserPosts(posts, authorId);
+    return dispatch(fetchWallData(baseApiReqUrl, currentOffset))
+      .then((response) => {
+        totalPosts = response.count;
+        return response;
       })
-      .then((posts) => {
-        return formatUserPosts(posts);
-      })
-      .then((posts) => {
-        return sortUserPosts(posts);
-      })
+      .then(response => parseUserPosts(response, authorId))
+      .then(posts => formatUserPosts(posts))
       .then((results) => {
-        dispatch(addResults(results));
+        if (results.length > 0) {
+          dispatch(addResults(results));
+          console.log('duration: ', performance.now() - searchStart);
+          console.log('resultsChunk: ', results);
+        }
       })
       .catch(e => console.error(e));
   };
 
   userPostsSearchIntervalId = setInterval(() => {
     if (getState().results.length >= postsAmount || offset >= totalPosts) {
-      searchDuration = performance.now() - searchStart;
-
-      const offsets = getState().failedRequestsOffsets;
-
-      if (offsets.length > 0) {
-        console.log('Failed requests offsets ', offsets);
-      }
-
       // Object.keys(getState().requests).forEach()
 
-      dispatch({ type: 'SEARCH_USER_POSTS_END', searchDuration });
+      dispatch({ type: 'SEARCH_USER_POSTS_END' });
       return clearInterval(userPostsSearchIntervalId);
-    }
 
-    // TODO: increase offset only if response.ok, count attempts here
+      // TODO: add stop condition when no more data and cut excess results
+      // if (responseData.items.length = 0) {
+      //   requestParams.totalPosts = 0:
+      // }
+      // searchResults.length = 10;
+    }
     offset += 100;
     handleRequest(offset);
   }, requestInterval);
