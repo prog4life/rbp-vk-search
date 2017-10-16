@@ -49,7 +49,7 @@ export const fetchWallData = (baseApiReqUrl, offset) => (dispatch, getState) => 
   })
     .then(response => response.json())
     .then((resJSON) => {
-      // dispatch({ type: 'FETCH_WALL_DATA_SUCCESS', offset });
+      dispatch({ type: 'FETCH_WALL_DATA_SUCCESS', offset });
       return resJSON.response;
     })
     .catch((ex) => {
@@ -89,6 +89,7 @@ export const searchUserPosts = inputValues => (dispatch, getState) => {
   clearInterval(userPostsSearchIntervalId);
   dispatch({ type: 'CLEAR_RESULTS' });
 
+  // TODO: extract as separate thunk
   const handleRequest = (currentOffset) => {
     return dispatch(fetchWallData(baseApiReqUrl, currentOffset))
       .then((response) => {
@@ -110,6 +111,11 @@ export const searchUserPosts = inputValues => (dispatch, getState) => {
   userPostsSearchIntervalId = setInterval(() => {
     if (getState().results.length >= postsAmount || offset >= totalPosts) {
       // Object.keys(getState().requests).forEach()
+
+      const offsets = getState().failedRequestsOffsets;
+      if (offsets.length > 0) {
+        return handleRequest(offsets[0]);
+      }
 
       dispatch({ type: 'SEARCH_USER_POSTS_END' });
       return clearInterval(userPostsSearchIntervalId);

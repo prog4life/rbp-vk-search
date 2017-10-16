@@ -22,6 +22,8 @@ export function requestsReducer(state = [], action) {
         ...state,
         action.offset
       ];
+    case 'FETCH_WALL_DATA_SUCCESS':
+      return state.map(offset => offset !== action.offset);
     default:
       return state;
   }
