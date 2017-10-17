@@ -1,6 +1,6 @@
 import fetchJsonp from 'fetch-jsonp';
 import {
-  apiVersion, requestInterval, jsonpTimeout, postsAmountDefault
+  apiVersion, requestInterval, jsonpTimeout, inputDefaults
 } from '../config/api';
 
 let wallPostsSearchIntervalId = null;
@@ -79,10 +79,14 @@ export const searchInWallPosts = inputValues => (dispatch, getState) => {
   let totalPostsAtWall;
   const searchStart = Date.now();
   const { token } = getState().tokenData;
-  const authorId = Number(inputValues.authorId);
-  // TODO: make postsAmount default value to be one of app config params
-  const postsAmount = inputValues.postsAmount || postsAmountDefault;
-  const { wallOwnerId, wallOwnerDomain, searchQuery } = inputValues;
+  const {
+    postsAmountDef, totalPostsDef, authorIdDef, ownerIdDef, ownerDomainDef
+  } = inputDefaults;
+  const authorId = Number(inputValues.authorId) || authorIdDef;
+  const postsAmount = Number(inputValues.postsAmount) || postsAmountDef;
+  const wallOwnerId = inputValues.wallOwnerId || ownerIdDef;
+  const wallOwnerDomain = inputValues.wallOwnerDomain || ownerDomainDef;
+  const { searchQuery } = inputValues;
   const baseApiReqUrl = 'https://api.vk.com/method/wall.get?' +
     `owner_id=${wallOwnerId}&domain=${wallOwnerDomain}&count=100` +
     `&access_token=${token}` +
@@ -97,7 +101,9 @@ export const searchInWallPosts = inputValues => (dispatch, getState) => {
   const handleRequest = (currentOffset) => {
     return dispatch(fetchWallData(baseApiReqUrl, currentOffset))
       .then((response) => {
-        totalPostsAtWall = response ? response.count : totalPostsAtWall;
+        totalPostsAtWall = response.count && response.count < totalPostsDef
+          ? response.count
+          : totalPostsDef;
         return response;
       })
       .then(response => parseSearchedPosts(response, authorId))
