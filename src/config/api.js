@@ -14,7 +14,7 @@ const inputDefaults = {
   ownerDomainDef: '4erniyspisok',
   authorIdDef: 406853999,
   totalPostsDef: 3000
-}
+};
 // serverTokenURL: 'https://nameless-sea-73563.herokuapp.com/auth',
 const tokenRequestURL =
   `https://oauth.vk.com/authorize?client_id=${clientID}&` +
