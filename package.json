@@ -10,8 +10,8 @@
     "watch": "node_modules/.bin/webpack -w --progress --color",
     "serve": "webpack-dev-server --progress --color",
     "mon": "nodemon server.js",
-    "rdext": "remotedev-extension --port=8031 --runserver",
-    "remotedev": "remotedev --hostname=localhost --port=8031"
+    "rdext": "remotedev-extension --port=8000 --runserver",
+    "remotedev": "remotedev --hostname=localhost --port=8000"
   },
   "dependencies": {
     "babel-core": "^6.26.0",
@@ -27,6 +27,7 @@
     "express": "^4.16.1",
     "fetch-jsonp": "^1.1.3",
     "file-loader": "^1.1.5",
+    "moment": "^2.19.1",
     "prop-types": "^15.6.0",
     "react": "^15.6.1",
     "react-bootstrap": "^0.31.3",

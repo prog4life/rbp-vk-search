@@ -23,7 +23,7 @@ export default (preloadedState = {}) => {
     realtime: true, // if process.env.NODE_ENV not set as 'development'
     // required to use local "remotedev-server", OR use remotedev.io/local alt
     // set same port in any monitor app (browser/Atom/VS Code extension)
-    port: 8031 // the port local "remotedev-server" is running at
+    port: 8000 // the port local "remotedev-server" is running at
   });
 
   const store = createStore(
