@@ -20,7 +20,7 @@ export function parseSearchedPosts(response, authorId) {
 export function formatSearchedPosts(posts) {
   return posts.map(post => ({
     fromId: post.from_id,
-    timestamp: post.date * 1000,
+    timestamp: post.date,
     postId: post.id,
     text: post.text,
     link: `https://vk.com/wall${post.owner_id}_${post.id}`

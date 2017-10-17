@@ -14,7 +14,7 @@ import './styles/main.css';
 
 const RESULTS = [
   {
-    timestamp: 1582357458000,
+    timestamp: 1582357458,
     fromId: 413870329,
     postId: 54525,
     text: 'Мне 29 лет симпатичная девушка. Ищу партнёра для интим отношений ' +
@@ -22,7 +22,7 @@ const RESULTS = [
     link: 'https://vk.com/club75465366?w=wall-75465366_37844%2Fall'
   },
   {
-    timestamp: 1323574580000,
+    timestamp: 1323574580,
     fromId: 247772351,
     postId: 13585,
     text: 'Я ищу спонсора на длительные отношения, я без опыта, ' +

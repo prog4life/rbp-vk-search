@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
 import SearchForm from './SearchForm';
 import ResultsPanel from './ResultsPanel';
@@ -59,7 +60,8 @@ class App extends React.Component {
       saveAccessTokenData
     } = this.props.actions;
 
-    const expiry = Date.now() + (expiresIn * 1000);
+    // const expiry = Date.now() + (expiresIn * 1000);
+    const expiry = moment().add(expiresIn, 'seconds').unix();
 
     setUserId(userId);
     saveAccessTokenData(accessToken, expiry);

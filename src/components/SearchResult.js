@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 import { ListGroupItem } from 'react-bootstrap';
 
 function SearchResult({ result, number }) {
@@ -17,7 +18,8 @@ function SearchResult({ result, number }) {
     <ListGroupItem>
       <span>{resultNumber}{' '}</span>
       <span className="post-timestamp">
-        {new Date(timestamp).toLocaleString()}
+        {/* {new Date(timestamp * 1000).toLocaleString()} */}
+        {moment.unix(timestamp).format('D MMM YYYY  H:mm')}
       </span>
       <span>{' '}
         {postIdLabel}
