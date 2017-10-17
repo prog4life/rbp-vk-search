@@ -12,26 +12,24 @@ class SearchForm extends React.Component {
     this.handleTextInputChange = this.handleTextInputChange.bind(this);
 
     this.state = {
-      wallOwner: '',
-      wallDomain: '',
+      wallOwnerId: '',
+      wallOwnerDomain: '',
       searchQuery: '',
       authorId: '',
-      searchOffset: '',
       postsAmount: ''
     };
   }
   handleSubmit(event) {
     event.preventDefault();
     const {
-      wallOwner, wallDomain, searchQuery, authorId, searchOffset, postsAmount
+      wallOwnerId, wallOwnerDomain, searchQuery, authorId, postsAmount
     } = event.target.elements;
 
     this.props.onSearch({
-      wallOwner: wallOwner.value,
-      wallDomain: wallDomain.value,
+      wallOwnerId: wallOwnerId.value,
+      wallOwnerDomain: wallOwnerDomain.value,
       searchQuery: searchQuery.value,
       authorId: authorId.value,
-      searchOffset: searchOffset.value,
       postsAmount: postsAmount.value
     });
   }
@@ -42,7 +40,7 @@ class SearchForm extends React.Component {
   }
   render() {
     const {
-      wallOwner, wallDomain, searchQuery, authorId, searchOffset, postsAmount
+      wallOwnerId, wallOwnerDomain, searchQuery, authorId, postsAmount
     } = this.state;
 
     return (
@@ -53,9 +51,9 @@ class SearchForm extends React.Component {
             <Col sm={6} lg={4}>
               <FormFieldGroup
                 onChange={this.handleTextInputChange}
-                id="wallOwner"
+                id="wallOwnerId"
                 type="text"
-                value={wallOwner}
+                value={wallOwnerId}
                 label="Wall owner id (user or group)"
                 placeholder="wall owner id"
               />
@@ -63,9 +61,9 @@ class SearchForm extends React.Component {
             <Col sm={6} lg={4}>
               <FormFieldGroup
                 onChange={this.handleTextInputChange}
-                id="wallDomain"
+                id="wallOwnerDomain"
                 type="text"
-                value={wallDomain}
+                value={wallOwnerDomain}
                 label="Short name of wall owner (instead of id)"
                 placeholder="wall owner textual id"
               />
@@ -97,7 +95,7 @@ class SearchForm extends React.Component {
                 onChange={this.handleTextInputChange}
                 id="searchOffset"
                 type="text"
-                value={searchOffset}
+                value=""
                 label="Show posts starting from this number of result"
                 placeholder="start from post number"
               />

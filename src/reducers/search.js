@@ -1,13 +1,21 @@
 export function sortResultsSubReducer(state = [], action) {
-  const newResults = [...state, ...action.results];
-
-  return newResults.sort((a, b) => b.timestamp - a.timestamp);
+  return action.ascending
+    ? state.sort((a, b) => a.timestamp - b.timestamp)
+    : state.sort((a, b) => b.timestamp - a.timestamp);
 }
 
 export function resultsReducer(state = [], action) {
   switch (action.type) {
     case 'ADD_RESULTS':
-      return sortResultsSubReducer(state, action);
+      // TODO: prevent adding of same results
+      return [...state, ...action.results];
+    case 'SORT_RESULTS':
+      return [...sortResultsSubReducer(state, action)];
+    case 'CUT_EXCESS_RESULTS':
+      return state.slice(0, action.amount);
+    case 'ADD_SORT_CUT_RESULTS':
+      return sortResultsSubReducer([...state, ...action.results], action)
+        .slice(0, action.amount);
     case 'CLEAR_RESULTS':
       return [];
     default:
@@ -17,13 +25,17 @@ export function resultsReducer(state = [], action) {
 
 export function requestsReducer(state = [], action) {
   switch (action.type) {
-    case 'FETCH_WALL_DATA_FAIL':
-      return [
-        ...state,
-        action.offset
-      ];
+    case 'FETCH_WALL_DATA_REQUEST':
+
+      // TODO: add and check pending state reuests                                 !!!
+
+      return state.filter(offset => offset !== action.offset);
     case 'FETCH_WALL_DATA_SUCCESS':
-      return state.map(offset => offset !== action.offset);
+      return state.filter(offset => offset !== action.offset);
+    case 'FETCH_WALL_DATA_FAIL':
+      return state.indexOf(action.offset) === -1
+        ? [...state, action.offset]
+        : state;
     default:
       return state;
   }
