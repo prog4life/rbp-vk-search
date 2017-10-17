@@ -15,7 +15,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
-    this.handleUserPostsSearch = this.handleUserPostsSearch.bind(this);
+    this.handleSearchInWallPosts = this.handleSearchInWallPosts.bind(this);
   }
   componentDidMount() {
     /* eslint max-statements: 0 */
@@ -64,15 +64,15 @@ class App extends React.Component {
     setUserId(userId);
     saveAccessTokenData(accessToken, expiry);
   }
-  handleUserPostsSearch(inputValues) {
-    const { searchUserPosts } = this.props.actions;
+  handleSearchInWallPosts(inputValues) {
+    const { searchInWallPosts } = this.props.actions;
 
-    searchUserPosts(inputValues);
+    searchInWallPosts(inputValues);
   }
   render() {
     return (
       <div id="App">
-        <SearchForm onSearch={this.handleUserPostsSearch} />
+        <SearchForm onSearch={this.handleSearchInWallPosts} />
         <ResultsPanel header="This is a panel with search results">
           <ResultsFilter filterText="Here will be filter text" />
           <ResultsList results={this.props.results} />

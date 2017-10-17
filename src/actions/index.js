@@ -1,2 +1,2 @@
 export * from './auth';
-export * from './userPosts';
+export * from './wallPosts';

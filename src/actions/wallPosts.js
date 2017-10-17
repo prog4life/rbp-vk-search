@@ -3,13 +3,13 @@ import {
   apiVersion, requestInterval, jsonpTimeout, postsAmountDefault
 } from '../config/api';
 
-let userPostsSearchIntervalId = null;
+let wallPostsSearchIntervalId = null;
 
 // export function prepareUserSearch(inputValues) {
 //   IDEA: handle user input, create api request params and place them to store
 // }
 
-export function parseUserPosts(response, authorId) {
+export function parseSearchedPosts(response, authorId) {
   const { items: posts } = response;
 
   return Array.isArray(posts)
@@ -17,7 +17,7 @@ export function parseUserPosts(response, authorId) {
     : Promise.reject(response); // NOTE: or throw?
 }
 
-export function formatUserPosts(posts) {
+export function formatSearchedPosts(posts) {
   return posts.map(post => ({
     fromId: post.from_id,
     timestamp: post.date * 1000,
@@ -74,7 +74,7 @@ export const fetchWallData = (baseApiReqUrl, offset) => (dispatch, getState) => 
 };
 
 /* eslint-disable max-statements */
-export const searchUserPosts = inputValues => (dispatch, getState) => {
+export const searchInWallPosts = inputValues => (dispatch, getState) => {
   let offset = 0;
   let totalPostsAtWall;
   const searchStart = Date.now();
@@ -90,7 +90,7 @@ export const searchUserPosts = inputValues => (dispatch, getState) => {
     '&extended=1';
 
   // NOTE: for situation when user press "Start/Stop" button
-  clearInterval(userPostsSearchIntervalId);
+  clearInterval(wallPostsSearchIntervalId);
   dispatch({ type: 'CLEAR_RESULTS' });
 
   // TODO: extract as separate thunk
@@ -100,8 +100,8 @@ export const searchUserPosts = inputValues => (dispatch, getState) => {
         totalPostsAtWall = response ? response.count : totalPostsAtWall;
         return response;
       })
-      .then(response => parseUserPosts(response, authorId))
-      .then(posts => formatUserPosts(posts))
+      .then(response => parseSearchedPosts(response, authorId))
+      .then(posts => formatSearchedPosts(posts))
       .then((results) => {
         if (results.length > 0) {
           // dispatch(addResults(results));
@@ -119,7 +119,7 @@ export const searchUserPosts = inputValues => (dispatch, getState) => {
       .catch(e => console.error(e));
   };
 
-  userPostsSearchIntervalId = setInterval(() => {
+  wallPostsSearchIntervalId = setInterval(() => {
     if (getState().results.length < postsAmount) {
       if (!totalPostsAtWall || offset < totalPostsAtWall) {
         offset += 100;
@@ -135,7 +135,7 @@ export const searchUserPosts = inputValues => (dispatch, getState) => {
     if (offsets.length > 0) {
       return handleRequest(offsets[0]);
     }
-    return clearInterval(userPostsSearchIntervalId);
+    return clearInterval(wallPostsSearchIntervalId);
 
     // NOTE: maybe add exit condition when get empty items(posts) few times
     // if (responseData.items.length = 0) { ... }
