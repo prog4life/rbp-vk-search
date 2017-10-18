@@ -40,3 +40,14 @@ export function requestsReducer(state = [], action) {
       return state;
   }
 }
+
+export function searchReducer(state = false, action) {
+  switch (action.type) {
+    case 'SEARCH_START':
+      return true;
+    case 'SEARCH_STOP':
+      return false;
+    default:
+      return state;
+  }
+}

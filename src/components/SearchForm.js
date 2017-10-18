@@ -21,11 +21,17 @@ class SearchForm extends React.Component {
   }
   handleSubmit(event) {
     event.preventDefault();
+
+    if (this.props.isSearching) {
+      this.props.onTerminateSearch();
+      return;
+    }
+
     const {
       wallOwnerId, wallOwnerDomain, searchQuery, authorId, postsAmount
     } = event.target.elements;
 
-    this.props.onSearch({
+    this.props.onStartSearch({
       wallOwnerId: wallOwnerId.value,
       wallOwnerDomain: wallOwnerDomain.value,
       searchQuery: searchQuery.value,
@@ -40,8 +46,17 @@ class SearchForm extends React.Component {
   }
   render() {
     const {
-      wallOwnerId, wallOwnerDomain, searchQuery, authorId, postsAmount
+      wallOwnerId,
+      wallOwnerDomain,
+      searchQuery,
+      authorId,
+      postsAmount
     } = this.state;
+    const { isSearching } = this.props;
+
+    const searchBtnTxt = isSearching ? 'Searching...' : 'Start Search';
+    const stopBtnTxt = 'Terminate Search';
+    const stopBtn = <Button type="submit">{stopBtnTxt}</Button>;
 
     return (
       <Grid>
@@ -118,13 +133,14 @@ class SearchForm extends React.Component {
               </FormGroup>
             </Col>
             <Col xs={4} sm={6} md={4}>
-              {/* TODO: Change to cancel button on loading */}
-              {/* <Button bsStyle="info" disabled={isLoading}>
-                    Start Search
-                  </Button> */}
-              <Button type="submit" bsStyle="info">
-                Start Search
+              <Button
+                type="submit"
+                bsStyle="info"
+                disabled={isSearching}
+              >
+                {searchBtnTxt}
               </Button>
+              {isSearching ? stopBtn : null}
             </Col>
           </Row>
         </form>
@@ -136,5 +152,7 @@ class SearchForm extends React.Component {
 export default SearchForm;
 
 SearchForm.propTypes = {
-  onSearch: PropTypes.func.isRequired
+  isSearching: PropTypes.bool.isRequired,
+  onStartSearch: PropTypes.func.isRequired,
+  onTerminateSearch: PropTypes.func.isRequired
 };

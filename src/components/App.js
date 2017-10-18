@@ -17,6 +17,7 @@ class App extends React.Component {
     super(props);
 
     this.handleSearchInWallPosts = this.handleSearchInWallPosts.bind(this);
+    this.handleSearchStop = this.handleSearchStop.bind(this);
   }
   componentDidMount() {
     /* eslint max-statements: 0 */
@@ -73,10 +74,17 @@ class App extends React.Component {
 
     searchInWallPosts(inputValues);
   }
+  handleSearchStop() {
+    this.props.actions.terminateSearch();
+  }
   render() {
     return (
       <div id="App">
-        <SearchForm onSearch={this.handleSearchInWallPosts} />
+        <SearchForm
+          onStartSearch={this.handleSearchInWallPosts}
+          onTerminateSearch={this.handleSearchStop}
+          isSearching={this.props.isSearching}
+        />
         <ResultsPanel header="This is a panel with search results">
           <ResultsFilter filterText="Here will be filter text" />
           <ResultsList results={this.props.results} />
@@ -88,6 +96,7 @@ class App extends React.Component {
 
 App.propTypes = {
   actions: PropTypes.objectOf(PropTypes.func).isRequired,
+  isSearching: PropTypes.bool.isRequired,
   results: PropTypes.arrayOf(PropTypes.object).isRequired,
   tokenData: PropTypes.shape({
     token: PropTypes.string,
@@ -97,10 +106,10 @@ App.propTypes = {
 
 function mapStateToProps(state) {
   return {
-    // TODO: try to disconnect userId and tokenData and see what happens
     userId: state.userId,
     tokenData: state.tokenData,
-    results: state.results
+    results: state.results,
+    isSearching: state.isSearching
   };
 }
 // NOTE: wraps each action creator into a dispatch call, to be invoked directly
@@ -111,4 +120,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(null, mapDispatchToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);

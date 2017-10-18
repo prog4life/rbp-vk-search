@@ -48,6 +48,13 @@ export function cutExcessResults(amount) {
   };
 }
 
+export function terminateSearch() {
+  clearInterval(wallPostsSearchIntervalId);
+  return {
+    type: 'SEARCH_STOP'
+  };
+}
+
 export const fetchWallData = (baseApiReqUrl, offset) => (dispatch, getState) => {
   const currentApiReqUrl = `${baseApiReqUrl}&offset=${offset}`;
 
@@ -93,7 +100,7 @@ export const searchInWallPosts = inputValues => (dispatch, getState) => {
     `&v=${apiVersion}` +
     '&extended=1';
 
-  // NOTE: for situation when user press "Start/Stop" button
+  // NOTE: doublecheck
   clearInterval(wallPostsSearchIntervalId);
   dispatch({ type: 'CLEAR_RESULTS' });
 
@@ -141,10 +148,11 @@ export const searchInWallPosts = inputValues => (dispatch, getState) => {
     if (offsets.length > 0) {
       return handleRequest(offsets[0]);
     }
-    return clearInterval(wallPostsSearchIntervalId);
+    return dispatch(terminateSearch());
 
     // NOTE: maybe add exit condition when get empty items(posts) few times
     // if (responseData.items.length = 0) { ... }
   }, requestInterval);
+  dispatch({ type: 'SEARCH_START' });
   handleRequest(offset);
 };

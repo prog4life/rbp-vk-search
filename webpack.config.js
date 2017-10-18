@@ -43,7 +43,7 @@ module.exports = {
         ],
         loader: 'babel-loader',
         options: {
-          presets: ['react', 'es2015', 'stage-0']
+          presets: ['react', 'env', 'stage-0']
           // plugins: ['react-hot-loader/babel'] // for react-hot-loader
         }
       },
