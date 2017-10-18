@@ -68,6 +68,8 @@ class App extends React.Component {
   }
   handleSearchInWallPosts(inputValues) {
     const { searchInWallPosts } = this.props.actions;
+    console.log('Provided store: ', this.context.store);
+    console.log('Context: ', this.context);
 
     searchInWallPosts(inputValues);
   }
@@ -84,7 +86,16 @@ class App extends React.Component {
   }
 }
 
-function mapState(state) {
+App.propTypes = {
+  actions: PropTypes.objectOf(PropTypes.func).isRequired,
+  results: PropTypes.arrayOf(PropTypes.object).isRequired,
+  tokenData: PropTypes.shape({
+    token: PropTypes.string,
+    expiresAt: PropTypes.number
+  }).isRequired
+};
+
+function mapStateToProps(state) {
   return {
     // TODO: try to disconnect userId and tokenData and see what happens
     userId: state.userId,
@@ -94,19 +105,10 @@ function mapState(state) {
 }
 // NOTE: wraps each action creator into a dispatch call, to be invoked directly
 // as this.props.actName() instead of this.props.dispatch(actions.actionName())
-function mapDispatch(dispatch) {
+function mapDispatchToProps(dispatch) {
   return {
     actions: bindActionCreators(allActions, dispatch)
   };
 }
 
-export default connect(mapState, mapDispatch)(App);
-
-App.propTypes = {
-  actions: PropTypes.objectOf(PropTypes.func).isRequired,
-  results: PropTypes.arrayOf(PropTypes.object).isRequired,
-  tokenData: PropTypes.shape({
-    token: PropTypes.string,
-    expiresAt: PropTypes.number
-  }).isRequired
-};
+export default connect(null, mapDispatchToProps)(App);

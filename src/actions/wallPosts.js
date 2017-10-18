@@ -55,7 +55,7 @@ export const fetchWallData = (baseApiReqUrl, offset) => (dispatch, getState) => 
   console.log('api request url offset: ', offset);
 
   return fetchJsonp(currentApiReqUrl, {
-    timeout: jsonpTimeout // default - 5000
+    // timeout: jsonpTimeout // default - 5000
   })
     .then(response => response.json())
     .then((resJSON) => {
