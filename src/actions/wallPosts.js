@@ -62,7 +62,7 @@ export const fetchWallData = (baseApiReqUrl, offset) => (dispatch, getState) => 
   console.log('api request url offset: ', offset);
 
   return fetchJsonp(currentApiReqUrl, {
-    // timeout: jsonpTimeout // default - 5000
+    timeout: jsonpTimeout // default - 5000
   })
     .then(response => response.json())
     .then((resJSON) => {
@@ -73,9 +73,9 @@ export const fetchWallData = (baseApiReqUrl, offset) => (dispatch, getState) => 
       console.warn('Parsing failed ', offset, ex);
 
       dispatch({ type: 'FETCH_WALL_DATA_FAIL', offset });
-      const offsets = getState().failedRequestsOffsets;
+      const { failedRequests } = getState();
 
-      console.log('Failed requests offsets ', offsets);
+      console.log('Failed requests offsets ', failedRequests);
       throw ex;
     });
 };
@@ -133,20 +133,21 @@ export const searchInWallPosts = inputValues => (dispatch, getState) => {
   };
 
   wallPostsSearchIntervalId = setInterval(() => {
+    // NOTE: temporarily done by single action
+    // dispatch(sortResults(false));
+    // dispatch(cutExcessResults(postsAmount));
     if (getState().results.length < postsAmount) {
       if (!totalPostsAtWall || offset < totalPostsAtWall) {
         offset += 100;
         return handleRequest(offset);
       }
     }
-    // NOTE: sorting and cutting will be done at render further
-    // dispatch(sortResults(false));
-    // dispatch(cutExcessResults(postsAmount));
 
     // TODO: add and check pending requests state                                !!!
-    const offsets = getState().failedRequestsOffsets;
-    if (offsets.length > 0) {
-      return handleRequest(offsets[0]);
+    const { failedRequests } = getState();
+    if (failedRequests.length > 0) {
+      const req = failedRequests.find(failedReq => !failedReq.pending);
+      return req ? handleRequest(req.offset) : false;
     }
     return dispatch(terminateSearch());
 

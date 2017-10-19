@@ -8,6 +8,6 @@ export default combineReducers({
   userId: userIdReducer,
   tokenData: tokenReducer,
   results: resultsReducer,
-  failedRequestsOffsets: requestsReducer,
+  failedRequests: requestsReducer,
   isSearching: searchReducer
 });

@@ -7,7 +7,7 @@ const responseType = 'token';
 const apiVersion = 5.68;
 const state = 55555;
 const requestInterval = 500;
-const jsonpTimeout = 3000;
+const jsonpTimeout = 500;
 const inputDefaults = {
   postsAmountDef: 10,
   ownerIdDef: '',
