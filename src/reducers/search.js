@@ -38,13 +38,19 @@ export function requestsReducer(state = [], action) {
     case 'FETCH_WALL_DATA_SUCCESS':
       return state.filter(failedReq => failedReq.offset !== action.offset);
     case 'FETCH_WALL_DATA_FAIL':
-      return state.some(failedReq => failedReq.offset === action.offset)
-        ? state
-        :
-        state.concat([{
+      return state.filter(failedReq => failedReq.offset !== action.offset)
+        .concat([{
           offset: action.offset,
           pending: false
         }]);
+
+      // return state.some(failedReq => failedReq.offset === action.offset)
+      //   ? state
+      //   :
+      //   state.concat([{
+      //     offset: action.offset,
+      //     pending: false
+      //   }]);
 
       // if (state.some(failedReq => failedReq.offset === action.offset)) {
       //   return state;

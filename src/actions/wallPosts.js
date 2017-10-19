@@ -18,6 +18,7 @@ export function parseSearchedPosts(response, authorId) {
 }
 
 export function formatSearchedPosts(posts) {
+  // TODO: add wallOwnerId as prop
   return posts.map(post => ({
     fromId: post.from_id,
     timestamp: post.date,
@@ -67,6 +68,7 @@ export const fetchWallData = (baseApiReqUrl, offset) => (dispatch, getState) => 
     .then(response => response.json())
     .then((resJSON) => {
       dispatch({ type: 'FETCH_WALL_DATA_SUCCESS', offset });
+      console.log('response: ', resJSON.response);
       return resJSON.response;
     })
     .catch((ex) => {
@@ -75,7 +77,7 @@ export const fetchWallData = (baseApiReqUrl, offset) => (dispatch, getState) => 
       dispatch({ type: 'FETCH_WALL_DATA_FAIL', offset });
       const { failedRequests } = getState();
 
-      console.log('Failed requests offsets ', failedRequests);
+      console.log('Failed requests: ', failedRequests);
       throw ex;
     });
 };
@@ -108,9 +110,10 @@ export const searchInWallPosts = inputValues => (dispatch, getState) => {
   const handleRequest = (currentOffset) => {
     return dispatch(fetchWallData(baseApiReqUrl, currentOffset))
       .then((response) => {
-        totalPostsAtWall = response.count && response.count < totalPostsDef
-          ? response.count
-          : totalPostsDef;
+        // totalPostsAtWall = response.count && response.count < totalPostsDef
+        //   ? response.count
+        //   : totalPostsDef;
+        totalPostsAtWall = totalPostsDef;
         return response;
       })
       .then(response => parseSearchedPosts(response, authorId))

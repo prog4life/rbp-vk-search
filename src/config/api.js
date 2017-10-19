@@ -6,14 +6,14 @@ const scope = 'friends';
 const responseType = 'token';
 const apiVersion = 5.68;
 const state = 55555;
-const requestInterval = 500;
+const requestInterval = 350;
 const jsonpTimeout = 500;
 const inputDefaults = {
   postsAmountDef: 10,
   ownerIdDef: '',
   ownerDomainDef: '4erniyspisok',
   authorIdDef: 406853999,
-  totalPostsDef: 3000
+  totalPostsDef: 5000
 };
 // serverTokenURL: 'https://nameless-sea-73563.herokuapp.com/auth',
 const tokenRequestURL =

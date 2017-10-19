@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormGroup, Checkbox, Button, Grid, Row, Col } from 'react-bootstrap';
+import { ButtonToolbar, Button, Grid, Row, Col } from 'react-bootstrap';
 
 import FormFieldGroup from './FormFieldGroup';
 
@@ -63,7 +63,7 @@ class SearchForm extends React.Component {
         <form onSubmit={this.handleSubmit}>
           <Row>
             {/*  TODO: use names instead of id's */}
-            <Col sm={6} lg={4}>
+            <Col xs={10} sm={6} lg={4}>
               <FormFieldGroup
                 onChange={this.handleTextInputChange}
                 id="wallOwnerId"
@@ -73,7 +73,7 @@ class SearchForm extends React.Component {
                 placeholder="wall owner id"
               />
             </Col>
-            <Col sm={6} lg={4}>
+            <Col xs={10} sm={6} lg={4}>
               <FormFieldGroup
                 onChange={this.handleTextInputChange}
                 id="wallOwnerDomain"
@@ -83,7 +83,7 @@ class SearchForm extends React.Component {
                 placeholder="wall owner textual id"
               />
             </Col>
-            <Col sm={6} lg={4}>
+            <Col xs={10} sm={6} lg={4}>
               <FormFieldGroup
                 onChange={this.handleTextInputChange}
                 id="searchQuery"
@@ -94,7 +94,7 @@ class SearchForm extends React.Component {
                 disabled
               />
             </Col>
-            <Col sm={6} lg={4}>
+            <Col xs={10} sm={6} lg={4}>
               <FormFieldGroup
                 onChange={this.handleTextInputChange}
                 id="authorId"
@@ -105,7 +105,7 @@ class SearchForm extends React.Component {
                 required
               />
             </Col>
-            <Col sm={6} lg={4}>
+            <Col xs={10} sm={6} lg={4}>
               <FormFieldGroup
                 onChange={this.handleTextInputChange}
                 id="searchOffset"
@@ -115,7 +115,7 @@ class SearchForm extends React.Component {
                 placeholder="start from post number"
               />
             </Col>
-            <Col sm={6} lg={4}>
+            <Col xs={10} sm={6} lg={4}>
               <FormFieldGroup
                 onChange={this.handleTextInputChange}
                 id="postsAmount"
@@ -125,22 +125,19 @@ class SearchForm extends React.Component {
                 placeholder="number of results"
               />
             </Col>
-            <Col xs={8} sm={6} md={8}>
-              <FormGroup controlId="onlyOwner">
-                <Checkbox readOnly disabled>
-                  Search among owner{"'"}s posts only
-                </Checkbox>
-              </FormGroup>
-            </Col>
-            <Col xs={4} sm={6} md={4}>
-              <Button
-                type="submit"
-                bsStyle="info"
-                disabled={isSearching}
-              >
-                {searchBtnTxt}
-              </Button>
-              {isSearching ? stopBtn : null}
+          </Row>
+          <Row>
+            <Col md={6} lg={4} mdOffset={6} lgOffset={8}>
+              <ButtonToolbar>
+                <Button
+                  type="submit"
+                  bsStyle="info"
+                  disabled={isSearching}
+                >
+                  {searchBtnTxt}
+                </Button>
+                {isSearching ? stopBtn : null}
+              </ButtonToolbar>
             </Col>
           </Row>
         </form>

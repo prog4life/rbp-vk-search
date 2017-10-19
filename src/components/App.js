@@ -69,8 +69,6 @@ class App extends React.Component {
   }
   handleSearchInWallPosts(inputValues) {
     const { searchInWallPosts } = this.props.actions;
-    console.log('Provided store: ', this.context.store);
-    console.log('Context: ', this.context);
 
     searchInWallPosts(inputValues);
   }
