@@ -47,6 +47,8 @@ module.exports = {
               // useBuiltIns: true,
               debug: true
             }],
+            'react',
+            'stage-2'
           ]
           // plugins: ['react-hot-loader/babel'] // for react-hot-loader
         }
