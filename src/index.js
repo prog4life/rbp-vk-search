@@ -9,7 +9,6 @@ import 'bootstrap/dist/css/bootstrap-theme.css';
 import App from 'App';
 import configureStore from './store/configureStore';
 
-
 import './styles/main.css';
 
 const RESULTS = [

@@ -3,7 +3,7 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: [
-    'babel-polyfill',
+    // 'babel-polyfill',
     // 'react-hot-loader/patch', // for react-hot-loader
     './src/index.js'
   ],
@@ -38,31 +38,55 @@ module.exports = {
           path.resolve(__dirname, 'src')
         ],
         exclude: [
-          path.resolve(__dirname, 'node_modules'),
-          path.resolve(__dirname, 'bower_components')
+          path.resolve(__dirname, 'node_modules')
         ],
         loader: 'babel-loader',
         options: {
-          presets: ['react', 'env', 'stage-0']
+          presets: [
+            ['env', {
+              // useBuiltIns: true,
+              debug: true
+            }],
+          ]
           // plugins: ['react-hot-loader/babel'] // for react-hot-loader
         }
       },
+      // {
+      //   test: /\.css$/,
+      //   use: [
+      //     // OR: 'style-loader', 'css-loader'
+      //     { loader: 'style-loader' },
+      //     { loader: 'css-loader' }
+      //   ]
+      // },
       {
-        test: /\.css$/,
-        use: [
-          // OR: 'style-loader', 'css-loader'
-          { loader: 'style-loader' },
-          { loader: 'css-loader' }
-        ]
-      },
-      {
-        test: /\.scss$/,
+        test: /\.(scss|css)$/,
         use: [
           'style-loader',
-          'css-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true
+            }
+          },
+          // {
+          //   loader: 'postcss-loader',
+          //   options: {
+          //     ident: 'postcss',
+          //     syntax: scssSyntax,
+          //     plugins: [
+          //       autoprefixer
+          //       // postcss-normalize,
+          //       // cssnano
+          //     ],
+          //     sourceMap: true
+          //   }
+          // },
+          // 'resolve-url-loader',
           {
             loader: 'sass-loader',
             options: {
+              sourceMap: true,
               includePaths: [
                 path.resolve(__dirname, 'src/styles')
               ]
@@ -83,9 +107,8 @@ module.exports = {
   devServer: {
     contentBase: path.join(__dirname, 'public'), // or "dist" or "build"
     compress: true,
-    port: 7031, // 9000, default: 8080
-    // hot: true,
-    clientLogLevel: 'info' // none, error, warning or info (default)
+    port: 7031 // 9000, default: 8080
+    // hot: true
   },
   devtool: 'source-map'
 };
