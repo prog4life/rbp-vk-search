@@ -1,6 +1,11 @@
 const http = require('http');
 const path = require('path');
 const express = require('express');
+// const remotedev = require('remotedev-server');
+require('remotedev-extension')({
+  port: 8000,
+  runserver: true
+});
 
 const app = express();
 
@@ -9,7 +14,7 @@ const app = express();
 // const webpackHotMiddleware = require('webpack-hot-middleware');
 // const config = require('./webpack.config');
 
-const port = process.env.PORT || '7031';
+const port = process.env.PORT || '7047';
 // const hostname = process.env.IP || 'localhost';
 
 // const compiler = webpack(config);
@@ -22,7 +27,9 @@ const port = process.env.PORT || '7031';
 //   }
 // }));
 
-app.use(express.static(path.join(__dirname, 'public')));
+// remotedev({ hostname: 'localhost', port: 8000 }); // NOTE: not able to start
+
+// app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/favicon.ico', (req, res) => {
   res.set('Content-Type', 'image/x-icon');

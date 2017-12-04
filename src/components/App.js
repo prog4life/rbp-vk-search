@@ -4,19 +4,19 @@ import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
+import * as actionCreators from 'actions';
+import { tokenRequestURL } from 'config/api';
+import { parseHash, handleErrorHash } from 'utils/res-hash-handler';
 import SearchForm from './SearchForm';
 import ResultsPanel from './ResultsPanel';
 import ResultsFilter from './ResultsFilter';
 import ResultsList from './ResultsList';
-import { tokenRequestURL } from '../config/api';
-import { parseHash, handleErrorHash } from '../utils/res-hash-handler';
-import * as allActions from '../actions';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
 
-    this.handleSearchInWallPosts = this.handleSearchInWallPosts.bind(this);
+    this.handleSearchForWallPosts = this.handleSearchForWallPosts.bind(this);
     this.handleSearchStop = this.handleSearchStop.bind(this);
   }
   componentDidMount() {
@@ -56,10 +56,7 @@ class App extends React.Component {
       user_id: userId
     } = parsedHash;
 
-    const {
-      setUserId,
-      saveAccessTokenData
-    } = this.props.actions;
+    const { actions: { setUserId, saveAccessTokenData } } = this.props;
 
     // const expiry = Date.now() + (expiresIn * 1000);
     const expiry = moment().add(expiresIn, 'seconds').unix();
@@ -67,25 +64,26 @@ class App extends React.Component {
     setUserId(userId);
     saveAccessTokenData(accessToken, expiry);
   }
-  handleSearchInWallPosts(inputValues) {
-    const { searchInWallPosts } = this.props.actions;
-
-    searchInWallPosts(inputValues);
+  handleSearchForWallPosts(inputValues) {
+    const { actions: { searchPostsOnWall } } = this.props;
+    searchPostsOnWall(inputValues);
   }
   handleSearchStop() {
-    this.props.actions.terminateSearch();
+    const { actions: { finishSearch } } = this.props;
+    finishSearch();
   }
   render() {
+    const { isSearching, results } = this.props;
     return (
       <div id="App">
         <SearchForm
-          onStartSearch={this.handleSearchInWallPosts}
+          isSearching={isSearching}
+          onStartSearch={this.handleSearchForWallPosts}
           onTerminateSearch={this.handleSearchStop}
-          isSearching={this.props.isSearching}
         />
         <ResultsPanel header="This is a panel with search results">
           <ResultsFilter filterText="Here will be filter text" />
-          <ResultsList results={this.props.results} />
+          <ResultsList results={results} />
         </ResultsPanel>
       </div>
     );
@@ -114,7 +112,7 @@ function mapStateToProps(state) {
 // as this.props.actName() instead of this.props.dispatch(actions.actionName())
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators(allActions, dispatch)
+    actions: bindActionCreators(actionCreators, dispatch)
   };
 }
 

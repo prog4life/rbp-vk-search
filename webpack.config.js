@@ -42,13 +42,14 @@ module.exports = {
         ],
         loader: 'babel-loader',
         options: {
+          plugins: ['transform-class-properties'],
           presets: [
             ['env', {
-              // useBuiltIns: true,
+              // useBuiltIns: 'entry', // or 'usage'
               debug: true
             }],
             'react',
-            'stage-2'
+            'stage-3'
           ]
           // plugins: ['react-hot-loader/babel'] // for react-hot-loader
         }
@@ -84,7 +85,7 @@ module.exports = {
           //     sourceMap: true
           //   }
           // },
-          // 'resolve-url-loader',
+          'resolve-url-loader',
           {
             loader: 'sass-loader',
             options: {
@@ -109,6 +110,7 @@ module.exports = {
   devServer: {
     contentBase: path.join(__dirname, 'public'), // or "dist" or "build"
     compress: true,
+    historyApiFallback: true,
     port: 7031 // 9000, default: 8080
     // hot: true
   },

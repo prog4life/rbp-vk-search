@@ -66,9 +66,9 @@ export function requestsReducer(state = [], action) {
 
 export function searchReducer(state = false, action) {
   switch (action.type) {
-    case 'SEARCH_START':
+    case 'START_SEARCH':
       return true;
-    case 'SEARCH_STOP':
+    case 'FINISH_SEARCH':
       return false;
     default:
       return state;
