@@ -59,18 +59,17 @@ export const searchPostsOnWall = inputValues => (dispatch, getState) => {
   // let totalPostsAtWall;
   const { token } = getState().tokenData;
   const {
-    postsAmountDef, totalPostsDef, authorIdDef, ownerIdDef, ownerDomainDef
+    postsAmountDef, authorIdDef, ownerIdDef, ownerDomainDef
   } = inputDefaults;
+  const { searchQuery, wallOwnerType } = inputValues;
+  const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
   const wallOwnerId = inputValues.wallOwnerId || ownerIdDef;
   const wallOwnerDomain = inputValues.wallOwnerDomain || ownerDomainDef;
-  const { searchQuery } = inputValues;
   authorId = Number(inputValues.authorId) || authorIdDef;
   postsAmount = Number(inputValues.postsAmount) || postsAmountDef;
   baseAPIReqUrl = 'https://api.vk.com/method/wall.get?' +
-    `owner_id=${wallOwnerId}&domain=${wallOwnerDomain}&count=100` +
-    `&access_token=${token}` +
-    `&v=${apiVersion}` +
-    '&extended=1';
+    `owner_id=${wallOwnerTypePrefix}${wallOwnerId}&domain=${wallOwnerDomain}` +
+    `&count=100&access_token=${token}&v=${apiVersion}&extended=1`;
   searchStart = Date.now();
 
   // NOTE: doublecheck

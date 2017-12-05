@@ -12,8 +12,7 @@ const inputDefaults = {
   postsAmountDef: 10,
   ownerIdDef: '',
   ownerDomainDef: '4erniyspisok',
-  authorIdDef: 406853999,
-  totalPostsDef: 5000
+  authorIdDef: 406853999
 };
 // serverTokenURL: 'https://nameless-sea-73563.herokuapp.com/auth',
 const tokenRequestURL =
