@@ -1,11 +1,25 @@
 node_modules/
 # config/
 
+# production
+# build/
+build/dist/
+build/assets/
+
+# public/
+public/dist/
+public/assets/
+
 **/.idea/
 
 public/bundle.js
 public/bundle.js.map
+public/*.css
+public/*.css.map
 
 # .eslintrc.json
 # .eslintignore
+
+# misc
+.DS_Store
 npm-debug.log

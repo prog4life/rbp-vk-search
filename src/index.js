@@ -1,3 +1,4 @@
+// import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
@@ -9,9 +10,9 @@ import 'bootstrap/dist/css/bootstrap-theme.css';
 import App from 'App';
 import configureStore from './store/configureStore';
 
-import './styles/main.css';
+import './styles/styles.css';
 
-const RESULTS = [
+const results = [
   {
     timestamp: 1582357458,
     fromId: 413870329,
@@ -31,8 +32,10 @@ const RESULTS = [
 ];
 
 const store = configureStore({
-  results: RESULTS
+  results
 });
+
+console.log('process.env.NODE_ENV: ', process.env.NODE_ENV);
 
 // store.subscribe(() => console.log('Updated state ', store.getState()));
 

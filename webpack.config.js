@@ -1,10 +1,27 @@
 const path = require('path');
 const webpack = require('webpack');
+// const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+
+const nodeEnv = process.env.NODE_ENV || 'development';
+const isProduction = nodeEnv === 'production';
+
+console.log('nodeEnv', nodeEnv);
+console.log('isProduction', isProduction);
+
+const extractStyles = new ExtractTextPlugin({
+  // filename: '[name].css',
+  filename: 'styles.css',
+  allChunks: true,
+  // inline loading in development is recommended for HMR and build speed
+  disable: nodeEnv === 'development' // OR !isProduction
+});
 
 module.exports = {
   entry: [
-    // 'babel-polyfill',
-    // 'react-hot-loader/patch', // for react-hot-loader
+    // 'babel-polyfill', // can load specific core-js polyfills separately
     './src/index.js'
   ],
   output: {
@@ -13,12 +30,27 @@ module.exports = {
     publicPath: '/'
   },
   plugins: [
+    extractStyles,
+    new CleanWebpackPlugin([
+      'public' // removes OR 'build' OR 'dist' folder
+      // 'public/*.*' // removes all files (even excluded) in 'public' folder
+      // 'public/*.css', // removes all CSS | JS | ... files in 'public' folder
+    ], {
+      // root: __dirname // abs path to webpack root dir (paths appended to it)
+      // dry: false, // "true" to test/emulate delete (will not remove files)
+      // watch: false, // if true, remove files on recompile
+      exclude: ['assets', 'index.html']
+    }),
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development')
+        NODE_ENV: JSON.stringify(nodeEnv)
       }
+    }),
+    // TODO: disable in development
+    new UglifyJSPlugin({
+      parallel: true, // default === os.cpus().length -1
+      sourceMap: true
     })
-    // new webpack.HotModuleReplacementPlugin()
   ],
   resolve: {
     alias: {
@@ -34,13 +66,13 @@ module.exports = {
     rules: [
       {
         test: /\.(js|jsx)$/,
+        loader: 'babel-loader',
         include: [
           path.resolve(__dirname, 'src')
         ],
         exclude: [
           path.resolve(__dirname, 'node_modules')
         ],
-        loader: 'babel-loader',
         options: {
           plugins: ['transform-class-properties'],
           presets: [
@@ -51,51 +83,21 @@ module.exports = {
             'react',
             'stage-3'
           ]
-          // plugins: ['react-hot-loader/babel'] // for react-hot-loader
         }
       },
-      // {
-      //   test: /\.css$/,
-      //   use: [
-      //     // OR: 'style-loader', 'css-loader'
-      //     { loader: 'style-loader' },
-      //     { loader: 'css-loader' }
-      //   ]
-      // },
       {
         test: /\.(scss|css)$/,
-        use: [
-          'style-loader',
-          {
-            loader: 'css-loader',
-            options: {
-              sourceMap: true
-            }
-          },
-          // {
-          //   loader: 'postcss-loader',
-          //   options: {
-          //     ident: 'postcss',
-          //     syntax: scssSyntax,
-          //     plugins: [
-          //       autoprefixer
-          //       // postcss-normalize,
-          //       // cssnano
-          //     ],
-          //     sourceMap: true
-          //   }
-          // },
-          'resolve-url-loader',
-          {
-            loader: 'sass-loader',
-            options: {
-              sourceMap: true,
-              includePaths: [
-                path.resolve(__dirname, 'src/styles')
-              ]
-            }
-          }
-        ]
+        use: extractStyles.extract({
+          use: [
+            {
+              loader: 'css-loader',
+              options: { importLoaders: 1, sourceMap: true }
+            },
+            'resolve-url-loader',
+            { loader: 'sass-loader', options: { sourceMap: true } }
+          ],
+          fallback: 'style-loader'
+        })
       },
       {
         test: /\.woff($|\?)|\.woff2($|\?)|\.ttf($|\?)|\.eot($|\?)|\.svg($|\?)/,
@@ -108,11 +110,12 @@ module.exports = {
     ]
   },
   devServer: {
-    contentBase: path.join(__dirname, 'public'), // or "dist" or "build"
+    progress: true,
+    contentBase: path.resolve(__dirname, 'public'), // or "dist" or "build"
     compress: true,
     historyApiFallback: true,
     port: 7031 // 9000, default: 8080
-    // hot: true
   },
   devtool: 'source-map'
+  // devtool: isProduction ? 'source-map' : 'cheap-module-eval-source-map'
 };
