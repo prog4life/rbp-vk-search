@@ -26,7 +26,7 @@ export function parseHash(hash) {
 
 // var testHash = 'access-token=0&error=value&=kedi&414&blabla=&fal=false';
 /* eslint camelcase: "off" */
-export function handleErrorHash({error, error_description}) {
+export function handleErrorHash({ error, error_description }) {
   const errorMessage = `Token request error: ${error}. ${error_description}.`;
 
   console.error(errorMessage);

@@ -14,7 +14,12 @@ const inputDefaults = {
   ownerDomainDef: '4erniyspisok',
   authorIdDef: 406853999
 };
-// serverTokenURL: 'https://nameless-sea-73563.herokuapp.com/auth',
+
+const tokenRequestBaseURL =
+  `https://oauth.vk.com/authorize?client_id=${clientID}&` +
+  `display=${display}&scope=${scope}&response_type=${responseType}&` +
+  `v=${apiVersion}&state=${state}&redirect_uri=${redirectURI}`;
+
 const tokenRequestURL =
   `https://oauth.vk.com/authorize?client_id=${clientID}&` +
   `display=${display}&redirect_uri=${redirectURI}&` +
@@ -32,5 +37,6 @@ export {
   requestInterval,
   jsonpTimeout,
   inputDefaults,
+  tokenRequestBaseURL,
   tokenRequestURL
 };

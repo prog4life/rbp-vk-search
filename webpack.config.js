@@ -3,7 +3,7 @@ const webpack = require('webpack');
 // const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+// const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 const isProduction = nodeEnv === 'production';
@@ -45,12 +45,12 @@ module.exports = {
       'process.env': {
         NODE_ENV: JSON.stringify(nodeEnv)
       }
-    }),
-    // TODO: disable in development
-    new UglifyJSPlugin({
-      parallel: true, // default === os.cpus().length -1
-      sourceMap: true
     })
+    // TODO: disable in development
+    // new UglifyJSPlugin({
+    //   parallel: true, // default === os.cpus().length -1
+    //   sourceMap: true
+    // })
   ],
   resolve: {
     alias: {
