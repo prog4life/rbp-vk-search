@@ -1,4 +1,4 @@
-export function extractUserWallPosts(response, authorId) {
+export function extractUserPosts(response, authorId) {
   const { items: posts } = response;
 
   if (Array.isArray(posts)) {
@@ -33,3 +33,23 @@ export const cutExcessResults = amount => ({
   type: 'CUT_EXCESS_RESULTS',
   amount
 });
+
+export const parseWallPosts = (response, authorId, postsAmount) => dispatch => (
+  extractUserPosts(response, authorId)
+    .then(posts => formatWallPosts(posts))
+    .then((results) => {
+      if (results.length > 0) {
+        // dispatch(addResults(results));
+        dispatch({
+          type: 'ADD_SORT_CUT_RESULTS',
+          results,
+          ascending: false,
+          amount: postsAmount
+        });
+        dispatch({ type: 'RESULTS_HAVE_BEEN_HANDLED' });
+        // console.log('duration: ', Date.now() - searchStart);
+        console.log('resultsChunk: ', results);
+      }
+    })
+    .catch(e => console.error(e))
+);

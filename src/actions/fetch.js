@@ -16,8 +16,9 @@ export const fetchWallDataFail = offset => ({
   offset
 });
 
-const fetchWallDataJSONP = (baseAPIReqUrl, offset) => (dispatch, getState) => {
-  const currentAPIReqUrl = `${baseAPIReqUrl}&offset=${offset}`;
+// const fetchWallDataJSONP = (baseAPIReqUrl, offset) => (dispatch, getState) => {
+const fetchWallDataJSONP = (currentAPIReqUrl, offset) => (dispatch, getState) => {
+  // const currentAPIReqUrl = `${baseAPIReqUrl}&offset=${offset}`;
 
   dispatch(fetchWallDataRequest(offset));
   // console.log('api request url offset: ', offset);
@@ -32,7 +33,7 @@ const fetchWallDataJSONP = (baseAPIReqUrl, offset) => (dispatch, getState) => {
       return resJSON.response;
     })
     .catch((ex) => {
-      console.warn('Parsing failed ', offset, ex);
+      console.warn('Fetching failed ', offset, ex);
       dispatch(fetchWallDataFail(offset));
       const { failedRequests } = getState();
 

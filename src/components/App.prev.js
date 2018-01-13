@@ -21,9 +21,9 @@ class App extends React.Component {
   }
   componentDidMount() {
     /* eslint max-statements: 0 */
-    if (this.props.tokenData.token) {
-      // TODO: check if token expires
-      console.info('accessToken is already present: ', this.props.tokenData.token);
+    if (this.props.accessToken) {
+      // TODO: check if accessToken expires
+      console.info('accessToken is already present: ', this.props.accessToken);
       return;
     }
 
@@ -56,13 +56,13 @@ class App extends React.Component {
       user_id: userId
     } = parsedHash;
 
-    const { actions: { setUserId, saveAccessTokenData } } = this.props;
+    const { actions: { setUserId, saveAccessToken } } = this.props;
 
-    // const expiry = Date.now() + (expiresIn * 1000);
-    const expiry = moment().add(expiresIn, 'seconds').unix();
+    // const tokenExpiresAt = Date.now() + (expiresIn * 1000);
+    const tokenExpiresAt = moment().add(expiresIn, 'seconds').unix();
 
     setUserId(userId);
-    saveAccessTokenData(accessToken, expiry);
+    saveAccessToken(accessToken, tokenExpiresAt);
   }
   handleSearchForWallPosts(inputValues) {
     const { actions: { searchPostsOnWall } } = this.props;
@@ -91,19 +91,18 @@ class App extends React.Component {
 }
 
 App.propTypes = {
+  accessToken: PropTypes.string.isRequired,
   actions: PropTypes.objectOf(PropTypes.func).isRequired,
   isSearching: PropTypes.bool.isRequired,
   results: PropTypes.arrayOf(PropTypes.object).isRequired,
-  tokenData: PropTypes.shape({
-    token: PropTypes.string,
-    expiresAt: PropTypes.number
-  }).isRequired
+  tokenExpiresAt: PropTypes.number.isRequired
 };
 
 function mapStateToProps(state) {
   return {
     userId: state.userId,
-    tokenData: state.tokenData,
+    accessToken: state.accessToken,
+    tokenExpiresAt: state.tokenExpiresAt,
     results: state.results,
     isSearching: state.isSearching
   };

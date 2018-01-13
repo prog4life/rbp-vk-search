@@ -11,7 +11,6 @@ export function parseHash(hash) {
   const result = {};
 
   hashChunks.forEach((chunk) => {
-    /* eslint consistent-return: "off" */
     const [key, value] = chunk.split('=');
 
     // TODO: consider saving empty string value
@@ -28,6 +27,5 @@ export function parseHash(hash) {
 /* eslint camelcase: "off" */
 export function handleErrorHash({ error, error_description }) {
   const errorMessage = `Token request error: ${error}. ${error_description}.`;
-
   console.error(errorMessage);
 }

@@ -1,6 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-// const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 // const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
@@ -32,7 +31,7 @@ module.exports = {
   plugins: [
     extractStyles,
     new CleanWebpackPlugin([
-      'public' // removes OR 'build' OR 'dist' folder
+      'public' // OR 'build' OR 'dist', removes folder
       // 'public/*.*' // removes all files (even excluded) in 'public' folder
       // 'public/*.css', // removes all CSS | JS | ... files in 'public' folder
     ], {

@@ -1,15 +1,16 @@
-const defaultTokenState = {
-  token: '',
-  expiresAt: null
-};
-
-export function tokenReducer(state = defaultTokenState, action) {
+export function accessTokenReducer(state = '', action) {
   switch (action.type) {
-    case 'SAVE_TOKEN_DATA':
-      return {
-        token: action.token,
-        expiresAt: action.expiresAt
-      };
+    case 'SAVE_ACCESS_TOKEN':
+      return action.accessToken;
+    default:
+      return state;
+  }
+}
+
+export function tokenExpiryReducer(state = null, action) {
+  switch (action.type) {
+    case 'SAVE_ACCESS_TOKEN':
+      return action.tokenExpiresAt;
     default:
       return state;
   }

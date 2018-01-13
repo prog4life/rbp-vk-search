@@ -5,6 +5,8 @@ const redirectURI = 'http://localhost:7031';
 const scope = 'friends';
 const responseType = 'token';
 const apiVersion = 5.68;
+// amount of requested items (wall posts, comments), vk API max limit: 100
+const count = 100;
 const state = 55555;
 const requestInterval = 350;
 const jsonpTimeout = 500;
@@ -33,6 +35,7 @@ export {
   scope,
   responseType,
   apiVersion,
+  count,
   state,
   requestInterval,
   jsonpTimeout,
