@@ -26,8 +26,19 @@ const fetchWallDataJSONP = (currentAPIReqUrl, offset) => (dispatch, getState) =>
   return fetchJSONP(currentAPIReqUrl, {
     timeout: jsonpTimeout // default - 5000
   })
-    .then(res => res.json())
+    .then((res) => {
+      return res.json();
+    })
+    // NOTE: without access_token:
+    // resJSON = {
+    //   error: {
+    //     error_code: 8,
+    //     error_msg: "Invalid request: method is unavailable without access token",
+    //     request_params: [{}, {}]
+    //   }
+    // };
     .then((resJSON) => {
+      // TODO: check for !error and !response
       dispatch(fetchWallDataSuccess(offset));
       // console.log('response: ', resJSON.response);
       return resJSON.response;

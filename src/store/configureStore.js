@@ -5,6 +5,7 @@ import { createLogger } from 'redux-logger';
 // to use with Chrome Extension
 // import { composeWithDevTools } from 'redux-devtools-extension';
 import { composeWithDevTools } from 'remote-redux-devtools';
+import scannerMiddleware from 'middleware/scannerMiddleware';
 import rootReducer from '../reducers';
 
 // must be the last middleware in chain
@@ -13,7 +14,7 @@ const logger = createLogger({
 });
 
 const middleware = process.env.NODE_ENV === 'development'
-  ? [immutabilityWatcher(), thunk, logger]
+  ? [immutabilityWatcher(), scannerMiddleware, thunk, logger]
   : [thunk];
 
 export default (preloadedState = {}) => {

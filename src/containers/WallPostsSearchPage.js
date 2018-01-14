@@ -41,8 +41,9 @@ class WallPostsSearchPage extends React.Component {
     }
   }
   handleSearchForWallPosts(inputValues) {
-    const { actions: { searchPostsOnWall } } = this.props;
-    searchPostsOnWall(inputValues);
+    const { actions: { searchPostsOnWall, searchPostsAtWall } } = this.props;
+    // searchPostsOnWall(inputValues);
+    searchPostsAtWall(inputValues);
   }
   handleSearchStop() {
     const { actions: { finishSearch } } = this.props;
@@ -55,7 +56,7 @@ class WallPostsSearchPage extends React.Component {
         <SearchForm
           isSearching={isSearching}
           onStartSearch={this.handleSearchForWallPosts}
-          onTerminateSearch={this.handleSearchStop}
+          onStopSearch={this.handleSearchStop}
         />
         <ResultsPanel header="This is a panel with search results">
           <ResultsFilter filterText="Here will be filter text" />

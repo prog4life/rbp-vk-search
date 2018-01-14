@@ -26,7 +26,7 @@ class SearchForm extends React.Component {
     event.preventDefault();
 
     if (this.props.isSearching) {
-      this.props.onTerminateSearch();
+      this.props.onStopSearch();
       return;
     }
 
@@ -65,7 +65,7 @@ class SearchForm extends React.Component {
     const { isSearching } = this.props;
 
     const searchBtnTxt = isSearching ? 'Searching...' : 'Start Search';
-    const stopBtnTxt = 'Terminate Search';
+    const stopBtnTxt = 'Stop Search';
     const stopBtn = (
       <Button type="submit">
         {stopBtnTxt}
@@ -174,5 +174,5 @@ export default SearchForm;
 SearchForm.propTypes = {
   isSearching: PropTypes.bool.isRequired,
   onStartSearch: PropTypes.func.isRequired,
-  onTerminateSearch: PropTypes.func.isRequired
+  onStopSearch: PropTypes.func.isRequired
 };

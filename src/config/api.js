@@ -12,9 +12,10 @@ const requestInterval = 350;
 const jsonpTimeout = 500;
 const inputDefaults = {
   postsAmountDef: 10,
-  ownerIdDef: '',
-  ownerDomainDef: '4erniyspisok',
-  authorIdDef: 406853999
+  ownerIdDef: '75465366',
+  // ownerDomainDef: '4erniyspisok',
+  ownerDomainDef: '',
+  authorIdDef: 372045306
 };
 
 const tokenRequestBaseURL =

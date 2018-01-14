@@ -34,22 +34,20 @@ export const cutExcessResults = amount => ({
   amount
 });
 
-export const parseWallPosts = (response, authorId, postsAmount) => dispatch => (
-  extractUserPosts(response, authorId)
-    .then(posts => formatWallPosts(posts))
-    .then((results) => {
-      if (results.length > 0) {
-        // dispatch(addResults(results));
-        dispatch({
-          type: 'ADD_SORT_CUT_RESULTS',
-          results,
-          ascending: false,
-          amount: postsAmount
-        });
-        dispatch({ type: 'RESULTS_HAVE_BEEN_HANDLED' });
-        // console.log('duration: ', Date.now() - searchStart);
-        console.log('resultsChunk: ', results);
-      }
-    })
-    .catch(e => console.error(e))
-);
+export const parseWallPosts = (response, authorId, postsAmount) => (dispatch) => {
+  const userPosts = formatWallPosts(extractUserPosts(response, authorId));
+
+  if (userPosts.length > 0) {
+    // dispatch(addResults(results));
+    dispatch({
+      type: 'ADD_SORT_CUT_RESULTS',
+      results: userPosts,
+      ascending: false,
+      amount: postsAmount
+    });
+    dispatch({ type: 'RESULTS_HAVE_BEEN_HANDLED' });
+    // console.log('duration: ', Date.now() - searchStart);
+    console.log('results chunk: ', userPosts);
+    return userPosts;
+  }
+};
