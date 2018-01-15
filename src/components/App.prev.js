@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 
 import * as actionCreators from 'actions';
-import { tokenRequestURL } from 'config/api';
+import { tokenRequestURL } from 'config/common';
 import { parseHash, handleErrorHash } from 'utils/res-hash-handler';
 import SearchForm from './SearchForm';
 import ResultsPanel from './ResultsPanel';

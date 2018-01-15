@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 
 import * as actionCreators from 'actions';
-import { tokenRequestURL } from 'config/api';
+import { tokenRequestURL } from 'config/common';
 import SearchForm from 'components/SearchForm';
 import ResultsPanel from 'components/ResultsPanel';
 import ResultsFilter from 'components/ResultsFilter';

@@ -1,5 +1,5 @@
 import fetchJSONP from 'fetch-jsonp';
-import { jsonpTimeout } from 'config/api';
+import { jsonpTimeout } from 'config/common';
 
 export const fetchWallDataRequest = offset => ({
   type: 'FETCH_WALL_DATA_REQUEST',
@@ -17,40 +17,46 @@ export const fetchWallDataFail = offset => ({
 });
 
 // const fetchWallDataJSONP = (baseAPIReqUrl, offset) => (dispatch, getState) => {
-const fetchWallDataJSONP = (currentAPIReqUrl, offset) => (dispatch, getState) => {
+const fetchWallDataJSONP = (currentAPIReqUrl, offset) => dispatch => (
   // const currentAPIReqUrl = `${baseAPIReqUrl}&offset=${offset}`;
 
-  dispatch(fetchWallDataRequest(offset));
+  // dispatch(fetchWallDataRequest(offset));
   // console.log('api request url offset: ', offset);
 
-  return fetchJSONP(currentAPIReqUrl, {
+  fetchJSONP(currentAPIReqUrl, {
     timeout: jsonpTimeout // default - 5000
   })
-    .then((res) => {
-      return res.json();
-    })
+    .then(res => (
+      res.json()
+    ))
     // NOTE: without access_token:
-    // resJSON = {
+    // resData = {
     //   error: {
     //     error_code: 8,
     //     error_msg: "Invalid request: method is unavailable without access token",
     //     request_params: [{}, {}]
     //   }
     // };
-    .then((resJSON) => {
-      // TODO: check for !error and !response
-      dispatch(fetchWallDataSuccess(offset));
+    .then((resData) => {
+      const { response, error } = resData;
+      if (!response) {
+        if (error) {
+          throw new Error(JSON.stringify(resData));
+        }
+        throw new Error('Empty response');
+      }
+      // dispatch(fetchWallDataSuccess(offset));
       // console.log('response: ', resJSON.response);
-      return resJSON.response;
+      return resData.response;
     })
     .catch((ex) => {
       console.warn('Fetching failed ', offset, ex);
-      dispatch(fetchWallDataFail(offset));
-      const { failedRequests } = getState();
+      // dispatch(fetchWallDataFail(offset));
+      // const { failedRequests } = getState();
 
-      console.log('Failed requests: ', failedRequests);
+      // console.log('Failed requests: ', failedRequests);
       throw ex;
-    });
-};
+    })
+);
 
 export default fetchWallDataJSONP;

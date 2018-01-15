@@ -54,7 +54,7 @@
     "redux-logger": "^3.0.6",
     "remote-redux-devtools": "^0.5.12",
     "remotedev-extension": "0.0.10",
-    "webpack-dev-server": "^2.10.1",
+    "webpack-dev-server": "^2.11.0",
     "webpack-merge": "^4.1.1"
   },
   "author": "",

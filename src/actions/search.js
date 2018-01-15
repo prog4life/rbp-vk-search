@@ -1,4 +1,4 @@
-import { apiVersion, count, requestInterval, inputDefaults } from 'config/api';
+import { apiVersion, count, requestInterval, inputDefaults } from 'config/common';
 import fetchWallDataJSONP from 'actions/fetch';
 import { parseWallPosts } from 'actions/results';
 
@@ -15,13 +15,17 @@ import { parseWallPosts } from 'actions/results';
 //   IDEA: handle user input, create api request params and place them to store
 // }
 
-export function finishSearch(
-  intervalId = wallPostsSearchIntervalId,
-  searchStopType = 'FINISH_SEARCH'
-) {
-  clearInterval(intervalId);
+// export function finishSearch(wallPostsSearchIntervalId) {
+//   clearInterval(intervalId);
+//   return {
+//     type: 'FINISH_SEARCH'
+//   };
+// }
+
+export function finishSearch(results, searchStopType = 'FINISH_SEARCH') {
   return {
-    type: searchStopType
+    type: searchStopType,
+    results
   };
 }
 
@@ -85,7 +89,7 @@ export const searchPostsAtWall = (inputValues) => {
 
   return {
     type: 'WALL_POSTS_SEARCH_START',
-    scanConfig: {
+    searchConfig: {
       authorId,
       baseAPIReqUrl,
       postsAmount,
@@ -97,8 +101,8 @@ export const searchPostsAtWall = (inputValues) => {
     callAPI: fetchWallDataJSONP,
     handleResponse: parseWallPosts,
     // completeSearch: finishSearch
-    completeSearch: () => dispatch => (
-      dispatch(finishSearch(null, 'WALL_POSTS_SEARCH_END'))
+    completeSearch: results => dispatch => (
+      dispatch(finishSearch(results, 'WALL_POSTS_SEARCH_END'))
     )
   };
 };

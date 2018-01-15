@@ -30,26 +30,20 @@ module.exports = {
   },
   plugins: [
     extractStyles,
-    new CleanWebpackPlugin([
-      'public' // OR 'build' OR 'dist', removes folder
-      // 'public/*.*' // removes all files (even excluded) in 'public' folder
-      // 'public/*.css', // removes all CSS | JS | ... files in 'public' folder
-    ], {
-      // root: __dirname // abs path to webpack root dir (paths appended to it)
-      // dry: false, // "true" to test/emulate delete (will not remove files)
-      // watch: false, // if true, remove files on recompile
-      exclude: ['assets', 'index.html']
-    }),
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify(nodeEnv)
       }
-    })
+    }),
     // TODO: disable in development
     // new UglifyJSPlugin({
     //   parallel: true, // default === os.cpus().length -1
     //   sourceMap: true
     // })
+    new CleanWebpackPlugin(
+      ['public'], // OR 'build' OR 'dist', removes folder
+      { exclude: ['assets', 'index.html'] }
+    )
   ],
   resolve: {
     alias: {

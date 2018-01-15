@@ -1,15 +1,22 @@
 export function extractUserPosts(response, authorId) {
-  const { items: posts } = response;
+  let posts;
+  try {
+    ({ items: posts } = response);
+  } catch (e) {
+    console.error('Unable to extract posts from response ', e);
+    return false;
+  }
 
   if (Array.isArray(posts)) {
     return posts.filter(post => post.from_id === authorId);
   }
-  throw new Error('Items in response is not an array');
+  console.warn('Items in response is not an array');
+  return false;
 }
 
 export const formatWallPosts = posts => (
   // TODO: add wallOwnerId as prop
-  posts.map(post => ({
+  posts && posts.map(post => ({
     fromId: post.from_id,
     timestamp: post.date,
     postId: post.id,
@@ -34,20 +41,22 @@ export const cutExcessResults = amount => ({
   amount
 });
 
-export const parseWallPosts = (response, authorId, postsAmount) => (dispatch) => {
-  const userPosts = formatWallPosts(extractUserPosts(response, authorId));
+export const parseWallPosts = (response, authorId, postsAmount) => (
+  (dispatch) => {
+    const userPosts = formatWallPosts(extractUserPosts(response, authorId));
 
-  if (userPosts.length > 0) {
-    // dispatch(addResults(results));
-    dispatch({
-      type: 'ADD_SORT_CUT_RESULTS',
-      results: userPosts,
-      ascending: false,
-      amount: postsAmount
-    });
-    dispatch({ type: 'RESULTS_HAVE_BEEN_HANDLED' });
-    // console.log('duration: ', Date.now() - searchStart);
-    console.log('results chunk: ', userPosts);
+    if (userPosts.length > 0) {
+      // dispatch(addResults(results));
+      dispatch({
+        type: 'ADD_SORT_CUT_RESULTS',
+        results: userPosts,
+        ascending: false,
+        amount: postsAmount
+      });
+      dispatch({ type: 'RESULTS_HAVE_BEEN_HANDLED' });
+      // console.log('duration: ', Date.now() - searchStart);
+      console.log('results chunk: ', userPosts);
+    }
     return userPosts;
   }
-};
+);

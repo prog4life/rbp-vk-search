@@ -18,6 +18,8 @@ export function resultsReducer(state = [], action) {
         .slice(0, action.amount);
     case 'CLEAR_RESULTS':
       return [];
+    // case 'WALL_POSTS_SEARCH_END':
+    //   return action.results.map(res => ({ ...res }));
     default:
       return state;
   }
