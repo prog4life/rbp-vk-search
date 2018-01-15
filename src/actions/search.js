@@ -22,16 +22,16 @@ import { parseWallPosts } from 'actions/results';
 //   };
 // }
 
-export function finishSearch(results, searchStopType = 'FINISH_SEARCH') {
+export function endUpSearch(results, searchStopType = 'FINISH_SEARCH') {
   return {
     type: searchStopType,
     results
   };
 }
 
-export const stopSearch = (searchStopType = 'STOP_SEARCH') => ({
-  type: searchStopType,
-  stopSearch: finishSearch
+export const terminateSearch = results => ({
+  type: 'TERMINATE_SEARCH',
+  results
 });
 
 // export const getPartOfResults = currentOffset => dispatch => (
@@ -96,13 +96,10 @@ export const searchPostsAtWall = (inputValues) => {
       requestInterval,
       searchQuery
     },
-    // TODO: clear results from within it
-    startSearch: () => dispatch => (dispatch({ type: 'CLEAR_RESULTS' })),
     callAPI: fetchWallDataJSONP,
     handleResponse: parseWallPosts,
-    // completeSearch: finishSearch
     completeSearch: results => dispatch => (
-      dispatch(finishSearch(results, 'WALL_POSTS_SEARCH_END'))
+      dispatch(endUpSearch(results, 'WALL_POSTS_SEARCH_END'))
     )
   };
 };

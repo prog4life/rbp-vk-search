@@ -49,14 +49,14 @@ const fetchWallDataJSONP = (currentAPIReqUrl, offset) => dispatch => (
       // console.log('response: ', resJSON.response);
       return resData.response;
     })
-    .catch((ex) => {
-      console.warn('Fetching failed ', offset, ex);
-      // dispatch(fetchWallDataFail(offset));
-      // const { failedRequests } = getState();
-
-      // console.log('Failed requests: ', failedRequests);
-      throw ex;
-    })
+    // .catch((ex) => {
+    //   console.warn('Fetching failed ', offset, ex);
+    //   // dispatch(fetchWallDataFail(offset));
+    //   // const { failedRequests } = getState();
+    //
+    //   // console.log('Failed requests: ', failedRequests);
+    //   throw ex;
+    // })
 );
 
 export default fetchWallDataJSONP;

@@ -69,8 +69,8 @@ class App extends React.Component {
     searchPostsOnWall(inputValues);
   }
   handleSearchStop() {
-    const { actions: { finishSearch } } = this.props;
-    finishSearch();
+    const { actions: { terminateSearch } } = this.props;
+    terminateSearch();
   }
   render() {
     const { isSearching, results } = this.props;

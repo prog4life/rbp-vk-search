@@ -1,19 +1,21 @@
 const scannerMiddleware = ({ dispatch, getState }) => {
   let failedRequests = [];
-  // let requests = [
-  //   {
-  //     offset: 400,
-  //     pending: true,
-  //     failed: false
-  //   }
-  // ];
   let results = [];
   let scannerIntervalId;
   let offset = 0;
   let totalPostsAtWall = 5000; // NOTE: temporarily
+  // IDEA: store pending or failed requests
+  // let requests = [
+  //   {
+  //     offset: 400,
+  //     pending: true,
+  //     failed: false,
+  //     failCount: 0
+  //   }
+  // ];
 
   const setFailedRequestAsPending = (currentOffset) => {
-    // if it was failed request with such offset, change its pending status
+    // if request with such offset have failed, change its pending status
     // to true on repeated request
     failedRequests = failedRequests.map((req) => {
       if (req.offset === currentOffset) {
@@ -30,19 +32,6 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     } else {
       failedRequests.push({ offset: currentOffset, pending: false });
     }
-
-    // let exist = false;
-    // failedRequests = failedRequests.map((req) => {
-    //   if (req.offset === currentOffset) {
-    //     exist = true;
-    //     return { offset: currentOffset, pending: false };
-    //   }
-    //   return req;
-    // });
-    //
-    // if (!exist) {
-    //   failedRequests.push({ offset: currentOffset, pending: false });
-    // }
   };
 
   const removeFailedRequest = (currentOffset) => {
@@ -57,22 +46,16 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       handleResponse,
       searchConfig,
       completeSearch,
-      startSearch,
-      stopSearch,
       type
     } = action;
 
-    if ((type !== 'STOP_SEARCH' || !stopSearch) && !searchConfig) {
+    if (!searchConfig && type !== 'TERMINATE_SEARCH') {
       return next(action);
     }
 
-    if (type === 'STOP_SEARCH' && stopSearch) {
+    if (type === 'TERMINATE_SEARCH') {
       clearInterval(scannerIntervalId);
-
-      // dispatch({ type: scanStopType });
-      dispatch(stopSearch());
-
-      return results; // OR "failedRequests"
+      return next(action); // OR "failedRequests", "results"
     }
 
     if (typeof callAPI !== 'function') {
@@ -101,9 +84,8 @@ const scannerMiddleware = ({ dispatch, getState }) => {
 
     // NOTE: doublecheck
     clearInterval(scannerIntervalId);
-    // TODO: reset offset at new search start
+    dispatch({ type });
     offset = 0;
-    dispatch(startSearch());
     results.length = 0;
     failedRequests.length = 0;
 
@@ -162,7 +144,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       }
 
       clearInterval(scannerIntervalId);
-      // TODO: pass current results at end
+      // TODO: pass current results at the end
       return dispatch(completeSearch(results));
 
       // NOTE: maybe add exit condition when get empty items(posts) few times

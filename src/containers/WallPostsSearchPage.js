@@ -46,8 +46,9 @@ class WallPostsSearchPage extends React.Component {
     searchPostsAtWall(inputValues);
   }
   handleSearchStop() {
-    const { actions: { finishSearch } } = this.props;
-    finishSearch();
+    // NOTE: optionally can get results from props and pass them as arg
+    const { actions: { terminateSearch } } = this.props;
+    terminateSearch();
   }
   render() {
     const { isSearching, results } = this.props;

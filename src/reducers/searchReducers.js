@@ -4,7 +4,7 @@ export function sortResultsSubReducer(state = [], action) {
     : state.sort((a, b) => b.timestamp - a.timestamp);
 }
 
-export function resultsReducer(state = [], action) {
+export function results(state = [], action) {
   switch (action.type) {
     case 'ADD_RESULTS':
       // TODO: prevent adding of same results
@@ -16,7 +16,10 @@ export function resultsReducer(state = [], action) {
     case 'ADD_SORT_CUT_RESULTS':
       return sortResultsSubReducer([...state, ...action.results], action)
         .slice(0, action.amount);
-    case 'CLEAR_RESULTS':
+    // clear results at search start
+    // case 'START_SEARCH':
+    //   return [];
+    case 'WALL_POSTS_SEARCH_START':
       return [];
     // case 'WALL_POSTS_SEARCH_END':
     //   return action.results.map(res => ({ ...res }));
@@ -25,7 +28,7 @@ export function resultsReducer(state = [], action) {
   }
 }
 
-export function requestsReducer(state = [], action) {
+export function failedRequests(state = [], action) {
   switch (action.type) {
     case 'FETCH_WALL_DATA_REQUEST':
       return state.map((failedReq) => {
@@ -66,11 +69,17 @@ export function requestsReducer(state = [], action) {
   }
 }
 
-export function searchReducer(state = false, action) {
+export function search(state = false, action) {
   switch (action.type) {
-    case 'START_SEARCH':
+    // case 'START_SEARCH':
+    //   return true;
+    case 'WALL_POSTS_SEARCH_START':
       return true;
-    case 'FINISH_SEARCH':
+    case 'WALL_POSTS_SEARCH_END':
+      return false;
+    // case 'FINISH_SEARCH':
+    //   return false;
+    case 'TERMINATE_SEARCH':
       return false;
     default:
       return state;
