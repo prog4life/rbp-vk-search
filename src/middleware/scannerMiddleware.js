@@ -1,9 +1,12 @@
 const scannerMiddleware = ({ dispatch, getState }) => {
   let failedRequests = [];
+  let emptyResponsesCount = 0;
   let results = [];
   let scannerIntervalId;
   let offset = 0;
-  let totalPostsAtWall = 5000; // NOTE: temporarily
+  let totalPostsAtWall;
+  // NOTE: temporarily
+  const totalPostsDef = 5000;
   // IDEA: store pending or failed requests
   // let requests = [
   //   {
@@ -92,7 +95,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     const performSingleCall = (currentOffset) => {
       setFailedRequestAsPending(currentOffset);
 
-      console.log('REQUEST with offset: ', currentOffset);
+      console.log('REQUEST: ', currentOffset);
 
       const currentAPIReqUrl = `${baseAPIReqUrl}&access_token=${accessToken}` +
         `&offset=${currentOffset}`;
@@ -101,12 +104,14 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       dispatch(callAPI(currentAPIReqUrl, currentOffset)).then(
         (response) => {
           removeFailedRequest(currentOffset);
-          console.log('SUCCESS with offset: ', currentOffset);
+          console.log(currentOffset, ' SUCCESS');
+
+          // TODO: remove totalPostsDef completely
+          totalPostsAtWall = response.count || totalPostsAtWall || totalPostsDef;
           // totalPostsAtWall = response.count && response.count < totalPostsDef
           //   ? response.count
           //   : totalPostsDef;
-          // TODO: remove totalPostsDef completely
-          // return response;
+
           const chunk = dispatch(handleResponse(
             response,
             authorId,
@@ -114,12 +119,9 @@ const scannerMiddleware = ({ dispatch, getState }) => {
           ));
           results = chunk && chunk.length > 0 ? results.concat(chunk) : results;
         },
-        (e) => { /* TODO: catch failed requests and store it in [] */
+        (e) => {
           addOrResetFailedRequest(currentOffset);
-          console.warn(
-            'Catch failed request with offset ', currentOffset,
-            ' and ', e
-          );
+          console.warn('FAILED ', currentOffset, ' offset request with ', e);
         }
       );
     };

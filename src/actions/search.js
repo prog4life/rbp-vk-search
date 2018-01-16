@@ -1,4 +1,6 @@
-import { apiVersion, count, requestInterval, inputDefaults } from 'config/common';
+import {
+  apiVersion, count, extended, requestInterval, inputDefaults
+} from 'config/common';
 import fetchWallDataJSONP from 'actions/fetch';
 import { parseWallPosts } from 'actions/results';
 
@@ -15,13 +17,6 @@ import { parseWallPosts } from 'actions/results';
 //   IDEA: handle user input, create api request params and place them to store
 // }
 
-// export function finishSearch(wallPostsSearchIntervalId) {
-//   clearInterval(intervalId);
-//   return {
-//     type: 'FINISH_SEARCH'
-//   };
-// }
-
 export function endUpSearch(results, searchStopType = 'FINISH_SEARCH') {
   return {
     type: searchStopType,
@@ -33,6 +28,56 @@ export const terminateSearch = results => ({
   type: 'TERMINATE_SEARCH',
   results
 });
+
+// NOTE: can retrieve info about author of posts at wall using wall.get with
+// extended param set to 1 from additional "profiles" field, profile objects in
+// addition to user id also includes first_name, last_name, sex, online,
+// 2 avatar fields, so can search using corresponding queries
+
+// TODO: rename "wallOwnerDomain" to "wallOwnerScreenName"
+
+export const searchPostsAtWall = (inputValues) => {
+  // TEMP
+  const {
+    postsAmountDef, authorIdDef, ownerIdDef, ownerDomainDef
+  } = inputDefaults;
+
+  const { searchQuery, wallOwnerType } = inputValues;
+  const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
+  const wallOwnerId = inputValues.wallOwnerId || ownerIdDef;
+  const wallOwnerDomain = inputValues.wallOwnerDomain || ownerDomainDef;
+  const authorId = Number(inputValues.authorId) || authorIdDef;
+  const postsAmount = Number(inputValues.postsAmount) || postsAmountDef;
+  // NOTE: cut "&access_token=${accessToken}"
+  // TODO: use "searchQuery" and "postsAmount" ?
+  const baseAPIReqUrl = 'https://api.vk.com/method/wall.get?' +
+    `owner_id=${wallOwnerTypePrefix}${wallOwnerId}` +
+    `&domain=${wallOwnerDomain}` +
+    `&count=${count}&v=${apiVersion}&extended=${extended}`;
+
+  return {
+    type: 'WALL_POSTS_SEARCH_START',
+    searchConfig: {
+      authorId,
+      baseAPIReqUrl,
+      postsAmount,
+      requestInterval,
+      searchQuery
+    },
+    callAPI: fetchWallDataJSONP,
+    handleResponse: parseWallPosts,
+    completeSearch: results => dispatch => (
+      dispatch(endUpSearch(results, 'WALL_POSTS_SEARCH_END'))
+    )
+  };
+};
+
+// export function finishSearch(wallPostsSearchIntervalId) {
+//   clearInterval(intervalId);
+//   return {
+//     type: 'FINISH_SEARCH'
+//   };
+// }
 
 // export const getPartOfResults = currentOffset => dispatch => (
 //   dispatch(fetchWallDataJSONP(
@@ -67,42 +112,6 @@ export const terminateSearch = results => ({
 //     // })
 //     // .catch(e => console.error(e))
 // );
-
-export const searchPostsAtWall = (inputValues) => {
-  // TEMP
-  const {
-    postsAmountDef, authorIdDef, ownerIdDef, ownerDomainDef
-  } = inputDefaults;
-
-  const { searchQuery, wallOwnerType } = inputValues;
-  const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
-  const wallOwnerId = inputValues.wallOwnerId || ownerIdDef;
-  const wallOwnerDomain = inputValues.wallOwnerDomain || ownerDomainDef;
-  const authorId = Number(inputValues.authorId) || authorIdDef;
-  const postsAmount = Number(inputValues.postsAmount) || postsAmountDef;
-  // NOTE: cut "&access_token=${accessToken}"
-  // TODO: use "searchQuery" and "postsAmount" ?
-  const baseAPIReqUrl = 'https://api.vk.com/method/wall.get?' +
-    `owner_id=${wallOwnerTypePrefix}${wallOwnerId}` +
-    `&domain=${wallOwnerDomain}` +
-    `&count=${count}&v=${apiVersion}&extended=1`;
-
-  return {
-    type: 'WALL_POSTS_SEARCH_START',
-    searchConfig: {
-      authorId,
-      baseAPIReqUrl,
-      postsAmount,
-      requestInterval,
-      searchQuery
-    },
-    callAPI: fetchWallDataJSONP,
-    handleResponse: parseWallPosts,
-    completeSearch: results => dispatch => (
-      dispatch(endUpSearch(results, 'WALL_POSTS_SEARCH_END'))
-    )
-  };
-};
 
 /* eslint-disable max-statements */
 // export const searchPostsOnWall = inputValues => (dispatch, getState) => {

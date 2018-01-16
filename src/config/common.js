@@ -7,9 +7,11 @@ const responseType = 'token';
 const apiVersion = 5.68;
 // amount of requested items (wall posts, comments), vk API max limit: 100
 const count = 100;
+// 0 OR 1 - specify to return or not additional "groups" and "profiles" fields
+const extended = 0;
 const state = 55555;
 // vk API limit is 3 requests per minute
-const requestInterval = 250;
+const requestInterval = 350;
 // set jsonpTimeout lower than requestInterval to make search sequential/serial
 // (API data will be processed in strong order), otherwise if some requests
 // have failed or were longer than interval, older data сan be received first
@@ -19,8 +21,7 @@ const jsonpTimeout = 1000;
 const inputDefaults = {
   postsAmountDef: 10,
   ownerIdDef: '75465366',
-  // ownerDomainDef: '4erniyspisok',
-  ownerDomainDef: '',
+  ownerDomainDef: '', // '4erniyspisok'
   authorIdDef: 372045306
 };
 
@@ -43,6 +44,7 @@ export {
   responseType,
   apiVersion,
   count,
+  extended,
   state,
   requestInterval,
   jsonpTimeout,

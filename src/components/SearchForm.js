@@ -6,12 +6,13 @@ import {
 
 import FormFieldGroup from './FormFieldGroup';
 
-class SearchForm extends React.Component {
+class SearchForm extends React.PureComponent {
   constructor(props) {
     super(props);
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleTextInputChange = this.handleTextInputChange.bind(this);
+    this.handleStopBtnClick = this.handleStopBtnClick.bind(this);
 
     this.state = {
       wallOwnerId: '',
@@ -24,9 +25,9 @@ class SearchForm extends React.Component {
   }
   handleSubmit(event) {
     event.preventDefault();
+    const { isSearching, onStartSearch } = this.props;
 
-    if (this.props.isSearching) {
-      this.props.onStopSearch();
+    if (isSearching) {
       return;
     }
 
@@ -39,7 +40,9 @@ class SearchForm extends React.Component {
       postsAmount
     } = event.target.elements;
 
-    this.props.onStartSearch({
+    // TODO: rename "Domain" to "Screen Name"
+
+    onStartSearch({
       wallOwnerId: wallOwnerId.value,
       wallOwnerDomain: wallOwnerDomain.value,
       wallOwnerType: wallOwnerType.value,
@@ -51,7 +54,13 @@ class SearchForm extends React.Component {
   handleTextInputChange(event) {
     this.setState({
       [event.target.id]: event.target.value
-    }, () => console.info('New searchform state: ', this.state));
+    });
+  }
+  handleStopBtnClick() {
+    const { isSearching, onStopSearch } = this.props;
+    if (isSearching) {
+      onStopSearch();
+    }
   }
   render() {
     const {
@@ -67,7 +76,7 @@ class SearchForm extends React.Component {
     const searchBtnTxt = isSearching ? 'Searching...' : 'Start Search';
     const stopBtnTxt = 'Stop Search';
     const stopBtn = (
-      <Button type="submit">
+      <Button onClick={this.handleStopBtnClick} type="button">
         {stopBtnTxt}
       </Button>
     );

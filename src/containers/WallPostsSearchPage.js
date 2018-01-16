@@ -30,20 +30,26 @@ class WallPostsSearchPage extends React.Component {
     console.log('location obj ', location);
 
     // TODO: remove this temp redirect later and sign in at search start
-    if (!accessToken) {
-      setTimeout(() => {
-        const result = window.confirm('You must be logged in your vk account' +
-          ' to perform search. Do you want to Sign In now?');
-        if (result) {
-          window.location.replace(tokenRequestURL);
-        }
-      }, 3000);
-    }
+    setTimeout(() => {
+      window.location.replace(tokenRequestURL);
+    }, 3000);
+
+    // if (!accessToken) {
+    //   setTimeout(() => {
+    //     const result = window.confirm('You must be logged in your vk account' +
+    //       ' to perform search. Do you want to Sign In now?');
+    //     if (result) {
+    //       window.location.replace(tokenRequestURL);
+    //     }
+    //   }, 3000);
+    // }
   }
   handleSearchForWallPosts(inputValues) {
     const { actions: { searchPostsOnWall, searchPostsAtWall } } = this.props;
     // searchPostsOnWall(inputValues);
     searchPostsAtWall(inputValues);
+    // TEMP
+    console.log('FORM STATE: ', inputValues);
   }
   handleSearchStop() {
     // NOTE: optionally can get results from props and pass them as arg
