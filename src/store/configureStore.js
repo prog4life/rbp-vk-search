@@ -15,7 +15,7 @@ const logger = createLogger({
 
 const middleware = process.env.NODE_ENV === 'development'
   ? [immutabilityWatcher(), scannerMiddleware, thunk, logger]
-  : [thunk];
+  : [scannerMiddleware, thunk];
 
 export default (preloadedState = {}) => {
   /* eslint-disable no-underscore-dangle */

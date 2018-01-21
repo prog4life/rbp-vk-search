@@ -39,7 +39,11 @@ const fetchWallDataJSONP = (currentAPIReqUrl, offset) => dispatch => (
     // };
     .then((resData) => {
       const { response, error } = resData;
+
       if (!response) {
+        if (!resData.ok) {
+          throw new Error(resData.statusText);
+        }
         if (error) {
           throw new Error(JSON.stringify(resData));
         }

@@ -1,3 +1,4 @@
+import fetchJSONP from 'fetch-jsonp';
 import {
   apiVersion, count, extended, requestInterval, inputDefaults
 } from 'config/common';
@@ -17,6 +18,92 @@ import { parseWallPosts } from 'actions/results';
 //   IDEA: handle user input, create api request params and place them to store
 // }
 
+// ----------------------------------------------------------------------------
+const codeParam = `
+  var nextWallGetRequestOffset;
+  var requestCount = 1;
+  var items = API.wall.get({
+    "owner_id": -101271678,
+    "offset": 0,
+    "count": 100
+  }).items;
+  // items = [
+  // { id: 5324, ..., comments: { count: 5 }, ...},
+  // { id: 4384, ..., comments: { count: 0 }, ...},
+  // ... ]
+  // var ids = items@.from_id;
+  var postIds = items@.id;
+  var numberOfCommentsInPost = items@.comments@.count; // [6, 18, 9, 27, 17, ...]
+  var commentsResponses = [];
+  var commentsCounts = [];
+  var commentsLength;
+  var handledPostsIds = [];
+  var idOfLastHandledPost;
+  var idOfNextPostToHandle;
+  var nextGetCommentsRequestOffset;
+
+  var i = 0;
+  while (i < numberOfCommentsInPost.length) {
+    if (numberOfCommentsInPost[i] > 0 && requestCount < 25) {
+      var postId;
+
+      if (idOfNextPostToHandle) {
+        postId = idOfNextPostToHandle;
+        idOfLastHandledPost = postId;
+      } else {
+        postId = items@.id[i];
+        idOfLastHandledPost = postId;
+      }
+      handledPostsIds.push(postId);
+
+      var commentsChunk = API.wall.getComments({
+        "owner_id": -101271678,
+        "post_id": postId,
+        // "offset": 0,
+        // start_comment_id: 4242,
+        "count": 100,
+        "sort": "desc",
+        "preview_length": 0,
+        // 0 - do not cut comment text
+        "extended": 0
+      });
+      requestCount = requestCount + 1;
+
+      // if (commentsChunk.items) {             add or not ???
+      idOfNextPostToHandle = items@.id[i + 1];
+      // }
+
+      commentsResponses.push(commentsChunk);
+      commentsCounts.push(commentsChunk.count);
+    }
+
+    // if (items[i].comments.count > 0) {
+    //   postsWithCommentsIds.push(items[i].id);
+    // }
+    i = i + 1;
+  }
+  commentsLength = commentsResponses.length;
+
+  return {
+    "counts": commentsCounts,
+    "commentsLength": commentsLength,
+    "idOfLastHandledPost": idOfLastHandledPost,
+    "idOfNextPostToHandle": idOfNextPostToHandle,
+    "handledPostsIds": handledPostsIds,
+    "postIds": postIds,
+    "comments ": commentsResponses
+  };
+`;
+
+// ----------------------------------------------------------------------------
+
+export const searchCommentsWithExecute = () => (dispatch) => {
+  const baseCallURL = 'https://api.vk.com/method/execute?';
+  const callURL = `${baseCallURL}$code=${codeParam}`;
+
+  return fetchJSONP(callURL);
+};
+
 export function endUpSearch(results, searchStopType = 'FINISH_SEARCH') {
   return {
     type: searchStopType,
@@ -24,6 +111,7 @@ export function endUpSearch(results, searchStopType = 'FINISH_SEARCH') {
   };
 }
 
+// TODO: skip handling of pending requests results after search stop
 export const terminateSearch = results => ({
   type: 'TERMINATE_SEARCH',
   results
@@ -50,6 +138,7 @@ export const searchPostsAtWall = (inputValues) => {
   const postsAmount = Number(inputValues.postsAmount) || postsAmountDef;
   // NOTE: cut "&access_token=${accessToken}"
   // TODO: use "searchQuery" and "postsAmount" ?
+  // TODO: use encodeURIComponent
   const baseAPIReqUrl = 'https://api.vk.com/method/wall.get?' +
     `owner_id=${wallOwnerTypePrefix}${wallOwnerId}` +
     `&domain=${wallOwnerDomain}` +

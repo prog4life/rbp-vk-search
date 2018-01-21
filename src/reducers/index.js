@@ -9,6 +9,6 @@ export default combineReducers({
   accessToken,
   tokenExpiresAt: tokenExpiry,
   results,
-  failedRequests: failedRequests,
+  failedRequests,
   isSearching: search
 });
