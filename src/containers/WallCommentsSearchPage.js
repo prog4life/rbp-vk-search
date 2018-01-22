@@ -11,12 +11,6 @@ const throwIfNotOk = (response) => {
   return response;
 };
 
-const saveResponseData = response => (
-  this.setState({
-    response
-  })
-);
-
 export class WallCommentsSearchPage extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -32,7 +26,7 @@ export class WallCommentsSearchPage extends React.PureComponent {
     dispatch(searchCommentsWithExecute())
       .then(getObjectFromJSON)
       .then(throwIfNotOk)
-      .then(saveResponseData);
+      .then(response => this.setState({ response }));
   }
 
   render() {
