@@ -33,7 +33,7 @@ class Home extends Component {
     // TODO: when redirect_uri will be changed to '/auth', redirect to "/"
     // TODO: check if accessToken expires
     return accessToken
-      ? <Redirect push to="/wall-posts" />
+      ? <Redirect push to="/wall-comments" />
       : <HomePage />;
   }
 }

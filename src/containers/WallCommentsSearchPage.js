@@ -1,14 +1,47 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { searchCommentsWithExecute } from 'actions';
+import PropTypes from 'prop-types';
+import {
+  searchCommentsWithExecute, searchPostsWithExecute
+} from 'actions';
+
+import { tokenRequestURL } from 'config/common';
 
 const getObjectFromJSON = response => response.json();
 
 const throwIfNotOk = (response) => {
-  if (!response.ok) {
-    throw Error(response.statusText);
+  if (response.error) {
+    throw Error(response.error);
   }
+  // if (!response.ok) {
+  //   throw Error(response.statusText);
+  // }
   return response;
+};
+
+const flattenResults = ({ response }) => {
+  const posts = [];
+  const receivedIds = response.ids;
+  const receivedPosts = response.posts;
+
+  const ids = receivedIds.reduce((accum, current, index) => {
+    // posts = [...posts, ...receivedPosts[index]];
+    [].push.apply(posts, receivedPosts[index]);
+    return accum.concat(current);
+  }, []);
+
+  return {
+    postsCount: response.postsCount,
+    postsCountUpd: posts.length,
+    postsCountByIds: ids.length,
+    ids,
+    posts
+  };
+};
+
+const propTypes = {
+  accessToken: PropTypes.string.isRequired,
+  history: PropTypes.instanceOf(Object).isRequired
 };
 
 export class WallCommentsSearchPage extends React.PureComponent {
@@ -19,13 +52,24 @@ export class WallCommentsSearchPage extends React.PureComponent {
     };
     this.handleCallAPIClick = this.handleCallAPIClick.bind(this);
   }
+  componentDidMount() {
+    const { accessToken, history } = this.props;
+
+    if (!accessToken) {
+      setTimeout(() => window.location.replace(tokenRequestURL), 3000);
+    } else {
+      console.log('access_token: ', accessToken);
+    }
+  }
   // getCommentsViaExecute
   handleCallAPIClick() {
-    const { dispatch } = this.props;
+    const { accessToken, dispatch } = this.props;
 
-    dispatch(searchCommentsWithExecute())
+    // dispatch(searchCommentsWithExecute())
+    searchPostsWithExecute(accessToken)
       .then(getObjectFromJSON)
       .then(throwIfNotOk)
+      .then(flattenResults)
       .then(response => this.setState({ response }));
   }
 
@@ -39,13 +83,19 @@ export class WallCommentsSearchPage extends React.PureComponent {
         </button>
         <pre>
           <code>
-            {response}
+            {JSON.stringify(response, null, 2)}
           </code>
         </pre>
       </div>
     );
   }
 }
+
+WallCommentsSearchPage.propTypes = propTypes;
+
+const mapStateToProps = ({ accessToken }) => ({
+  accessToken
+});
 
 // const WallCommentsSearchPage = () => (
 //   <div>
@@ -56,4 +106,4 @@ export class WallCommentsSearchPage extends React.PureComponent {
 //   </div>
 // );
 
-export default connect()(WallCommentsSearchPage);
+export default connect(mapStateToProps)(WallCommentsSearchPage);

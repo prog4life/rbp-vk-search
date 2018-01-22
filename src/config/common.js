@@ -2,9 +2,9 @@ const clientID = 5931563;
 const display = 'popup';
 // const redirectURI = 'https://nameless-sea-73563.herokuapp.com';
 const redirectURI = 'http://localhost:7031';
-const scope = 'friends';
+const scope = 'friends'; // 'wall,friends,groups';
 const responseType = 'token';
-const apiVersion = 5.68;
+const apiVersion = 5.71; // 5.68
 // amount of requested items (wall posts, comments), vk API max limit: 100
 const count = 100;
 // 0 OR 1 - specify to return or not additional "groups" and "profiles" fields

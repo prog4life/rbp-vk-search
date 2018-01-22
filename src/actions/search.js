@@ -95,11 +95,82 @@ const codeParam = `
   };
 `;
 
+// [8055, 25559, 25471, 25434, 25405, 25363, 25320, 25292, 25230, 25224, 25221,
+// 25033, 24966, 24965, 24946, 24941, 24647, 24610, 24505, 24440, 24386, 24272,
+// 24170, 23563]
+
+const code2 = `
+  var offset = 0;
+  var postsStore = [];
+  var postIdsStore = [];
+  var postsCount = 0;
+
+  var i = 0;
+
+  while (i < 10) {                   // FROM 10 TO 25
+
+    var posts = API.wall.get({
+      "owner_id": -11026685,
+      "offset": offset,
+      "count": 100
+    }).items;
+
+    postsStore.push(posts);
+
+    postsCount = postsCount + posts.length;
+
+    var postIds = posts@.id;
+    // var idsCount = postIdsStore.length;
+    // postIdsStore.splice(idsCount, idsCount + postIds.length, postIds);
+    postIdsStore.push(postIds);
+
+    offset = offset + 100;
+
+    i = i + 1;
+  }
+
+  // var id = posts@.id;
+  // var fromId = posts@.from_id;
+  // var dates = posts@.date;
+  // var text = posts@.text;
+  // var fromId = posts@.from_id;
+  // var commentsCount = posts@.comments@.count;
+  // var likesCount = posts@.likes@.count;
+
+  return {
+    "postsCount": postsCount,
+    "ids": postIdsStore,
+    // "fromId": fromId,
+    // "dates": dates,
+    // "text": text,
+    // "commentsCount": commentsCount,
+    // "likesCount": likesCount,
+    "posts": postsStore
+  };
+`;
+
 // ----------------------------------------------------------------------------
 
-export const searchCommentsWithExecute = () => (dispatch) => {
+export const searchPostsWithExecute = (accessToken) => {
   const baseCallURL = 'https://api.vk.com/method/execute?';
-  const callURL = `${baseCallURL}$code=${codeParam}`;
+  const callURL = `${baseCallURL}code=${encodeURIComponent(code2)}` +
+    `&access_token=${accessToken}&v=${apiVersion}`;
+
+  return fetchJSONP(callURL);
+};
+
+export const searchCommentsWithExecute = () => (dispatch, getState) => {
+  const token = getState().accessToken;
+  const baseCallURL = 'https://api.vk.com/method/execute?';
+  const callURL = `${baseCallURL}code=${encodeURIComponent(code2)}` +
+    `&access_token=${token}&v=${apiVersion}`;
+
+  return fetchJSONP(callURL);
+};
+
+export const searchCommentsWithStoredProcedure = (procedure, token) => {
+  const callURL = `https://api.vk.com/method/execute.${procedure}?` +
+    `access_token=${token}&v=${apiVersion}`;
 
   return fetchJSONP(callURL);
 };
@@ -110,6 +181,7 @@ export function endUpSearch(results, searchStopType = 'FINISH_SEARCH') {
     results
   };
 }
+
 
 // TODO: skip handling of pending requests results after search stop
 export const terminateSearch = results => ({

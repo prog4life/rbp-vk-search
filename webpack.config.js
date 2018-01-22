@@ -43,7 +43,7 @@ module.exports = {
     // })
     new CleanWebpackPlugin(
       ['public'], // OR 'build' OR 'dist', removes folder
-      { exclude: ['assets', 'index.html'] }
+      { exclude: ['index.html'] }
     )
   ],
   resolve: {
@@ -54,7 +54,7 @@ module.exports = {
       path.resolve(__dirname, 'src'),
       'node_modules'
     ],
-    extensions: ['.js', '.json', '.jsx', '.css', 'scss', '*']
+    extensions: ['.js', '.json', '.jsx', '*']
   },
   module: {
     rules: [
@@ -81,6 +81,10 @@ module.exports = {
       },
       {
         test: /\.(scss|css)$/,
+        include: [
+          path.resolve(__dirname, 'src'),
+          path.resolve(__dirname, 'node_modules')
+        ],
         use: extractStyles.extract({
           use: [
             {
@@ -94,13 +98,12 @@ module.exports = {
         })
       },
       {
-        test: /\.woff($|\?)|\.woff2($|\?)|\.ttf($|\?)|\.eot($|\?)|\.svg($|\?)/,
-        loader: 'url-loader'
+        test: /\.(png|jpe?g|gif|svg|eot|ttf|woff|woff2)$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000
+        }
       }
-      // {
-      //   test: /\.(eot|woff|woff2|ttf|svg|png|jpe?g|gif)(\?\S*)?$/,
-      //   loader: 'url-loader?limit=100000@name=[name][ext]'
-      // }
     ]
   },
   devServer: {
