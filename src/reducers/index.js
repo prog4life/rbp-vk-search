@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 // import * as reducers from './auth';
 import { accessToken, tokenExpiry, userId } from './authReducers';
-import { results, failedRequests, search } from './searchReducers';
+import { results, search } from './searchReducers';
 
 // exporting of rootReducer
 export default combineReducers({
@@ -9,6 +9,5 @@ export default combineReducers({
   accessToken,
   tokenExpiresAt: tokenExpiry,
   results,
-  failedRequests,
   isSearching: search
 });

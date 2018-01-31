@@ -19,8 +19,8 @@ const propTypes = {
   parseAccessTokenHash: PropTypes.func.isRequired,
   results: PropTypes.arrayOf(PropTypes.object).isRequired,
   searchPostsAtWall: PropTypes.func.isRequired,
-  // tokenExpiresAt: PropTypes.number.isRequired
   terminateSearch: PropTypes.func.isRequired
+  // tokenExpiresAt: PropTypes.number.isRequired
 };
 
 class WallPostsSearch extends React.Component {
@@ -43,7 +43,7 @@ class WallPostsSearch extends React.Component {
     console.log('location obj ', location);
 
     if (parseAccessTokenHash(location.hash.substr(1))) {
-      history.replace(match.url); // TODO: need to add it here ?
+      history.replace(match.url);
       return;
     }
     // history.replace(match.url); // looks like redundant
@@ -112,7 +112,4 @@ const mapDispatchToProps = dispatch => (
   bindActionCreators(actionCreators, dispatch)
 );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WallPostsSearch);
+export default connect(mapStateToProps, mapDispatchToProps)(WallPostsSearch);

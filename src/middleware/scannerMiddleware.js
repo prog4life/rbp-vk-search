@@ -1,6 +1,6 @@
 const scannerMiddleware = ({ dispatch, getState }) => {
   let failedRequests = [];
-  let emptyResponsesCount = 0;
+  let emptyResponsesCount = 0; // for further usage
   let results = [];
   let scannerIntervalId;
   let offset = 0;
@@ -20,12 +20,12 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   const setFailedRequestAsPending = (currentOffset) => {
     // if request with such offset have failed, change its pending status
     // to true on repeated request
-    failedRequests = failedRequests.map((req) => {
+    failedRequests.forEach((req) => {
       if (req.offset === currentOffset) {
-        return { offset: currentOffset, pending: true };
+        req.pending = true;
       }
-      return req;
     });
+    console.log('F-REQUESTS 0: ', failedRequests, 'must SET ', currentOffset, 'as PENDING');
   };
 
   const addOrResetFailedRequest = (currentOffset) => {
@@ -39,6 +39,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
 
   const removeFailedRequest = (currentOffset) => {
     // remove successful one from "failedRequests"
+    // NOTE: better to mutate same array here and do not copy it
     failedRequests = failedRequests.filter(req => req.offset !== currentOffset);
   };
 
@@ -81,8 +82,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       authorId,
       baseAPIReqUrl,
       postsAmount,
-      requestInterval,
-      searchQuery
+      requestInterval
     } = searchConfig;
 
     // NOTE: doublecheck
@@ -93,9 +93,10 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     failedRequests.length = 0;
 
     const performSingleCall = (currentOffset) => {
+      console.log('REQUEST: ', currentOffset);
       setFailedRequestAsPending(currentOffset);
 
-      console.log('REQUEST: ', currentOffset);
+      console.log('F-REQUESTS 1: ', failedRequests, 'must SET ', currentOffset, 'as PENDING');
 
       const currentAPIReqUrl = `${baseAPIReqUrl}&access_token=${accessToken}` +
         `&offset=${currentOffset}`;
@@ -105,6 +106,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         (response) => {
           removeFailedRequest(currentOffset);
           console.log(currentOffset, ' SUCCESS');
+          console.log('F-REQUESTS 2: ', failedRequests, 'must REMOVE ', currentOffset, 'from failed');
 
           // TODO: remove totalPostsDef completely
           totalPostsAtWall = response.count || totalPostsAtWall || totalPostsDef;
@@ -112,16 +114,13 @@ const scannerMiddleware = ({ dispatch, getState }) => {
           //   ? response.count
           //   : totalPostsDef;
 
-          const chunk = dispatch(handleResponse(
-            response,
-            authorId,
-            postsAmount
-          ));
+          const chunk = dispatch(handleResponse(response, authorId));
           results = chunk && chunk.length > 0 ? results.concat(chunk) : results;
         },
         (e) => {
           addOrResetFailedRequest(currentOffset);
           console.warn('FAILED ', currentOffset, ' offset request with ', e);
+          console.log('F-REQUESTS 3: ', failedRequests, 'must SET ', currentOffset, 'as FAILED');
         }
       );
     };
@@ -132,6 +131,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       if (failedRequests.length > 0) {
         const req = failedRequests.find(failedReq => !failedReq.pending);
         if (req) {
+          console.log('F-REQUESTS 4: ', failedRequests);
           performSingleCall(req.offset);
         }
         return false;

@@ -3,7 +3,7 @@ import {
   apiVersion, count, extended, requestInterval, inputDefaults
 } from 'config/common';
 import fetchWallDataJSONP from 'actions/fetch';
-import { parseWallPosts } from 'actions/results';
+import { parsePostsFromWall } from 'actions/results';
 
 // let wallPostsSearchIntervalId = null;
 // let emptyResponses = 0;
@@ -191,7 +191,7 @@ export const terminateSearch = results => ({
 
 // NOTE: can retrieve info about author of posts at wall using wall.get with
 // extended param set to 1 from additional "profiles" field, profile objects in
-// addition to user id also includes first_name, last_name, sex, online,
+// addition to "user_id" field also includes first_name, last_name, sex, online,
 // 2 avatar fields, so can search using corresponding queries
 
 // TODO: rename "wallOwnerDomain" to "wallOwnerScreenName"
@@ -202,14 +202,14 @@ export const searchPostsAtWall = (inputValues) => {
     postsAmountDef, authorIdDef, ownerIdDef, ownerDomainDef
   } = inputDefaults;
 
-  const { searchQuery, wallOwnerType } = inputValues;
+  const { wallOwnerType } = inputValues;
   const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
   const wallOwnerId = inputValues.wallOwnerId || ownerIdDef;
   const wallOwnerDomain = inputValues.wallOwnerDomain || ownerDomainDef;
   const authorId = Number(inputValues.authorId) || authorIdDef;
   const postsAmount = Number(inputValues.postsAmount) || postsAmountDef;
   // NOTE: cut "&access_token=${accessToken}"
-  // TODO: use "searchQuery" and "postsAmount" ?
+  // TODO: use "postsAmount" ?
   // TODO: use encodeURIComponent
   const baseAPIReqUrl = 'https://api.vk.com/method/wall.get?' +
     `owner_id=${wallOwnerTypePrefix}${wallOwnerId}` +
@@ -222,11 +222,10 @@ export const searchPostsAtWall = (inputValues) => {
       authorId,
       baseAPIReqUrl,
       postsAmount,
-      requestInterval,
-      searchQuery
+      requestInterval
     },
     callAPI: fetchWallDataJSONP,
-    handleResponse: parseWallPosts,
+    handleResponse: parsePostsFromWall,
     completeSearch: results => dispatch => (
       dispatch(endUpSearch(results, 'WALL_POSTS_SEARCH_END'))
     )
@@ -251,11 +250,11 @@ export const searchPostsAtWall = (inputValues) => {
 //       //   : totalPostsDef;
 //       // TODO: remove totalPostsDef completely
 //       // return response;
-//       dispatch(parseWallPosts(response, authorId, postsAmount));
+//       dispatch(parsePostsFromWall(response, authorId, postsAmount));
 //     } /* TODO: catch failed request and store it in [] */)
 //     .catch(e => console.warn('To catch uncaught ', e))
 //
-//     // .then(response => extractUserPosts(response, authorId))
+//     // .then(response => extractPostsByAuthorId(response, authorId))
 //     // .then(posts => formatWallPosts(posts))
 //     // .then((results) => {
 //     //   if (results.length > 0) {

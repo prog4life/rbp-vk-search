@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
-// import moment from 'moment';
 import PropTypes from 'prop-types';
 import { parseAccessTokenHash } from 'actions';
-// import { parseHash, handleErrorHash } from 'utils/res-hash-handler';
 import HomePage from 'components/HomePage';
 
 class Home extends Component {

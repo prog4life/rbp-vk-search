@@ -33,6 +33,7 @@ const publicPath = path.join(__dirname, 'public');
 
 app.use(express.static(publicPath));
 
+// TODO: remove after favicon will be added
 app.get('/favicon.ico', (req, res) => {
   res.set('Content-Type', 'image/x-icon');
   res.status(200).end();
