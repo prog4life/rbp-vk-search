@@ -15,6 +15,7 @@ const propTypes = {
   history: PropTypes.instanceOf(Object).isRequired,
   isSearching: PropTypes.bool.isRequired,
   location: PropTypes.instanceOf(Object).isRequired,
+  match: PropTypes.instanceOf(Object).isRequired,
   parseAccessTokenHash: PropTypes.func.isRequired,
   results: PropTypes.arrayOf(PropTypes.object).isRequired,
   searchPostsAtWall: PropTypes.func.isRequired,
@@ -22,7 +23,7 @@ const propTypes = {
   terminateSearch: PropTypes.func.isRequired
 };
 
-class WallPostsSearchPage extends React.Component {
+class WallPostsSearch extends React.Component {
   constructor(props) {
     super(props);
 
@@ -34,18 +35,18 @@ class WallPostsSearchPage extends React.Component {
       accessToken,
       parseAccessTokenHash,
       location,
-      history,
-      match
+      match,
+      history
     } = this.props;
 
     console.log('match obj ', match);
     console.log('location obj ', location);
 
     if (parseAccessTokenHash(location.hash.substr(1))) {
-      history.replace(match.path); // TODO: need to add it here ?
+      history.replace(match.url); // TODO: need to add it here ?
       return;
     }
-    history.replace(match.path);
+    // history.replace(match.url); // looks like redundant
 
     if (accessToken) {
       // TODO: check if accessToken expired
@@ -55,7 +56,7 @@ class WallPostsSearchPage extends React.Component {
 
     // TODO: remove this temp redirect later and sign in at search start
     setTimeout(() => {
-      window.location.replace(tokenRequestURL);
+      window.location.replace(tokenRequestURL); // req to external vk api url
     }, 3000);
 
     // if (!accessToken) {
@@ -82,7 +83,7 @@ class WallPostsSearchPage extends React.Component {
   render() {
     const { isSearching, results } = this.props;
     return (
-      <div id="App">
+      <div className="wall-posts-search">
         <SearchForm
           isSearching={isSearching}
           onStartSearch={this.handleSearchForWallPosts}
@@ -97,7 +98,7 @@ class WallPostsSearchPage extends React.Component {
   }
 }
 
-WallPostsSearchPage.propTypes = propTypes;
+WallPostsSearch.propTypes = propTypes;
 
 const mapStateToProps = state => ({
   userId: state.userId,
@@ -114,4 +115,4 @@ const mapDispatchToProps = dispatch => (
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(WallPostsSearchPage);
+)(WallPostsSearch);

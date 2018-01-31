@@ -12,7 +12,7 @@ import 'styles/main.css';
 
 console.log('process.env.NODE_ENV: ', process.env.NODE_ENV);
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<App />, document.getElementById('app'));
 
 // NOTE: for react-hot-loader, HMR
 // if (module.hot) {

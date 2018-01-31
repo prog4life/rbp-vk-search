@@ -1,4 +1,4 @@
-#root {
+#app {
   /* height: 100%;
   width: 100%;
   position: absolute;
@@ -6,7 +6,7 @@
   left: 0; */
 }
 
-#App {
+.wall-posts-search {
   /* width: 70%;
   height: 100%;
   margin: 10px;

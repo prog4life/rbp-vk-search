@@ -75,7 +75,7 @@ class App extends React.Component {
   render() {
     const { isSearching, results } = this.props;
     return (
-      <div id="App">
+      <div id="app">
         <SearchForm
           isSearching={isSearching}
           onStartSearch={this.handleSearchForWallPosts}

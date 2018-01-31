@@ -2,7 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 // import Home from 'containers/Home';
-import WallPostsSearchPage from 'containers/WallPostsSearchPage';
+import WallPostsSearch from 'containers/WallPostsSearch';
 import NotFoundPage from 'components/NotFoundPage';
 import configureStore from 'store/configureStore';
 
@@ -36,8 +36,8 @@ const App = () => (
     <Router>
       <Switch>
         {/* <Route component={Home} exact path="/" /> */}
-        {/* <Route component={WallPostsSearchPage} path="/wall-posts" /> */}
-        <Route component={WallPostsSearchPage} path="/" />
+        {/* <Route component={WallPostsSearch} path="/wall-posts" /> */}
+        <Route component={WallPostsSearch} exact path="/" />
         <Route component={NotFoundPage} />
       </Switch>
     </Router>

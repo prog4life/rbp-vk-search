@@ -1,5 +1,6 @@
 import moment from 'moment';
 
+// TODO: split into 2 distinct actions
 export const saveAccessToken = (accessToken, tokenExpiresAt) => ({
   type: 'SAVE_ACCESS_TOKEN',
   accessToken,
@@ -16,18 +17,12 @@ export const setUserId = userId => ({
   userId
 });
 
-export const tokenRequestError = (error, errorDescription) => ({
-  type: 'TOKEN_REQUEST_ERROR',
-  error,
-  errorDescription
-});
-
 export const parseAccessTokenHash = hash => (dispatch) => {
   if (!hash) {
     return false;
   }
   if (typeof hash !== 'string') {
-    // TODO: log warning ?
+    console.error('Hash must be string');
     return false;
   }
   // TODO: consider using decodeURIComponent
@@ -35,7 +30,7 @@ export const parseAccessTokenHash = hash => (dispatch) => {
   const result = {};
 
   hashChunks.forEach((chunk) => {
-    const [key, value] = chunk.split('=');
+    const [key, value = ''] = chunk.split('=');
 
     // TODO: consider saving empty string value
     if (!key || value.length < 1) {
@@ -53,12 +48,12 @@ export const parseAccessTokenHash = hash => (dispatch) => {
   } = result;
 
   if (error) {
-    dispatch(tokenRequestError(error, errorDescription));
+    console.error(`Hash has error: ${error}, description: ${errorDescription}`);
     return false;
   }
 
   if (accessToken) {
-    let tokenExpiresAt;
+    let tokenExpiresAt = null;
 
     if (expiresIn) {
       // const tokenExpiresAt = Date.now() + (expiresIn * 1000);
@@ -71,4 +66,5 @@ export const parseAccessTokenHash = hash => (dispatch) => {
     }
     return result;
   }
+  return false;
 };
