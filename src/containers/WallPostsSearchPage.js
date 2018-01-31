@@ -10,6 +10,18 @@ import ResultsPanel from 'components/ResultsPanel';
 import ResultsFilter from 'components/ResultsFilter';
 import ResultsList from 'components/ResultsList';
 
+const propTypes = {
+  accessToken: PropTypes.string.isRequired,
+  history: PropTypes.instanceOf(Object).isRequired,
+  isSearching: PropTypes.bool.isRequired,
+  location: PropTypes.instanceOf(Object).isRequired,
+  parseAccessTokenHash: PropTypes.func.isRequired,
+  results: PropTypes.arrayOf(PropTypes.object).isRequired,
+  searchPostsAtWall: PropTypes.func.isRequired,
+  // tokenExpiresAt: PropTypes.number.isRequired
+  terminateSearch: PropTypes.func.isRequired
+};
+
 class WallPostsSearchPage extends React.Component {
   constructor(props) {
     super(props);
@@ -18,16 +30,28 @@ class WallPostsSearchPage extends React.Component {
     this.handleSearchStop = this.handleSearchStop.bind(this);
   }
   componentDidMount() {
-    const { accessToken, location, match } = this.props;
-
-    if (accessToken) {
-      // TODO: check if accessToken expires
-      console.info('accessToken is already present: ', accessToken);
-      return;
-    }
+    const {
+      accessToken,
+      parseAccessTokenHash,
+      location,
+      history,
+      match
+    } = this.props;
 
     console.log('match obj ', match);
     console.log('location obj ', location);
+
+    if (parseAccessTokenHash(location.hash.substr(1))) {
+      history.replace(match.path); // TODO: need to add it here ?
+      return;
+    }
+    history.replace(match.path);
+
+    if (accessToken) {
+      // TODO: check if accessToken expired
+      console.info('accessToken is already present: ', accessToken);
+      return;
+    }
 
     // TODO: remove this temp redirect later and sign in at search start
     setTimeout(() => {
@@ -37,7 +61,7 @@ class WallPostsSearchPage extends React.Component {
     // if (!accessToken) {
     //   setTimeout(() => {
     //     const result = window.confirm('You must be logged in your vk account' +
-    //       ' to perform search. Do you want to Sign In now?');
+    //       ' to perform search. Do you want to log in now?');
     //     if (result) {
     //       window.location.replace(tokenRequestURL);
     //     }
@@ -45,15 +69,14 @@ class WallPostsSearchPage extends React.Component {
     // }
   }
   handleSearchForWallPosts(inputValues) {
-    const { actions: { searchPostsOnWall, searchPostsAtWall } } = this.props;
-    // searchPostsOnWall(inputValues);
+    const { searchPostsAtWall } = this.props;
     searchPostsAtWall(inputValues);
-    // TEMP
+    // TEMP:
     console.log('FORM STATE: ', inputValues);
   }
   handleSearchStop() {
     // NOTE: optionally can get results from props and pass them as arg
-    const { actions: { terminateSearch } } = this.props;
+    const { terminateSearch } = this.props;
     terminateSearch();
   }
   render() {
@@ -74,29 +97,19 @@ class WallPostsSearchPage extends React.Component {
   }
 }
 
-WallPostsSearchPage.propTypes = {
-  accessToken: PropTypes.string.isRequired,
-  actions: PropTypes.objectOf(PropTypes.func).isRequired,
-  isSearching: PropTypes.bool.isRequired,
-  results: PropTypes.arrayOf(PropTypes.object).isRequired
-  // tokenExpiresAt: PropTypes.number.isRequired
-};
+WallPostsSearchPage.propTypes = propTypes;
 
-function mapStateToProps(state) {
-  return {
-    userId: state.userId,
-    accessToken: state.accessToken,
-    tokenExpiresAt: state.tokenExpiresAt,
-    results: state.results,
-    isSearching: state.isSearching
-  };
-}
+const mapStateToProps = state => ({
+  userId: state.userId,
+  accessToken: state.accessToken,
+  tokenExpiresAt: state.tokenExpiresAt,
+  results: state.results,
+  isSearching: state.isSearching
+});
 
-function mapDispatchToProps(dispatch) {
-  return {
-    actions: bindActionCreators(actionCreators, dispatch)
-  };
-}
+const mapDispatchToProps = dispatch => (
+  bindActionCreators(actionCreators, dispatch)
+);
 
 export default connect(
   mapStateToProps,

@@ -27,9 +27,10 @@ export const parseAccessTokenHash = hash => (dispatch) => {
     return false;
   }
   if (typeof hash !== 'string') {
+    // TODO: log warning ?
     return false;
   }
-  // TODO: consider using decodeUriComponent
+  // TODO: consider using decodeURIComponent
   const hashChunks = hash.split('&');
   const result = {};
 
@@ -53,7 +54,7 @@ export const parseAccessTokenHash = hash => (dispatch) => {
 
   if (error) {
     dispatch(tokenRequestError(error, errorDescription));
-    return result;
+    return false;
   }
 
   if (accessToken) {
@@ -64,10 +65,10 @@ export const parseAccessTokenHash = hash => (dispatch) => {
       tokenExpiresAt = moment().add(expiresIn, 'seconds').unix();
     }
     dispatch(saveAccessToken(accessToken, tokenExpiresAt));
-  }
 
-  if (userId) {
-    dispatch(setUserId(userId));
+    if (userId) {
+      dispatch(setUserId(userId));
+    }
+    return result;
   }
-  return result;
 };

@@ -48,7 +48,7 @@ module.exports = {
   ],
   resolve: {
     alias: {
-      App: path.resolve(__dirname, 'src/components/App.js')
+      App: path.resolve(__dirname, 'src/containers/App.js')
     },
     modules: [
       path.resolve(__dirname, 'src'),
