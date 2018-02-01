@@ -64,9 +64,9 @@ class App extends React.Component {
     setUserId(userId);
     saveAccessToken(accessToken, tokenExpiresAt);
   }
-  handleSearchForWallPosts(inputValues) {
+  handleSearchForWallPosts(inputData) {
     const { actions: { searchPostsOnWall } } = this.props;
-    searchPostsOnWall(inputValues);
+    searchPostsOnWall(inputData);
   }
   handleSearchStop() {
     const { actions: { terminateSearch } } = this.props;

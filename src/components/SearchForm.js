@@ -20,7 +20,7 @@ class SearchForm extends React.PureComponent {
       wallOwnerType: 'group',
       searchQuery: '',
       authorId: '',
-      postsAmount: ''
+      postsLimit: ''
     };
   }
   handleSubmit(event) {
@@ -37,10 +37,10 @@ class SearchForm extends React.PureComponent {
       wallOwnerType,
       searchQuery,
       authorId,
-      postsAmount
+      postsLimit
     } = event.target.elements;
 
-    // TODO: rename "Domain" to "Screen Name"
+    // TODO: rename "Domain" to "Screen Name" or "Short Name"
 
     onStartSearch({
       wallOwnerId: wallOwnerId.value,
@@ -48,7 +48,7 @@ class SearchForm extends React.PureComponent {
       wallOwnerType: wallOwnerType.value,
       searchQuery: searchQuery.value,
       authorId: authorId.value,
-      postsAmount: postsAmount.value
+      postsLimit: postsLimit.value
     });
   }
   handleTextInputChange(event) {
@@ -69,7 +69,7 @@ class SearchForm extends React.PureComponent {
       wallOwnerType,
       searchQuery,
       authorId,
-      postsAmount
+      postsLimit
     } = this.state;
     const { isSearching } = this.props;
 
@@ -149,12 +149,12 @@ class SearchForm extends React.PureComponent {
             </Col>
             <Col xs={10} sm={6} lg={4}>
               <FormFieldGroup
-                id="postsAmount"
+                id="postsLimit"
                 label="Amount of search results to show"
                 onChange={this.handleTextInputChange}
                 placeholder="number of results"
                 type="text"
-                value={postsAmount}
+                value={postsLimit}
               />
             </Col>
           </Row>
@@ -178,10 +178,11 @@ class SearchForm extends React.PureComponent {
   }
 }
 
-export default SearchForm;
-
 SearchForm.propTypes = {
   isSearching: PropTypes.bool.isRequired,
   onStartSearch: PropTypes.func.isRequired,
   onStopSearch: PropTypes.func.isRequired
 };
+
+export default SearchForm;
+

@@ -4,9 +4,9 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   let results = [];
   let scannerIntervalId;
   let offset = 0;
-  let totalPostsAtWall;
+  let responseCount;
   // NOTE: temporarily
-  const totalPostsDef = 5000;
+  const responseCountDef = 5000;
   // IDEA: store pending or failed requests
   // let requests = [
   //   {
@@ -18,42 +18,79 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   // ];
 
   const setFailedRequestAsPending = (currentOffset) => {
-    // if request with such offset have failed, change its pending status
-    // to true on repeated request
+    console.log('REQUEST: ', currentOffset);
+    // change "pending" status of request to "true" at repeated request with
+    // same offset value
     failedRequests.forEach((req) => {
       if (req.offset === currentOffset) {
         req.pending = true;
+        console.log('REQUEST 1: ', failedRequests, 'must SET ', currentOffset, 'as PENDING');
       }
     });
-    console.log('F-REQUESTS 0: ', failedRequests, 'must SET ', currentOffset, 'as PENDING');
   };
 
-  const addOrResetFailedRequest = (currentOffset) => {
+  // remove successful one from "failedRequests"
+  const removeFailedRequest = currentOffset => (response) => {
+    console.log(currentOffset, ' SUCCESS');
+
+    // NOTE: consider mutating same array here
+    failedRequests = failedRequests.filter(req => req.offset !== currentOffset);
+
+    console.log('SUCCESS 2: ', failedRequests, 'must REMOVE ', currentOffset, 'from failed');
+
+    return response;
+  };
+
+  const onRequestFail = currentOffset => (e) => {
+    console.warn('Request with ', currentOffset, ' offset have FAILED ', e);
+
     const existing = failedRequests.find(req => req.offset === currentOffset);
+
     if (existing) {
       existing.pending = false;
+      console.log('FAIL 3: ', failedRequests, 'must SET ', currentOffset, 'as FAILED');
     } else {
       failedRequests.push({ offset: currentOffset, pending: false });
+      console.log('FAIL 4: ', failedRequests, 'must ADD ', currentOffset, 'to FAILED');
     }
   };
 
-  const removeFailedRequest = (currentOffset) => {
-    // remove successful one from "failedRequests"
-    // NOTE: better to mutate same array here and do not copy it
-    failedRequests = failedRequests.filter(req => req.offset !== currentOffset);
+  const setResponseCount = (response) => {
+    // TODO: remove responseCountDef completely
+    responseCount = (response && response.count) || responseCount || responseCountDef;
+    // responseCount = response.count && response.count < responseCountDef
+    //   ? response.count
+    //   : responseCountDef;
+    return response;
   };
+
+  // const addOrResetFailedRequest = (currentOffset) => {
+  //   const existing = failedRequests.find(req => req.offset === currentOffset);
+  //   if (existing) {
+  //     existing.pending = false;
+  //   } else {
+  //     failedRequests.push({ offset: currentOffset, pending: false });
+  //   }
+  //   console.log('F-REQUESTS 3: ', failedRequests, 'must SET ', currentOffset, 'as FAILED');
+  // };
 
   return next => (action) => {
     const { accessToken } = getState();
     const {
       callAPI,
-      handleResponse,
+      parseResponse,
       searchConfig,
       completeSearch,
+      addResultsType,
       type
     } = action;
 
     if (!searchConfig && type !== 'TERMINATE_SEARCH') {
+      return next(action);
+    }
+
+    // NOTE: additional !type condition was added
+    if (!type) {
       return next(action);
     }
 
@@ -66,8 +103,8 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       throw new Error('Expected callAPI to be a function');
     }
 
-    if (typeof handleResponse !== 'function') {
-      throw new Error('Expected handleResponse to be a function');
+    if (typeof parseResponse !== 'function') {
+      throw new Error('Expected parseResponse to be a function');
     }
 
     if (typeof completeSearch !== 'function') {
@@ -81,11 +118,11 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     const {
       authorId,
       baseAPIReqUrl,
-      postsAmount,
+      postsLimit,
       requestInterval
     } = searchConfig;
 
-    // NOTE: doublecheck
+    // doublecheck
     clearInterval(scannerIntervalId);
     dispatch({ type });
     offset = 0;
@@ -93,36 +130,30 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     failedRequests.length = 0;
 
     const performSingleCall = (currentOffset) => {
-      console.log('REQUEST: ', currentOffset);
       setFailedRequestAsPending(currentOffset);
 
-      console.log('F-REQUESTS 1: ', failedRequests, 'must SET ', currentOffset, 'as PENDING');
-
-      const currentAPIReqUrl = `${baseAPIReqUrl}&access_token=${accessToken}` +
+      const currentAPIReqUrl = `${baseAPIReqUrl}` +
+        `&access_token=${accessToken}` +
         `&offset=${currentOffset}`;
 
-      // TEMP: pass currentOffset temporarily
-      dispatch(callAPI(currentAPIReqUrl, currentOffset)).then(
-        (response) => {
-          removeFailedRequest(currentOffset);
-          console.log(currentOffset, ' SUCCESS');
-          console.log('F-REQUESTS 2: ', failedRequests, 'must REMOVE ', currentOffset, 'from failed');
-
-          // TODO: remove totalPostsDef completely
-          totalPostsAtWall = response.count || totalPostsAtWall || totalPostsDef;
-          // totalPostsAtWall = response.count && response.count < totalPostsDef
-          //   ? response.count
-          //   : totalPostsDef;
-
-          const chunk = dispatch(handleResponse(response, authorId));
-          results = chunk && chunk.length > 0 ? results.concat(chunk) : results;
-        },
-        (e) => {
-          addOrResetFailedRequest(currentOffset);
-          console.warn('FAILED ', currentOffset, ' offset request with ', e);
-          console.log('F-REQUESTS 3: ', failedRequests, 'must SET ', currentOffset, 'as FAILED');
-        }
-      );
+      callAPI(currentAPIReqUrl)
+        .then(removeFailedRequest(currentOffset), onRequestFail(currentOffset))
+        .then(setResponseCount)
+        .then(parseResponse(authorId)) // TODO: throw there
+        // TODO: extract as single then(addResults)
+        // TODO: cut results with "postsLimit"
+        .then((chunk) => {
+          // to collect results in this middleware too (optionally)
+          if (chunk && chunk.length > 0) {
+            // TODO: prevent adding duplicate results
+            results = results.concat(chunk);
+            dispatch({
+              type: addResultsType,
+              results: chunk
+            });
+          }
+        })
+        .catch(e => console.error(e));
     };
 
     scannerIntervalId = setInterval(() => {
@@ -137,16 +168,15 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         return false;
       }
 
-      if (results.length < postsAmount) {
-        if (!totalPostsAtWall || offset < totalPostsAtWall) {
-          // NOTE: must be depended on count variable
+      if (results.length < postsLimit) {
+        if (!responseCount || offset < responseCount) {
+          // NOTE: should vary depending on the "count" value
           offset += 100;
           return performSingleCall(offset);
         }
       }
 
       clearInterval(scannerIntervalId);
-      // TODO: pass current results at the end
       return dispatch(completeSearch(results));
 
       // NOTE: maybe add exit condition when get empty items(posts) few times

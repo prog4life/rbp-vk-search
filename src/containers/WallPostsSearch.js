@@ -69,11 +69,11 @@ class WallPostsSearch extends React.Component {
     //   }, 3000);
     // }
   }
-  handleSearchForWallPosts(inputValues) {
+  handleSearchForWallPosts(inputData) {
     const { searchPostsAtWall } = this.props;
-    searchPostsAtWall(inputValues);
+    searchPostsAtWall(inputData);
     // TEMP:
-    console.log('FORM STATE: ', inputValues);
+    console.log('FORM STATE: ', inputData);
   }
   handleSearchStop() {
     // NOTE: optionally can get results from props and pass them as arg

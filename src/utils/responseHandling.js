@@ -1,4 +1,4 @@
-// TODO: replace next 3 functions to utils ?
+// TODO: replace all next functions to utils ?
 export function extractPostsByAuthorId(response, authorId) {
   let posts;
   try {
@@ -33,21 +33,12 @@ export const sortPosts = (posts, desc = true) => (
   ))
 );
 
-export const addResults = results => ({
-  type: 'ADD_RESULTS',
-  results
-});
+const parsePostsFromWall = authorId => (response) => {
+  const extractedPosts = extractPostsByAuthorId(response, authorId);
+  const formatedPosts = formatWallPosts(extractedPosts);
 
-export const parsePostsFromWall = (response, authorId) => (
-  (dispatch) => {
-    const posts = formatWallPosts(extractPostsByAuthorId(response, authorId));
-    const sortedPosts = sortPosts(posts, true);
+  return sortPosts(formatedPosts, true);
+};
 
-    if (sortedPosts.length > 0) {
-      dispatch(addResults(sortedPosts));
-      dispatch({ type: 'RESULTS_HAVE_BEEN_HANDLED' });
-      console.log('Results chunk: ', sortedPosts);
-    }
-    return sortedPosts;
-  }
-);
+export default parsePostsFromWall;
+
