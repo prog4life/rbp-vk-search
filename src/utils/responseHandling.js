@@ -1,4 +1,3 @@
-// TODO: replace all next functions to utils ?
 export function extractPostsByAuthorId(response, authorId) {
   let posts;
   try {

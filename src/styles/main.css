@@ -7,11 +7,24 @@
 }
 
 .wall-posts-search {
+  margin-top: 58px;
   /* width: 70%;
   height: 100%;
   margin: 10px;
   border: 1px solid rgb(111, 201, 55); */
 }
+
+.navitem {
+  margin-right: 15px;
+}
+
+.nav-auth {
+  margin-right: 0;
+}
+
+/* .signed-in-dropdown {
+
+} */
 
 form {
   margin-bottom: 1.5rem;

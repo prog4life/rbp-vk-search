@@ -12,6 +12,10 @@ export const setTokenExpiry = expiresAt => ({
   expiresAt
 });
 
+export const signOut = () => ({
+  type: 'SIGN_OUT'
+});
+
 export const setUserId = userId => ({
   type: 'SET_USER_ID',
   userId

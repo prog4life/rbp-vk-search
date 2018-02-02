@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 import * as actionCreators from 'actions';
 import { tokenRequestURL } from 'config/common';
+import TopBar from 'components/TopBar';
 import SearchForm from 'components/SearchForm';
 import ResultsPanel from 'components/ResultsPanel';
 import ResultsFilter from 'components/ResultsFilter';
@@ -29,6 +30,7 @@ class WallPostsSearch extends React.Component {
 
     this.handleSearchForWallPosts = this.handleSearchForWallPosts.bind(this);
     this.handleSearchStop = this.handleSearchStop.bind(this);
+    this.handleNavSelect = this.handleNavSelect.bind(this);
   }
   componentDidMount() {
     const {
@@ -80,10 +82,22 @@ class WallPostsSearch extends React.Component {
     const { terminateSearch } = this.props;
     terminateSearch();
   }
+  handleNavSelect(eventKey, e) {
+    const { signOut } = this.props;
+    if (eventKey === 1.2) {
+      signOut();
+    }
+    console.log('Select: ', eventKey);
+  }
   render() {
-    const { isSearching, results } = this.props;
+    const { isSearching, results, accessToken, userId } = this.props;
     return (
       <div className="wall-posts-search">
+        <TopBar
+          isLoggedIn={Boolean(accessToken)}
+          onNavSelect={this.handleNavSelect}
+          userId={userId}
+        />
         <SearchForm
           isSearching={isSearching}
           onStartSearch={this.handleSearchForWallPosts}
