@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
 
-function FormFieldGroup({ id, label, help, ...props }) {
+const FormInputGroup = ({ id, label, help, ...props }) => {
   // const {
   //   id, label, type, placeholder, isDisabled, isRequired, value, onChange
   // } = props;
@@ -46,11 +46,9 @@ function FormFieldGroup({ id, label, help, ...props }) {
   //     {help && <HelpBlock>{help}</HelpBlock>}
   //   </FormGroup>
   // );
-}
+};
 
-export default FormFieldGroup;
-
-FormFieldGroup.propTypes = {
+FormInputGroup.propTypes = {
   id: PropTypes.string.isRequired,
   // isDisabled: PropTypes.bool,
   // isRequired: PropTypes.bool,
@@ -62,11 +60,13 @@ FormFieldGroup.propTypes = {
   value: PropTypes.string.isRequired
 };
 
-FormFieldGroup.defaultProps = {
+FormInputGroup.defaultProps = {
   // isDisabled: false,
   // isRequired: false,
   placeholder: ''
 };
+
+export default FormInputGroup;
 
 // <FormGroup> will already serve as a grid row in a <Form horizontal>
 

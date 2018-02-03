@@ -118,7 +118,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     const {
       authorId,
       baseAPIReqUrl,
-      postsLimit,
+      searchResultsLimit,
       requestInterval
     } = searchConfig;
 
@@ -141,7 +141,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         .then(setResponseCount)
         .then(parseResponse(authorId)) // TODO: throw there
         // TODO: extract as single then(addResults)
-        // TODO: cut results with "postsLimit"
+        // TODO: cut results with "searchResultsLimit"
         .then((chunk) => {
           // to collect results in this middleware too (optionally)
           if (chunk && chunk.length > 0) {
@@ -168,7 +168,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         return false;
       }
 
-      if (results.length < postsLimit) {
+      if (results.length < searchResultsLimit) {
         if (!responseCount || offset < responseCount) {
           // NOTE: should vary depending on the "count" value
           offset += 100;

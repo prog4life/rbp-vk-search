@@ -1,26 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-  ButtonToolbar, Button, Grid, Row, Col, FormGroup, ControlLabel, FormControl
+  Grid,
+  Row,
+  Col
 } from 'react-bootstrap';
 
-import FormFieldGroup from './FormFieldGroup';
+import PostAuthorId from './PostAuthorId';
+import WallOwnerId from './WallOwnerId';
+import WallOwnerShortName from './WallOwnerShortName';
+import WallOwnerType from './WallOwnerType';
+import SearchResultsLimit from './SearchResultsLimit';
+import SearchControlButtons from './SearchControlButtons';
 
 class SearchForm extends React.PureComponent {
   constructor(props) {
     super(props);
 
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleTextInputChange = this.handleTextInputChange.bind(this);
+    this.handleInputValueChange = this.handleInputValueChange.bind(this);
     this.handleStopBtnClick = this.handleStopBtnClick.bind(this);
 
     this.state = {
       wallOwnerId: '',
-      wallOwnerDomain: '',
+      wallOwnerShortName: '',
       wallOwnerType: 'group',
-      searchQuery: '',
-      authorId: '',
-      postsLimit: ''
+      postAuthorId: '',
+      searchResultsLimit: ''
     };
   }
   handleSubmit(event) {
@@ -33,25 +39,23 @@ class SearchForm extends React.PureComponent {
 
     const {
       wallOwnerId,
-      wallOwnerDomain,
+      wallOwnerShortName,
       wallOwnerType,
-      searchQuery,
-      authorId,
-      postsLimit
+      postAuthorId,
+      searchResultsLimit
     } = event.target.elements;
 
     // TODO: rename "Domain" to "Screen Name" or "Short Name"
 
     onStartSearch({
       wallOwnerId: wallOwnerId.value,
-      wallOwnerDomain: wallOwnerDomain.value,
+      wallOwnerShortName: wallOwnerShortName.value,
       wallOwnerType: wallOwnerType.value,
-      searchQuery: searchQuery.value,
-      authorId: authorId.value,
-      postsLimit: postsLimit.value
+      postAuthorId: postAuthorId.value,
+      searchResultsLimit: searchResultsLimit.value
     });
   }
-  handleTextInputChange(event) {
+  handleInputValueChange(event) {
     this.setState({
       [event.target.id]: event.target.value
     });
@@ -65,112 +69,62 @@ class SearchForm extends React.PureComponent {
   render() {
     const {
       wallOwnerId,
-      wallOwnerDomain,
+      wallOwnerShortName,
       wallOwnerType,
-      searchQuery,
-      authorId,
-      postsLimit
+      postAuthorId,
+      searchResultsLimit
     } = this.state;
     const { isSearching } = this.props;
 
-    const searchBtnTxt = isSearching ? 'Searching...' : 'Start Search';
-    const stopBtnTxt = 'Stop Search';
-    const stopBtn = (
-      <Button onClick={this.handleStopBtnClick} type="button">
-        {stopBtnTxt}
-      </Button>
-    );
-
     return (
       <Grid>
-        <form onSubmit={this.handleSubmit}>
+        <form className="search-form" onSubmit={this.handleSubmit}>
           <Row>
             {/*  TODO: use names instead of id's */}
-            <Col xs={10} sm={6} lg={4}>
-              <FormFieldGroup
-                id="wallOwnerId"
-                label="Wall owner id (user or group)"
-                onChange={this.handleTextInputChange}
-                placeholder="wall owner id"
-                type="text"
+            <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
+              <WallOwnerId
+                onChange={this.handleInputValueChange}
                 value={wallOwnerId}
               />
             </Col>
-            <Col xs={10} sm={6} lg={4}>
-              <FormFieldGroup
-                id="wallOwnerDomain"
-                label="Short name of wall owner (instead of id)"
-                onChange={this.handleTextInputChange}
-                placeholder="wall owner textual id"
-                type="text"
-                value={wallOwnerDomain}
+            <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
+              <WallOwnerShortName
+                onChange={this.handleInputValueChange}
+                value={wallOwnerShortName}
               />
             </Col>
-            <Col xs={10} sm={6} lg={4}>
-              <FormGroup controlId="wallOwnerType">
-                <ControlLabel>
-                  {'Wall is owned by'}
-                </ControlLabel>
-                <FormControl
-                  componentClass="select"
-                  onChange={this.handleTextInputChange}
-                  value={wallOwnerType}
-                >
-                  <option value="user">
-                    {'User'}
-                  </option>
-                  <option value="group">
-                    {'Community / Group'}
-                  </option>
-                </FormControl>
-              </FormGroup>
-            </Col>
-            <Col xs={10} sm={6} lg={4}>
-              <FormFieldGroup
-                disabled
-                id="searchQuery"
-                label="Text to search in post (optional, disabled)"
-                onChange={this.handleTextInputChange}
-                placeholder="text to search"
-                type="text"
-                value={searchQuery}
+            <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
+              <WallOwnerType
+                onChange={this.handleInputValueChange}
+                value={wallOwnerType}
               />
             </Col>
-            <Col xs={10} sm={6} lg={4}>
-              <FormFieldGroup
-                id="authorId"
-                label="Post author id, which posts to search (required)"
-                onChange={this.handleTextInputChange}
-                placeholder="post author id"
-                required
-                type="text"
-                value={authorId}
+            <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
+              <PostAuthorId
+                onChange={this.handleInputValueChange}
+                value={postAuthorId}
               />
             </Col>
-            <Col xs={10} sm={6} lg={4}>
-              <FormFieldGroup
-                id="postsLimit"
-                label="Amount of search results to show"
-                onChange={this.handleTextInputChange}
-                placeholder="number of results"
-                type="text"
-                value={postsLimit}
+            <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
+              <SearchResultsLimit
+                onChange={this.handleInputValueChange}
+                value={searchResultsLimit}
+              />
+            </Col>
+            <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4} >
+              <SearchControlButtons
+                isSearching={isSearching}
+                onStopClick={this.handleStopBtnClick}
               />
             </Col>
           </Row>
           <Row>
-            <Col md={6} lg={4} mdOffset={6} lgOffset={8}>
-              <ButtonToolbar>
-                <Button
-                  bsStyle="info"
-                  disabled={isSearching}
-                  type="submit"
-                >
-                  {searchBtnTxt}
-                </Button>
-                {isSearching ? stopBtn : null}
-              </ButtonToolbar>
-            </Col>
+            {/* <Col md={6} lg={4} mdOffset={6} lgOffset={8}>
+              <SearchControlButtons
+                isSearching={isSearching}
+                onStopClick={this.handleStopBtnClick}
+              />
+            </Col> */}
           </Row>
         </form>
       </Grid>

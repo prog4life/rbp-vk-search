@@ -8,6 +8,7 @@
 
 .wall-posts-search {
   margin-top: 58px;
+
   /* width: 70%;
   height: 100%;
   margin: 10px;
@@ -26,8 +27,17 @@
 
 } */
 
-form {
+.search-form {
+  /* margin: 0 auto; */
   margin-bottom: 1.5rem;
+
+  /* width: 70%; */
+}
+
+@media (min-width: 768px) {
+  .search-control-buttons {
+    padding-top: 25px;
+  }
 }
 
 .post-timestamp {

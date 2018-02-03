@@ -3,8 +3,8 @@
 // let totalNumerOfPosts = 5000; // NOTE: temporarily
 // let baseAPIReqUrl = '';
 // let offset = 0;
-// let authorId;
-// let postsLimit;
+// let postAuthorId;
+// let searchResultsLimit;
 // let searchStart;
 
 // export function prepareUserSearch(inputData) {
@@ -186,11 +186,11 @@ export const searchCommentsWithStoredProcedure = (procedure, token) => {
 //       //   : responseCountDef;
 //       // TODO: remove responseCountDef completely
 //       // return response;
-//       dispatch(parsePostsFromWall(response, authorId, postsLimit));
+//       dispatch(parsePostsFromWall(response, postAuthorId, searchResultsLimit));
 //     } /* TODO: catch failed request and store it in [] */)
 //     .catch(e => console.warn('To catch uncaught ', e))
 //
-//     // .then(response => extractPostsByAuthorId(response, authorId))
+//     // .then(response => extractPostsByAuthorId(response, postAuthorId))
 //     // .then(posts => formatWallPosts(posts))
 //     // .then((results) => {
 //     //   if (results.length > 0) {
@@ -199,7 +199,7 @@ export const searchCommentsWithStoredProcedure = (procedure, token) => {
 //     //       type: 'ADD_SORT_CUT_RESULTS',
 //     //       results,
 //     //       ascending: false,
-//     //       amount: postsLimit
+//     //       amount: searchResultsLimit
 //     //     });
 //     //     dispatch({ type: 'RESULTS_HAVE_BEEN_HANDLED' });
 //     //     console.log('duration: ', Date.now() - searchStart);
@@ -215,16 +215,16 @@ export const searchCommentsWithStoredProcedure = (procedure, token) => {
 //   // let totalNumerOfPosts;
 //   const { accessToken } = getState();
 //   const {
-//     postsLimitDef, authorIdDef, ownerIdDef, ownerDomainDef
+//     searchResultsLimitDef, postAuthorIdDef, ownerIdDef, ownerDomainDef
 //   } = inputDefaults;
-//   const { searchQuery, wallOwnerType } = inputData;
+//   const { wallOwnerType } = inputData;
 //   const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
 //   const wallOwnerId = inputData.wallOwnerId || ownerIdDef;
-//   const wallOwnerDomain = inputData.wallOwnerDomain || ownerDomainDef;
-//   authorId = Number(inputData.authorId) || authorIdDef;
-//   postsLimit = Number(inputData.postsLimit) || postsLimitDef;
+//   const wallOwnerShortName = inputData.wallOwnerShortName || ownerDomainDef;
+//   postAuthorId = Number(inputData.postAuthorId) || postAuthorIdDef;
+//   searchResultsLimit = Number(inputData.searchResultsLimit) || searchResultsLimitDef;
 //   baseAPIReqUrl = 'https://api.vk.com/method/wall.get?' +
-//     `owner_id=${wallOwnerTypePrefix}${wallOwnerId}&domain=${wallOwnerDomain}` +
+//     `owner_id=${wallOwnerTypePrefix}${wallOwnerId}&domain=${wallOwnerShortName}` +
 //     `&count=${count}&access_token=${accessToken}&v=${apiVersion}&extended=1`;
 //   searchStart = Date.now();
 //
@@ -238,8 +238,8 @@ export const searchCommentsWithStoredProcedure = (procedure, token) => {
 //     const { results, failedRequests } = getState();
 //     // NOTE: temporarily done by single action
 //     // dispatch(sortResults(false));
-//     // dispatch(cutExcessResults(postsLimit));
-//     if (results.length < postsLimit) {
+//     // dispatch(cutExcessResults(searchResultsLimit));
+//     if (results.length < searchResultsLimit) {
 //       if (!totalNumerOfPosts || offset < totalNumerOfPosts) {
 //         // NOTE: must depend on count var
 //         offset += 100;

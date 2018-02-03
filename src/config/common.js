@@ -19,10 +19,10 @@ const requestInterval = 350;
 // but with jsonpTimeout lower than 500-1000 ms search may collapse !!!
 const jsonpTimeout = 500;
 const inputDefaults = {
-  postsLimitDef: 10,
+  searchResultsLimitDef: 10,
   ownerIdDef: '75465366',
   ownerDomainDef: '', // '4erniyspisok'
-  authorIdDef: 372045306
+  postAuthorIdDef: 372045306
 };
 
 const tokenRequestBaseURL =
