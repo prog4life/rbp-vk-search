@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 
 import * as actionCreators from 'actions';
+import countSearchProgressInPercents from 'selectors/selectors';
 import { tokenRequestURL } from 'config/common';
 import TopBar from 'components/TopBar';
 import SearchForm from 'components/SearchForm';
@@ -14,11 +15,16 @@ import ResultsList from 'components/ResultsList';
 const propTypes = {
   accessToken: PropTypes.string.isRequired,
   history: PropTypes.instanceOf(Object).isRequired,
-  isSearching: PropTypes.bool.isRequired,
   location: PropTypes.instanceOf(Object).isRequired,
   match: PropTypes.instanceOf(Object).isRequired,
   parseAccessTokenHash: PropTypes.func.isRequired,
   results: PropTypes.arrayOf(PropTypes.object).isRequired,
+  search: PropTypes.shape({
+    isActive: PropTypes.bool,
+    count: PropTypes.number,
+    processed: PropTypes.number,
+    progress: PropTypes.number
+  }).isRequired,
   searchPostsAtWall: PropTypes.func.isRequired,
   terminateSearch: PropTypes.func.isRequired
   // tokenExpiresAt: PropTypes.number.isRequired
@@ -90,7 +96,7 @@ class WallPostsSearch extends React.Component {
     console.log('Select: ', eventKey);
   }
   render() {
-    const { isSearching, results, accessToken, userId } = this.props;
+    const { search, results, accessToken, userId } = this.props;
     return (
       <div className="wall-posts-search">
         <TopBar
@@ -99,9 +105,9 @@ class WallPostsSearch extends React.Component {
           userId={userId}
         />
         <SearchForm
-          isSearching={isSearching}
           onStartSearch={this.handleSearchForWallPosts}
           onStopSearch={this.handleSearchStop}
+          search={search}
         />
         <ResultsPanel header="This is a panel with search results">
           <ResultsFilter filterText="Here will be filter text" />
@@ -119,7 +125,10 @@ const mapStateToProps = state => ({
   accessToken: state.accessToken,
   tokenExpiresAt: state.tokenExpiresAt,
   results: state.results,
-  isSearching: state.isSearching
+  search: {
+    ...state.search,
+    progress: countSearchProgressInPercents(state.search)
+  }
 });
 
 const mapDispatchToProps = dispatch => (

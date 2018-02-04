@@ -6,7 +6,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   let offset = 0;
   let responseCount;
   // NOTE: temporarily
-  const responseCountDef = 5000;
+  // const responseCountDef = 5000;
   // IDEA: store pending or failed requests
   // let requests = [
   //   {
@@ -124,7 +124,9 @@ const scannerMiddleware = ({ dispatch, getState }) => {
 
     // doublecheck
     clearInterval(scannerIntervalId);
-    dispatch({ type });
+    // dispatch({ type }); // TODO: replaced by next(action) to avoid
+    // dispatching of empty action witn "SOME_START" type
+    next(action);
     offset = 0;
     results.length = 0;
     failedRequests.length = 0;
@@ -138,7 +140,17 @@ const scannerMiddleware = ({ dispatch, getState }) => {
 
       callAPI(currentAPIReqUrl)
         .then(removeFailedRequest(currentOffset), onRequestFail(currentOffset))
+        // TODO: separate then(checkResponse)
         .then(setResponseCount)
+        // updateSearchProgress
+        .then((response) => {
+          dispatch({
+            type: 'UPDATE_SEARCH_PROGRESS',
+            count: responseCount,
+            processed: offset
+          });
+          return response;
+        })
         .then(parseResponse(authorId)) // TODO: throw there
         // TODO: extract as single then(addResults)
         // TODO: cut results with "searchResultsLimit"

@@ -21,7 +21,7 @@ const throwIfEmptyOrError = (resData) => {
   }
 
   if (error || !ok) {
-    throw new Error(resData); // need to stringify?
+    throw new Error(JSON.stringify(resData, null, 2)); // need to stringify?
   }
   throw new Error('Empty response');
 };

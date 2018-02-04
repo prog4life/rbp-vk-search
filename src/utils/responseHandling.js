@@ -1,5 +1,6 @@
 export function extractPostsByAuthorId(response, authorId) {
   let posts;
+  console.log(response);
   try {
     ({ items: posts } = response);
   } catch (e) {

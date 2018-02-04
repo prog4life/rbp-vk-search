@@ -9,5 +9,5 @@ export default combineReducers({
   accessToken,
   tokenExpiresAt: tokenExpiry,
   results,
-  isSearching: search
+  search
 });
