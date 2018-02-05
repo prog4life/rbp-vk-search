@@ -4,15 +4,17 @@ export function extractPostsByAuthorId(response, authorId) {
   try {
     ({ items: posts } = response);
   } catch (e) {
-    console.error('Unable to extract posts from response ', e);
-    return false;
+    // console.error('Unable to extract posts from response ', e);
+    // return false;
+    throw Error('Unable to extract posts from response');
   }
 
   if (Array.isArray(posts)) {
     return posts.filter(post => post.from_id === authorId);
   }
-  console.error('Items in response is not an array');
-  return false;
+  // console.error('Items in response is not an array');
+  // return false;
+  throw Error('Items in response is not an array');
 }
 
 export const formatWallPosts = posts => (

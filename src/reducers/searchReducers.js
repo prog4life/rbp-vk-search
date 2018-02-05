@@ -17,8 +17,8 @@ export function results(state = [], action) {
 
 const defaultSearchState = {
   isActive: false,
-  processed: 0,
-  count: null
+  processed: 0
+  // total: undefined
   // progress: 0
 };
 
@@ -40,7 +40,7 @@ export function search(state = defaultSearchState, action) {
     case 'UPDATE_SEARCH_PROGRESS':
       return {
         ...state,
-        count: action.count || state.count,
+        total: action.total || state.total,
         processed: action.processed || state.processed
       };
     // case 'FINISH_SEARCH':

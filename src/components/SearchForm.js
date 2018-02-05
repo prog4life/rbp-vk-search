@@ -1,25 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  Grid,
-  Row,
-  Col
-} from 'react-bootstrap';
+import { Grid, Row, Col } from 'react-bootstrap';
 
+import ControlsContainer from 'containers/ControlsContainer';
 import PostAuthorId from './PostAuthorId';
 import WallOwnerId from './WallOwnerId';
 import WallOwnerShortName from './WallOwnerShortName';
 import WallOwnerType from './WallOwnerType';
 import SearchResultsLimit from './SearchResultsLimit';
-import SearchControlButtons from './SearchControlButtons';
-import ProgressViewer from './ProgressViewer';
+// import SearchControlButtons from './SearchControlButtons';
+// import ProgressViewer from './ProgressViewer';
 
 const propTypes = {
   onStartSearch: PropTypes.func.isRequired,
   onStopSearch: PropTypes.func.isRequired,
   search: PropTypes.shape({
     isActive: PropTypes.bool,
-    count: PropTypes.number,
+    total: PropTypes.number,
     processed: PropTypes.number,
     progress: PropTypes.number
   }).isRequired
@@ -43,11 +40,12 @@ class SearchForm extends React.PureComponent {
   }
   handleSubmit(event) {
     event.preventDefault();
-    const { search, onStartSearch } = this.props;
+    // const { search, onStartSearch } = this.props;
+    const { onStartSearch } = this.props;
 
-    if (search.isActive) {
-      return;
-    }
+    // if (search.isActive) {
+    //   return;
+    // }
 
     const {
       wallOwnerId,
@@ -56,8 +54,6 @@ class SearchForm extends React.PureComponent {
       postAuthorId,
       searchResultsLimit
     } = event.target.elements;
-
-    // TODO: rename "Domain" to "Screen Name" or "Short Name"
 
     onStartSearch({
       wallOwnerId: wallOwnerId.value,
@@ -74,10 +70,11 @@ class SearchForm extends React.PureComponent {
   }
   handleStopBtnClick(e) {
     e.preventDefault(); // TODO: to prevent submit, type="button" did not work
-    const { search, onStopSearch } = this.props;
-    if (search.isActive) {
-      onStopSearch();
-    }
+    const { onStopSearch } = this.props;
+    // NOTE: probably this check and "search" destructuring are unnecessary
+    // if (search.isActive) {
+    onStopSearch();
+    // }
   }
   render() {
     const {
@@ -87,7 +84,7 @@ class SearchForm extends React.PureComponent {
       postAuthorId,
       searchResultsLimit
     } = this.state;
-    const { search } = this.props;
+    // const { search } = this.props;
 
     return (
       <Grid>
@@ -126,27 +123,28 @@ class SearchForm extends React.PureComponent {
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4} >
               {/* TODO: Create container for next 2 components ? */}
-              <SearchControlButtons
+              {/* <SearchControlButtons
                 isSearching={search.isActive}
                 onStopClick={this.handleStopBtnClick}
               />
               {search.isActive &&
                 <ProgressViewer
                   now={search.progress}
-                  numOfProcessed={search.processed}
-                  totalAmount={search.count}
+                  processedCount={search.processed}
+                  total={search.total}
                 />
-              }
+              } */}
+              <ControlsContainer onStopBtnClick={this.handleStopBtnClick} />
             </Col>
           </Row>
-          <Row>
-            {/* <Col md={6} lg={4} mdOffset={6} lgOffset={8}>
+          {/* <Row>
+            <Col md={6} lg={4} mdOffset={6} lgOffset={8}>
               <SearchControlButtons
                 isSearching={search.isActive}
                 onStopClick={this.handleStopBtnClick}
               />
-            </Col> */}
-          </Row>
+            </Col>
+          </Row> */}
         </form>
       </Grid>
     );

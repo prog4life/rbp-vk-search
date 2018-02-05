@@ -21,7 +21,7 @@ const propTypes = {
   results: PropTypes.arrayOf(PropTypes.object).isRequired,
   search: PropTypes.shape({
     isActive: PropTypes.bool,
-    count: PropTypes.number,
+    total: PropTypes.number,
     processed: PropTypes.number,
     progress: PropTypes.number
   }).isRequired,
@@ -107,7 +107,7 @@ class WallPostsSearch extends React.Component {
         <SearchForm
           onStartSearch={this.handleSearchForWallPosts}
           onStopSearch={this.handleSearchStop}
-          search={search}
+          // search={search}
         />
         <ResultsPanel header="This is a panel with search results">
           <ResultsFilter filterText="Here will be filter text" />
@@ -125,10 +125,11 @@ const mapStateToProps = state => ({
   accessToken: state.accessToken,
   tokenExpiresAt: state.tokenExpiresAt,
   results: state.results,
-  search: {
-    ...state.search,
-    progress: countSearchProgressInPercents(state.search)
-  }
+  // search: {
+  //   ...state.search,
+  //   progress: countSearchProgressInPercents(state.search)
+  // }
+  search: state.search
 });
 
 const mapDispatchToProps = dispatch => (

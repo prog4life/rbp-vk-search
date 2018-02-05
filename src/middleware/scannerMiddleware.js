@@ -53,11 +53,12 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       failedRequests.push({ offset: currentOffset, pending: false });
       console.log('FAIL 4: ', failedRequests, 'must ADD ', currentOffset, 'to FAILED');
     }
+    // TODO: throw here or return Promise.reject(e); to prevent invoking chained
   };
 
   const setResponseCount = (response) => {
     // TODO: remove responseCountDef completely
-    responseCount = (response && response.count) || responseCount || responseCountDef;
+    responseCount = (response && response.count) || responseCount;
     // responseCount = response.count && response.count < responseCountDef
     //   ? response.count
     //   : responseCountDef;
@@ -142,16 +143,18 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         .then(removeFailedRequest(currentOffset), onRequestFail(currentOffset))
         // TODO: separate then(checkResponse)
         .then(setResponseCount)
-        // updateSearchProgress
-        .then((response) => {
-          dispatch({
-            type: 'UPDATE_SEARCH_PROGRESS',
-            count: responseCount,
-            processed: offset
-          });
-          return response;
-        })
         .then(parseResponse(authorId)) // TODO: throw there
+        // updateSearchProgress
+        .then((chunk) => {
+          if (responseCount) {
+            dispatch({
+              type: 'UPDATE_SEARCH_PROGRESS',
+              total: responseCount,
+              processed: offset
+            });
+          }
+          return chunk;
+        })
         // TODO: extract as single then(addResults)
         // TODO: cut results with "searchResultsLimit"
         .then((chunk) => {
