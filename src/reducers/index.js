@@ -12,3 +12,6 @@ export default combineReducers({
   results,
   search
 });
+
+// TODO: export mainReducer from './mainReducer'; // OR
+// export { default } from './mainReducer';

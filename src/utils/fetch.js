@@ -15,7 +15,6 @@ const getObjectFromJson = response => response.json();
 const throwIfEmptyOrError = (resData) => {
   const { response, error, ok } = resData;
 
-  // TODO: check what type response is and can it be []
   if (response) {
     return response;
   }

@@ -2,7 +2,8 @@ export function results(state = [], action) {
   switch (action.type) {
     case 'ADD_RESULTS':
       // TODO: prevent adding of same results
-      return [...state, ...action.results];
+      // TODO: cut results
+      return [...state, ...action.results].slice(0, action.limit);
     // clear results at search start
     // case 'START_SEARCH':
     //   return [];
@@ -17,7 +18,7 @@ export function results(state = [], action) {
 
 const defaultSearchState = {
   isActive: false,
-  processed: 0,
+  processed: 0
   // total: undefined
   // progress: 0
 };
@@ -38,6 +39,7 @@ export function search(state = defaultSearchState, action) {
         processed: 0
         // progress: 0
       };
+    // NOTE: filtered in Redux logger config
     case 'UPDATE_SEARCH_PROGRESS':
       return {
         ...state,

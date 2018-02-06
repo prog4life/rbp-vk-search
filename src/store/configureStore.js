@@ -10,7 +10,8 @@ import rootReducer from '../reducers';
 
 // must be the last middleware in chain
 const logger = createLogger({
-  duration: true
+  duration: true,
+  predicate: (getState, action) => action.type !== 'UPDATE_SEARCH_PROGRESS'
 });
 
 const middleware = process.env.NODE_ENV === 'development'

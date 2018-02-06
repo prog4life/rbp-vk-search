@@ -51,7 +51,7 @@ export const searchPostsAtWall = (inputData) => {
   return {
     type: 'WALL_POSTS_SEARCH_START',
     searchConfig: {
-      postAuthorId,
+      authorId: postAuthorId,
       baseAPIReqUrl,
       searchResultsLimit,
       requestInterval

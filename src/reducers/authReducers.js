@@ -35,6 +35,8 @@ export function userName(state = '', action) {
   switch (action.type) {
     case 'SET_USER_NAME':
       return action.userName;
+    case 'SIGN_OUT':
+      return '';
     default:
       return state;
   }

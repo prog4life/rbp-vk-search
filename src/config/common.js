@@ -17,11 +17,11 @@ const requestInterval = 350;
 // have failed or were longer than interval, older data сan be received first
 // and newer data will be received later, after repeated requests
 // but with jsonpTimeout lower than 500-1000 ms search may collapse !!!
-const jsonpTimeout = 500;
+const jsonpTimeout = 600;
 const inputDefaults = {
   searchResultsLimitDef: 10,
   ownerIdDef: '75465366',
-  ownerDomainDef: '', // '4erniyspisok'
+  ownerDomainDef: '',
   postAuthorIdDef: 372045306
 };
 

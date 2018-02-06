@@ -2,7 +2,7 @@ import moment from 'moment';
 import { apiVersion } from 'config/common';
 import fetchDataJSONP from 'utils/fetch';
 
-// TODO: split into 2 distinct actions
+// TODO: split into 2 distinct actions ?
 export const saveAccessToken = (accessToken, tokenExpiresAt) => ({
   type: 'SAVE_ACCESS_TOKEN',
   accessToken,

@@ -1,20 +1,15 @@
 export function extractPostsByAuthorId(response, authorId) {
   let posts;
-  console.log(response);
   try {
     ({ items: posts } = response);
   } catch (e) {
-    // console.error('Unable to extract posts from response ', e);
-    // return false;
     throw Error('Unable to extract posts from response');
   }
 
   if (Array.isArray(posts)) {
     return posts.filter(post => post.from_id === authorId);
   }
-  // console.error('Items in response is not an array');
-  // return false;
-  throw Error('Items in response is not an array');
+  throw Error('Posts from response is not array');
 }
 
 export const formatWallPosts = posts => (
@@ -27,6 +22,7 @@ export const formatWallPosts = posts => (
   }))
 );
 
+// TODO: add order to common config
 export const sortPosts = (posts, desc = true) => (
   posts && posts.sort((a, b) => (
     desc
