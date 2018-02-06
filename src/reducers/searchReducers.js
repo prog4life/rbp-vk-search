@@ -17,7 +17,7 @@ export function results(state = [], action) {
 
 const defaultSearchState = {
   isActive: false,
-  processed: 0
+  processed: 0,
   // total: undefined
   // progress: 0
 };
@@ -34,8 +34,9 @@ export function search(state = defaultSearchState, action) {
     case 'WALL_POSTS_SEARCH_END':
       // TODO: clean up search state values
       return {
-        ...state,
-        isActive: false
+        isActive: false,
+        processed: 0
+        // progress: 0
       };
     case 'UPDATE_SEARCH_PROGRESS':
       return {
@@ -48,8 +49,9 @@ export function search(state = defaultSearchState, action) {
     case 'TERMINATE_SEARCH':
       // TODO: clean up search state values
       return {
-        ...state,
-        isActive: false
+        isActive: false,
+        processed: 0
+        // progress: 0
       };
     default:
       return state;

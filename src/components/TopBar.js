@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 import { Navbar, Nav, NavDropdown, MenuItem} from 'react-bootstrap';
 import { tokenRequestURL } from 'config/common';
 
-const renderNavDropdown = userId => (
+const renderNavDropdown = (userId, userName) => (
   <Nav className="nav-auth" pullRight>
     <NavDropdown
       eventKey={1}
       id="signed-in-dropdown"
-      title={userId ? `Signed in as: ${userId}` : 'Signed in'}
+      title={userName ? `Signed in as: ${userName}` : 'Signed in'}
     >
       {userId &&
         <Fragment>
@@ -32,14 +32,14 @@ const renderNavDropdown = userId => (
 
 const renderSingleNavItem = () => (
   <Navbar.Text className="navitem" pullRight>
-    {/* TODO: clean up, remove href */}
-    <Navbar.Link href={tokenRequestURL.replace('state=55555', `state=${Date.now().toString()}`)}>
+    {/* TODO: clean up, change href */}
+    <Navbar.Link href={tokenRequestURL}>
       {'Sign in'}
     </Navbar.Link>
   </Navbar.Text>
 );
 
-const TopBar = ({ userId, isLoggedIn, onNavSelect }) => (
+const TopBar = ({ userId, userName, isLoggedIn, onNavSelect }) => (
   <Navbar fixedTop onSelect={onNavSelect}>
     <Navbar.Header>
       <Navbar.Brand>
@@ -49,7 +49,7 @@ const TopBar = ({ userId, isLoggedIn, onNavSelect }) => (
       </Navbar.Brand>
     </Navbar.Header>
     <Navbar.Collapse>
-      {isLoggedIn ? renderNavDropdown(userId) : renderSingleNavItem()}
+      {isLoggedIn ? renderNavDropdown(userId, userName) : renderSingleNavItem()}
     </Navbar.Collapse>
   </Navbar>
 );

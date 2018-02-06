@@ -12,6 +12,8 @@ import ResultsPanel from 'components/ResultsPanel';
 import ResultsFilter from 'components/ResultsFilter';
 import ResultsList from 'components/ResultsList';
 
+import ResultsListContainer from 'containers/ResultsListContainer';
+
 const propTypes = {
   accessToken: PropTypes.string.isRequired,
   history: PropTypes.instanceOf(Object).isRequired,
@@ -26,8 +28,10 @@ const propTypes = {
     progress: PropTypes.number
   }).isRequired,
   searchPostsAtWall: PropTypes.func.isRequired,
-  terminateSearch: PropTypes.func.isRequired
+  terminateSearch: PropTypes.func.isRequired,
   // tokenExpiresAt: PropTypes.number.isRequired
+  userId: PropTypes.string.isRequired,
+  userName: PropTypes.string.isRequired
 };
 
 class WallPostsSearch extends React.Component {
@@ -96,13 +100,17 @@ class WallPostsSearch extends React.Component {
     console.log('Select: ', eventKey);
   }
   render() {
-    const { search, results, accessToken, userId } = this.props;
+    const {
+      search, results, accessToken, userId, userName
+    } = this.props;
+
     return (
       <div className="wall-posts-search">
         <TopBar
           isLoggedIn={Boolean(accessToken)}
           onNavSelect={this.handleNavSelect}
           userId={userId}
+          userName={userName}
         />
         <SearchForm
           onStartSearch={this.handleSearchForWallPosts}
@@ -112,6 +120,7 @@ class WallPostsSearch extends React.Component {
         <ResultsPanel header="This is a panel with search results">
           <ResultsFilter filterText="Here will be filter text" />
           <ResultsList results={results} />
+          {/* <ResultsListContainer /> */}
         </ResultsPanel>
       </div>
     );
@@ -122,6 +131,7 @@ WallPostsSearch.propTypes = propTypes;
 
 const mapStateToProps = state => ({
   userId: state.userId,
+  userName: state.userName,
   accessToken: state.accessToken,
   tokenExpiresAt: state.tokenExpiresAt,
   results: state.results,

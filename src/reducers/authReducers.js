@@ -30,3 +30,12 @@ export function userId(state = '', action) {
       return state;
   }
 }
+
+export function userName(state = '', action) {
+  switch (action.type) {
+    case 'SET_USER_NAME':
+      return action.userName;
+    default:
+      return state;
+  }
+}

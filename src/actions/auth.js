@@ -1,4 +1,6 @@
 import moment from 'moment';
+import { apiVersion } from 'config/common';
+import fetchDataJSONP from 'utils/fetch';
 
 // TODO: split into 2 distinct actions
 export const saveAccessToken = (accessToken, tokenExpiresAt) => ({
@@ -12,6 +14,7 @@ export const setTokenExpiry = expiresAt => ({
   expiresAt
 });
 
+// TODO: terminate search on sign out
 export const signOut = () => ({
   type: 'SIGN_OUT'
 });
@@ -20,6 +23,22 @@ export const setUserId = userId => ({
   type: 'SET_USER_ID',
   userId
 });
+
+export const setUserName = userName => ({
+  type: 'SET_USER_NAME',
+  userName
+});
+
+export const getUserName = (id) => {
+  const url = `https://api.vk.com/method/users.get?` +
+    `user_ids=${id}&v=${apiVersion}`;
+
+  return fetchDataJSONP(url, 5000).then((response) => {
+    const [{ first_name: firstName, last_name: lastName }] = response;
+
+    return `${firstName} ${lastName}`;
+  }).catch(e => console.log(e));
+};
 
 export const parseAccessTokenHash = hash => (dispatch) => {
   if (!hash) {
@@ -67,6 +86,7 @@ export const parseAccessTokenHash = hash => (dispatch) => {
 
     if (userId) {
       dispatch(setUserId(userId));
+      getUserName(userId).then(userName => dispatch(setUserName(userName)));
     }
     return result;
   }

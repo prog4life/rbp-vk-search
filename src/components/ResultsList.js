@@ -10,7 +10,7 @@ function ResultsList({ results }) {
       {/* <SearchResult number="2" result={result2} /> */}
       {results.map((result, index) => (
         <SearchResult
-          key={uuidv1()}
+          key={uuidv1()} // TODO: replace by post_id
           number={index + 1}
           result={result}
         />

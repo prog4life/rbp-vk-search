@@ -5,6 +5,8 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   let scannerIntervalId;
   let offset = 0;
   let responseCount;
+  // TODO:
+  let finished = false;
   // NOTE: temporarily
   // const responseCountDef = 5000;
   // IDEA: store pending or failed requests
@@ -25,6 +27,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       if (req.offset === currentOffset) {
         req.pending = true;
         console.log('REQUEST 1: ', failedRequests, 'must SET ', currentOffset, 'as PENDING');
+        console.log('But have ', req);
       }
     });
   };
@@ -42,8 +45,6 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   };
 
   const onRequestFail = currentOffset => (e) => {
-    console.warn('Request with ', currentOffset, ' offset have FAILED ', e);
-
     const existing = failedRequests.find(req => req.offset === currentOffset);
 
     if (existing) {
@@ -53,7 +54,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       failedRequests.push({ offset: currentOffset, pending: false });
       console.log('FAIL 4: ', failedRequests, 'must ADD ', currentOffset, 'to FAILED');
     }
-    // TODO: throw here or return Promise.reject(e); to prevent invoking chained
+    throw Error(`Request with ${currentOffset} offset FAILED, ${e.message}`);
   };
 
   const setResponseCount = (response) => {
@@ -63,6 +64,19 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     //   ? response.count
     //   : responseCountDef;
     return response;
+  };
+
+  const updateSearchProgress = (resultsChunk) => {
+    // TODO: if search is terminated - do not continue
+    // if (finished) { return false; }
+    if (responseCount) {
+      dispatch({
+        type: 'UPDATE_SEARCH_PROGRESS',
+        total: responseCount,
+        processed: offset
+      });
+    }
+    return resultsChunk;
   };
 
   // const addOrResetFailedRequest = (currentOffset) => {
@@ -96,6 +110,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     }
 
     if (type === 'TERMINATE_SEARCH') {
+      finished = true;
       clearInterval(scannerIntervalId);
       return next(action); // OR "failedRequests", "results"
     }
@@ -131,6 +146,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     offset = 0;
     results.length = 0;
     failedRequests.length = 0;
+    finished = false;
 
     const performSingleCall = (currentOffset) => {
       setFailedRequestAsPending(currentOffset);
@@ -141,20 +157,10 @@ const scannerMiddleware = ({ dispatch, getState }) => {
 
       callAPI(currentAPIReqUrl)
         .then(removeFailedRequest(currentOffset), onRequestFail(currentOffset))
-        // TODO: separate then(checkResponse)
+        // TODO: extract then(checkResponse)
         .then(setResponseCount)
         .then(parseResponse(authorId)) // TODO: throw there
-        // updateSearchProgress
-        .then((chunk) => {
-          if (responseCount) {
-            dispatch({
-              type: 'UPDATE_SEARCH_PROGRESS',
-              total: responseCount,
-              processed: offset
-            });
-          }
-          return chunk;
-        })
+        .then(updateSearchProgress)
         // TODO: extract as single then(addResults)
         // TODO: cut results with "searchResultsLimit"
         .then((chunk) => {
@@ -191,6 +197,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         }
       }
 
+      finished = true;
       clearInterval(scannerIntervalId);
       return dispatch(completeSearch(results));
 
