@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 // import * as reducers from './auth';
 import { accessToken, tokenExpiry, userId, userName } from './authReducers';
 import { results, search } from './searchReducers';
+import requests from './requestsReducer';
 
 // exporting of rootReducer
 export default combineReducers({
@@ -10,7 +11,8 @@ export default combineReducers({
   userName,
   tokenExpiresAt: tokenExpiry,
   results,
-  search
+  search,
+  requests
 });
 
 // TODO: export mainReducer from './mainReducer'; // OR

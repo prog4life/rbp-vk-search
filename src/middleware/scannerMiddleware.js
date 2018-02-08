@@ -1,67 +1,82 @@
 const scannerMiddleware = ({ dispatch, getState }) => {
-  let failedRequests = [];
-  let emptyResponsesCount = 0; // for further usage
+  // let failedRequests = [];
+  // let emptyResponsesCount = 0; // idea
   // let results = [];
   let scannerIntervalId;
   let offset = 0;
   let responseCount;
   // TODO:
   let finished = false;
-  // NOTE: temporarily
-  // const responseCountDef = 5000;
-  // IDEA: store pending or failed requests
-  // let requests = [
+
+  // const responseCountDef = 5000; // NOTE: temporarily
+
+  // const requests = [
   //   {
   //     offset: 400,
   //     pending: true,
-  //     failed: false,
-  //     failCount: 0
+  //     failCount: 0   // idea
   //   }
   // ];
 
-  const genId = (n = 3) => (Math.random() * 1000000).toString().slice(0, n);
+  // const genId = (n = 3) => (Math.random() * 1000000).toString().slice(0, n);
 
-  failedRequests.id = genId();
+  // failedRequests.id = genId();
 
   const setFailedRequestAsPending = (currentOffset) => {
     console.log('REQUEST: ', currentOffset);
+
+    dispatch({
+      type: 'REQUEST_PENDING',
+      offset: currentOffset
+    });
+
     // change "pending" status of request to "true" at repeated request with
     // same offset value
-    console.log('REQUEST 1: ', failedRequests, 'SHOULD SET ', currentOffset, 'as PENDING');
-    failedRequests.forEach((req) => {
-      if (req.offset === currentOffset) {
-        req.pending = true;
-      }
-    });
-    console.log('REQUEST 1: ', failedRequests, 'MUST BE SET ', currentOffset, 'as PENDING');
+    // console.log('REQUEST 1: ', failedRequests, 'SHOULD SET ', currentOffset, 'as PENDING');
+    // failedRequests.forEach((req) => {
+    //   if (req.offset === currentOffset) {
+    //     req.pending = true;
+    //   }
+    // });
+    // console.log('REQUEST 1: ', failedRequests, 'MUST BE SET ', currentOffset, 'as PENDING');
   };
 
   // remove successful one from "failedRequests"
   const removeFailedRequest = currentOffset => (response) => {
     console.log(currentOffset, ' SUCCESS');
 
+    dispatch({
+      type: 'REQUEST_SUCCESS',
+      offset: currentOffset
+    });
+
     // NOTE: consider mutating same array here
-    failedRequests = failedRequests.filter(req => req.offset !== currentOffset);
-    failedRequests.id = genId();
-    console.log('SUCCESS 2: ', failedRequests, 'must REMOVE ', currentOffset, 'from failed');
+    // failedRequests = failedRequests.filter(req => req.offset !== currentOffset);
+    // failedRequests.id = genId();
+    // console.log('SUCCESS 2: ', failedRequests, 'must REMOVE ', currentOffset, 'from failed');
     return response;
   };
 
   const onRequestFail = currentOffset => (e) => {
-    const existing = failedRequests.find(req => req.offset === currentOffset);
-    console.log('EXISTING ', existing, ' must be with offset ', currentOffset, 'in ', failedRequests);
+    dispatch({
+      type: 'REQUEST_FAIL',
+      offset: currentOffset
+    });
 
-    if (existing) {
-      existing.pending = false;
-      console.log('FAIL 3: ', failedRequests, 'must SET existing ', existing, 'with ', currentOffset, 'as FAILED');
-    } else {
-      failedRequests.push({
-        id: genId(5),
-        offset: currentOffset,
-        pending: false
-      });
-      console.log('FAIL 4: ', failedRequests, 'must ADD ', currentOffset, 'to FAILED');
-    }
+    // const existing = failedRequests.find(req => req.offset === currentOffset);
+    // console.log('EXISTING ', existing, ' must be with offset ', currentOffset, 'in ', failedRequests);
+
+    // if (existing) {
+    //   existing.pending = false;
+    //   console.log('FAIL 3: ', failedRequests, 'must SET existing ', existing, 'with ', currentOffset, 'as FAILED');
+    // } else {
+    //   failedRequests.push({
+    //     id: genId(5),
+    //     offset: currentOffset,
+    //     pending: false
+    //   });
+    //   console.log('FAIL 4: ', failedRequests, 'must ADD ', currentOffset, 'to FAILED');
+    // }
     throw Error(`Request with ${currentOffset} offset FAILED, ${e.message}`);
   };
 
@@ -149,7 +164,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     next(action);
     offset = 0;
     // results.length = 0;
-    failedRequests.length = 0;
+    // failedRequests.length = 0;
     finished = false;
 
     const performSingleCall = (currentOffset) => {
@@ -188,13 +203,16 @@ const scannerMiddleware = ({ dispatch, getState }) => {
 
     scannerIntervalId = setInterval(() => {
       // TODO: handle case with wrong wall owner id
+      const failedRequests = getState().requests;
 
+      // if (failedRequests.length > 0) {
       if (failedRequests.length > 0) {
         const req = failedRequests.find(failedReq => !failedReq.pending);
+
         if (req) {
-          console.log('F-REQUESTS 4: ', failedRequests);
           performSingleCall(req.offset);
         }
+        console.log('F-REQUESTS 4: ', failedRequests);
         return false;
       }
 
