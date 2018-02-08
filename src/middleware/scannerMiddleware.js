@@ -19,41 +19,48 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   //   }
   // ];
 
+  const genId = (n = 3) => (Math.random() * 1000000).toString().slice(0, n);
+
+  failedRequests.id = genId();
+
   const setFailedRequestAsPending = (currentOffset) => {
     console.log('REQUEST: ', currentOffset);
     // change "pending" status of request to "true" at repeated request with
     // same offset value
+    console.log('REQUEST 1: ', failedRequests, 'SHOULD SET ', currentOffset, 'as PENDING');
     failedRequests.forEach((req) => {
       if (req.offset === currentOffset) {
         req.pending = true;
-        console.log('REQUEST 1: ', failedRequests, 'must SET ', currentOffset, 'as PENDING');
-        console.log('BUT have ', req);
       }
     });
+    console.log('REQUEST 1: ', failedRequests, 'MUST BE SET ', currentOffset, 'as PENDING');
   };
 
   // remove successful one from "failedRequests"
   const removeFailedRequest = currentOffset => (response) => {
     console.log(currentOffset, ' SUCCESS');
 
-    console.log('SUCCESS 2: ', failedRequests, 'must REMOVE ', currentOffset, 'from failed');
     // NOTE: consider mutating same array here
     failedRequests = failedRequests.filter(req => req.offset !== currentOffset);
-    console.log('BUT have ', failedRequests);
+    failedRequests.id = genId();
+    console.log('SUCCESS 2: ', failedRequests, 'must REMOVE ', currentOffset, 'from failed');
     return response;
   };
 
   const onRequestFail = currentOffset => (e) => {
     const existing = failedRequests.find(req => req.offset === currentOffset);
+    console.log('EXISTING ', existing, ' must be with offset ', currentOffset, 'in ', failedRequests);
 
     if (existing) {
       existing.pending = false;
-      console.log('FAIL 3: ', failedRequests, 'must SET existing ', currentOffset, 'as FAILED');
-      console.log('BUT have existing ', existing);
+      console.log('FAIL 3: ', failedRequests, 'must SET existing ', existing, 'with ', currentOffset, 'as FAILED');
     } else {
-      failedRequests.push({ offset: currentOffset, pending: false });
-      console.log('FAIL 4: must ADD ', currentOffset, 'to FAILED');
-      console.log('BUT have failedRequests: ', failedRequests);
+      failedRequests.push({
+        id: genId(5),
+        offset: currentOffset,
+        pending: false
+      });
+      console.log('FAIL 4: ', failedRequests, 'must ADD ', currentOffset, 'to FAILED');
     }
     throw Error(`Request with ${currentOffset} offset FAILED, ${e.message}`);
   };
