@@ -21,9 +21,10 @@ export default function requests(state = [], action) {
     case 'REQUEST_SUCCESS':
       return state.filter(req => req.offset !== action.offset);
     case 'REQUEST_PENDING':
+      // OR filter then add
       return state.some(req => req.offset === action.offset)
         ? changeRequestPendingState(state, action, true)
-        : [...state];
+        : [...state, { offset: action.offset, pending: true }];
     default:
       return state;
   }

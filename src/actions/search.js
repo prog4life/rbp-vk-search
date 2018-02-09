@@ -1,7 +1,8 @@
 import {
-  apiVersion, count, extended, requestInterval, inputDefaults
+  apiVersion, count, extended, requestInterval, waitPrevRequest, inputDefaults
 } from 'config/common';
 import fetchDataJSONP from 'utils/fetch';
+import requestViaAxiosJSONP from 'utils/axios-jsonp';
 import parsePostsFromWall from 'utils/responseHandling';
 
 export const addResults = results => ({
@@ -54,9 +55,11 @@ export const searchPostsAtWall = (inputData) => {
       authorId: postAuthorId,
       baseAPIReqUrl,
       searchResultsLimit,
-      requestInterval
+      requestInterval,
+      waitPrevRequest
     },
-    callAPI: fetchDataJSONP,
+    // callAPI: fetchDataJSONP,
+    callAPI: requestViaAxiosJSONP,
     parseResponse: parsePostsFromWall,
     addResultsType: 'ADD_RESULTS',
     completeSearch: results => dispatch => (

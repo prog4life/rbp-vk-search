@@ -17,7 +17,11 @@ const requestInterval = 350;
 // older data сan be received first and newer data will be received later,
 // after repeated requests
 // with jsonpTimeout lower than 1000 ms search may collapse !!!
-const jsonpTimeout = 1000; // default - 5000
+const jsonpTimeout = 1000; // default for fetch-jsonp: 5000
+// make or not next requests if previous one have not completed yet
+const waitPrevRequest = true;
+const waitTimeout = 3000;
+
 const inputDefaults = {
   searchResultsLimitDef: 10,
   ownerIdDef: '75465366',
@@ -48,6 +52,8 @@ export {
   state,
   requestInterval,
   jsonpTimeout,
+  waitPrevRequest,
+  waitTimeout,
   inputDefaults,
   tokenRequestBaseURL,
   tokenRequestURL

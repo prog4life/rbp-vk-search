@@ -7,7 +7,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   // TODO:
   let finished = false;
 
-  // const failedRequests = [
+  // const requests = [
   //   {
   //     offset: 400,
   //     pending: true,
@@ -15,15 +15,15 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   //   }
   // ];
 
-  const setFailedRequestAsPending = (currentOffset) => {
+  const requestPending = (currentOffset) => {
     dispatch({
       type: 'REQUEST_PENDING',
       offset: currentOffset
     });
   };
 
-  // remove successful one from "failedRequests"
-  const removeFailedRequest = currentOffset => (response) => {
+  // remove successful one from "requests"
+  const requestSuccess = currentOffset => (response) => {
     dispatch({
       type: 'REQUEST_SUCCESS',
       offset: currentOffset
@@ -31,7 +31,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     return response;
   };
 
-  const onRequestFail = currentOffset => (e) => {
+  const requestFail = currentOffset => (e) => {
     // TODO: add if (!finished) check
     dispatch({
       type: 'REQUEST_FAIL',
@@ -61,13 +61,13 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   // };
 
   // const addOrResetFailedRequest = (currentOffset) => {
-  //   const existing = failedRequests.find(req => req.offset === currentOffset);
+  //   const existing = requests.find(req => req.offset === currentOffset);
   //   if (existing) {
   //     existing.pending = false;
   //   } else {
-  //     failedRequests.push({ offset: currentOffset, pending: false });
+  //     requests.push({ offset: currentOffset, pending: false });
   //   }
-  //   console.log('F-REQUESTS 3: ', failedRequests, 'must SET ', currentOffset, 'as FAILED');
+  //   console.log('F-REQUESTS 3: ', requests, 'must SET ', currentOffset, 'as FAILED');
   // };
 
   // TODO: add to action "responseStateTypes" field
@@ -119,7 +119,8 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       authorId,
       baseAPIReqUrl,
       searchResultsLimit,
-      requestInterval
+      requestInterval,
+      waitPrevRequest
     } = searchConfig;
 
     // doublecheck
@@ -134,14 +135,16 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     finished = false;
 
     const performSingleCall = (currentOffset) => {
-      setFailedRequestAsPending(currentOffset);
+      requestPending(currentOffset);
 
       const currentAPIReqUrl = `${baseAPIReqUrl}` +
         `&access_token=${accessToken}` +
         `&offset=${currentOffset}`;
 
+      // TODO: use timestamps - Date.now === timeout to track failed requests
+
       callAPI(currentAPIReqUrl)
-        .then(removeFailedRequest(currentOffset), onRequestFail(currentOffset))
+        .then(requestSuccess(currentOffset), requestFail(currentOffset))
         .then(setResponseCount)
         .then(parseResponse(authorId)) // TODO: throw there
         // .then(collectResults)
@@ -170,18 +173,27 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     scannerIntervalId = setInterval(() => {
       // TODO: handle case with wrong wall owner id
 
-      const failedRequests = getState().requests;
+      // TODO: waitPending/sequential config: that determines to make or not
+      // new reqest if pending requests present
 
-      if (failedRequests.length > 0) {
-        const notPendingReq = failedRequests.find(request => !request.pending);
+      const { requests } = getState();
 
-        if (notPendingReq) {
-          console.log('Failed request FOUND, will call with: ', notPendingReq);
+      if (requests.length > 0) {
+        const pendingReq = requests.find(request => request.pending);
 
-          performSingleCall(notPendingReq.offset);
+        console.log('REQUESTS 4: ', JSON.stringify(requests, null, 2));
+
+        if (pendingReq && waitPrevRequest) {
+          return false;
         }
-        console.log('F-REQUESTS 4: ', JSON.stringify(failedRequests, null, 2));
-        return false;
+
+        // only failed requests present, no pending requests, repeat first
+        if (!pendingReq) {
+          console.log('Will call this FAILED request: ', requests[0].offset);
+
+          performSingleCall(requests[0].offset);
+          return false;
+        }
       }
 
       if (getState().results.length < searchResultsLimit) { // was results.length

@@ -28,11 +28,11 @@ export default (preloadedState = {}) => {
   // devTools options object is optional, without it replace "composeEnhancers"
   // call with "composeWithDevTools"
   const composeEnhancers = composeWithDevTools({
-    realtime: true // if process.env.NODE_ENV not set as 'development'
+    realtime: true, // if process.env.NODE_ENV not set as 'development'
     // port setting required to use with local "remotedev-server", OR
     // use remotedev.io/local alternatively
     // set same port in any monitor app (browser/Atom/VS Code extension)
-    // port: 8000 // the port local "remotedev-server" is running at
+    port: 8000 // the port local "remotedev-server" is running at
   });
 
   const store = createStore(

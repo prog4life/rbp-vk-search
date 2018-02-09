@@ -3,7 +3,7 @@ import { jsonpTimeout } from 'config/common';
 
 const getObjectFromJson = response => response.json();
 
-// error response example:
+// vk API error response example:
 // resData = {
 //   error: {
 //     error_code: 8,
@@ -26,8 +26,8 @@ const throwIfEmptyOrError = (resData) => {
 };
 
 // TODO: think over timeout modifying functionality
-const fetchDataJSONP = (currentAPIReqUrl, updatedTimeout) => (
-  fetchJSONP(currentAPIReqUrl, {
+const fetchDataJSONP = (url, updatedTimeout) => (
+  fetchJSONP(url, {
     timeout: updatedTimeout || jsonpTimeout // default - 5000
   })
     .then(getObjectFromJson)
