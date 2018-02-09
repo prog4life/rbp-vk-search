@@ -1,4 +1,16 @@
 const scannerMiddleware = ({ dispatch, getState }) => {
+  let failedRequests = {
+    // 'offset300': {
+    //   id: 7901,
+    //   offset: 300,
+    //   pending: false
+    // },
+    // 'offset700': {
+    //   id: 2313,
+    //   offset: 700,
+    //   pending: true
+    // }
+  };
   // let emptyResponsesCount = 0; // idea
   // let results = [];
   let scannerIntervalId;
@@ -7,7 +19,9 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   // TODO:
   let finished = false;
 
-  // const failedRequests = [
+  // const responseCountDef = 5000; // NOTE: temporarily
+
+  // const requests = [
   //   {
   //     offset: 400,
   //     pending: true,
@@ -15,28 +29,45 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   //   }
   // ];
 
+  const genId = (n = 3) => (Math.random() * 1000000).toString().slice(0, n);
+
   const setFailedRequestAsPending = (currentOffset) => {
-    dispatch({
-      type: 'REQUEST_PENDING',
-      offset: currentOffset
-    });
+    const current = `offset${currentOffset}`;
+
+    if (failedRequests[current]) {
+      failedRequests[current].pending = true;
+    }
+
+    // console.log('REQUEST 1: ', JSON.stringify(failedRequests, null, 2), 'MUST BE SET ', currentOffset, 'as PENDING');
   };
 
   // remove successful one from "failedRequests"
   const removeFailedRequest = currentOffset => (response) => {
-    dispatch({
-      type: 'REQUEST_SUCCESS',
-      offset: currentOffset
-    });
+    const current = `offset${currentOffset}`;
+
+    if (failedRequests[current]) {
+      delete failedRequests[current];
+    }
+
+    // console.log('SUCCESS 2: ', currentOffset, 'MUST BE REMOVED from: ', JSON.stringify(failedRequests, null, 2));
     return response;
   };
 
   const onRequestFail = currentOffset => (e) => {
-    // TODO: add if (!finished) check
-    dispatch({
-      type: 'REQUEST_FAIL',
-      offset: currentOffset
-    });
+    const current = `offset${currentOffset}`;
+
+    if (failedRequests[current]) {
+      failedRequests[current].pending = false;
+      // console.log('FAIL 3: ', JSON.stringify(failedRequests, null, 2), 'must SET ', current, ' as FAILED');
+    } else {
+      failedRequests[current] = {
+        offset: currentOffset,
+        id: genId(4),
+        pending: false
+      };
+      // console.log('FAIL 3: ', JSON.stringify(failedRequests, null, 2), 'must ADD ', current, 'to FAILED');
+    }
+
     throw Error(`Request with ${currentOffset} offset FAILED, ${e.message}`);
   };
 
@@ -44,9 +75,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     responseCount = response && response.count
       ? response.count
       : responseCount;
-
-    console.log('RESPONSE from setResponseCount: ', response); // TEMP:
-
+    // console.log('RESPONSE from setResponseCount: ', response); // TEMP:
     return response;
   };
 
@@ -69,8 +98,6 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   //   }
   //   console.log('F-REQUESTS 3: ', failedRequests, 'must SET ', currentOffset, 'as FAILED');
   // };
-
-  // TODO: add to action "responseStateTypes" field
 
   return next => (action) => {
     const { accessToken } = getState();
@@ -95,7 +122,6 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     if (type === 'TERMINATE_SEARCH') {
       finished = true;
       clearInterval(scannerIntervalId);
-      // TODO: clear failedReuests in store
       return next(action);
     }
 
@@ -112,7 +138,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     }
 
     if (typeof searchConfig !== 'object') {
-      throw new Error('Expected an object of search config params');
+      throw new Error('Expected an object of scan params');
     }
 
     const {
@@ -129,8 +155,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     next(action);
     offset = 0;
     // results.length = 0;
-    // TODO: clear failedReuests in store:
-    // dispatch({ type: 'CLEAR_REQUESTS' });
+    failedRequests = {};
     finished = false;
 
     const performSingleCall = (currentOffset) => {
@@ -170,20 +195,21 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     scannerIntervalId = setInterval(() => {
       // TODO: handle case with wrong wall owner id
 
-      const failedRequests = getState().requests;
+      const reqs = Object.keys(failedRequests);
 
-      if (failedRequests.length > 0) {
-        const notPendingReq = failedRequests.find(request => !request.pending);
+      if (reqs.length > 0) {
+        const failed = reqs.find(req => failedRequests[req].pending !== true);
 
-        if (notPendingReq) {
-          console.log('Failed request FOUND, will call with: ', notPendingReq);
+        if (failed) {
+          // console.log('Failed request FOUND, will call with: ', failed);
 
-          performSingleCall(notPendingReq.offset);
+          performSingleCall(failedRequests[failed].offset);
         }
-        console.log('F-REQUESTS 4: ', JSON.stringify(failedRequests, null, 2));
+        // console.log('F-REQUESTS 4: ', JSON.stringify(failedRequests, null, 2));
         return false;
       }
 
+      // TODO: need to resolve if store is not used
       if (getState().results.length < searchResultsLimit) { // was results.length
         if (!responseCount || offset < responseCount) {
           // NOTE: should vary depending on the "count" value

@@ -12,12 +12,12 @@ const extended = 0;
 const state = 55555;
 // vk API limit is 3 requests per minute
 const requestInterval = 350;
-// set jsonpTimeout lower than requestInterval to make search sequential/serial
-// (API data will be processed in strong order), otherwise if some requests
-// have failed or were longer than interval, older data сan be received first
-// and newer data will be received later, after repeated requests
-// but with jsonpTimeout lower than 500-1000 ms search may collapse !!!
-const jsonpTimeout = 600;
+// search reuests are not sequential/serial (API data can be processed NOT in
+// strong order), if some requests have failed or were longer than interval,
+// older data сan be received first and newer data will be received later,
+// after repeated requests
+// with jsonpTimeout lower than 1000 ms search may collapse !!!
+const jsonpTimeout = 1000; // default - 5000
 const inputDefaults = {
   searchResultsLimitDef: 10,
   ownerIdDef: '75465366',
