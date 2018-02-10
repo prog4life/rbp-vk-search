@@ -11,6 +11,8 @@ const SearchControls = ({
   progress,
   onStopBtnClick
 }) => (
+  // TODO: replace Fragment by container div with margin-bottom equal to
+  // FormGroup margin-bottom ?
   <Fragment>
     <SearchControlButtons
       isSearching={isSearchActive}

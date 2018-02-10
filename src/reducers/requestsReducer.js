@@ -26,6 +26,7 @@ export default function requests(state = [], action) {
           pending: false
         });
     case 'WALL_POSTS_SEARCH_START':
+    case 'TERMINATE_SEARCH':
       return [];
     default:
       return state;

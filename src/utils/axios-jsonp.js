@@ -3,6 +3,7 @@ import axios from 'axios-jsonp-pro';
 
 export default function axiosJSONP(url, customTimeout) {
   return axios.jsonp(url, {
+    // url
     // timeout: 700
   })
     .then((response) => {
@@ -14,6 +15,6 @@ export default function axiosJSONP(url, customTimeout) {
       return response.response;
     })
     .catch((error) => {
-      throw Error('axios catch error: ', error);
+      throw error;
     });
 }

@@ -23,9 +23,8 @@ const scannerMiddleware = ({ dispatch, getState }) => {
 
   // remove successful request obj from "requests"
   const onRequestSuccess = (currentOffset, actionCreator) => (response) => {
-    dispatch(actionCreator(currentOffset));
-
     if (!isSearchTerminated) {
+      dispatch(actionCreator(currentOffset));
       return response;
     }
     throw Error('Unnecessary response, search is already terminated');
@@ -115,7 +114,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
 
     // doublecheck
     clearInterval(scannerIntervalId);
-    // to notify reducers of search start
+    // to notify reducers about search start
     // will also clear "requests" in store
     next(action);
     offset = 0;
@@ -162,13 +161,16 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     scannerIntervalId = setInterval(() => {
       const { requests } = getState();
 
+      // NOTE: should vary depending on the "count" value
+      offset += 100;
+
       if (requests.length > 0) {
         const pendingReq = requests.find(request => request.pending);
 
         console.log('REQUESTS 4: ', JSON.stringify(requests, null, 2));
 
         if (pendingReq && waitPending) {
-          return false;
+          return;
         }
 
         // no pending requests, only failed requests present, repeat first
@@ -176,46 +178,42 @@ const scannerMiddleware = ({ dispatch, getState }) => {
           console.log('Will call this FAILED request: ', requests[0].offset);
 
           performSingleCall(requests[0].offset);
-          return false;
+          return;
         }
 
         const failedReq = requests.find(request => !request.pending);
 
-        // pending requests present but "waitPending" is false and failed
-        // requests present, repeat first of failed
+        // pending and failed requests present but "waitPending" is false -
+        // repeat first of failed
         if (failedReq) {
           console.log('Not waiting for pending and call: ', failedReq.offset);
 
           performSingleCall(failedReq.offset);
-          return false;
+          return;
         }
 
-        // // "waitPending" is false, no failed reqs, but pending reqs present
-        // if (pendingReq) {
-        //   // need to call next offset
-        //   return false;
-        // }
+        // if some pending requests still present
+        if (offset > responseCount) {
+          return;
+        }
       }
 
       if (getState().results.length < searchResultsLimit) { // was results.length
-        if (!responseCount || offset < responseCount) {
-          // NOTE: should vary depending on the "count" value
-          offset += 100;
-          return performSingleCall(offset);
+        if (!responseCount || offset <= responseCount) {
+          performSingleCall(offset);
+          return;
         }
-        // TODO: add requests.length > 0 for case when "waitPending" is false, 
-        // no failed reqs, pending reqs present but offset > count
       }
 
-      isSearchTerminated = true;
+      // isSearchTerminated = true;
       clearInterval(scannerIntervalId);
       // return dispatch(completeSearch(results));
-      return dispatch(completeSearch());
+      dispatch(completeSearch());
 
       // NOTE: maybe add exit condition when get empty items(posts) few times
       // if (responseData.items.length = 0) { ... }
     }, requestInterval);
-    // to make first request before timer tick
+    // to make first request before timer tick, return for eslint
     return performSingleCall(offset);
   };
 };
