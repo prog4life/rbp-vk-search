@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { apiVersion } from 'config/common';
-import fetchDataJSONP from 'utils/fetch';
+import fetchJSONP from 'utils/fetch';
 
 // TODO: split into 2 distinct actions ?
 export const saveAccessToken = (accessToken, tokenExpiresAt) => ({
@@ -33,7 +33,7 @@ export const getUserName = (id) => {
   const url = `https://api.vk.com/method/users.get?` +
     `user_ids=${id}&v=${apiVersion}`;
 
-  return fetchDataJSONP(url, 5000).then((response) => {
+  return fetchJSONP(url, 5000).then((response) => {
     const [{ first_name: firstName, last_name: lastName }] = response;
 
     return `${firstName} ${lastName}`;

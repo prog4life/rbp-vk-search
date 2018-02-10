@@ -55,6 +55,9 @@ class SearchForm extends React.PureComponent {
       searchResultsLimit
     } = event.target.elements;
 
+    // TODO: handle case with wrong wallOwnerId here or onChange with
+    // request to API
+
     onStartSearch({
       wallOwnerId: wallOwnerId.value,
       wallOwnerShortName: wallOwnerShortName.value,

@@ -176,7 +176,7 @@ export const searchCommentsWithStoredProcedure = (procedure, token) => {
 // }
 
 // export const getPartOfResults = currentOffset => dispatch => (
-//   dispatch(fetchDataJSONP(
+//   dispatch(fetchJSONP(
 //     `${baseAPIReqUrl}&offset=${currentOffset}`,
 //     currentOffset
 //   ))

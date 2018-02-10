@@ -4,40 +4,40 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   let scannerIntervalId;
   let offset = 0;
   let responseCount;
-  // TODO:
-  let finished = false;
+  let isSearchTerminated = false;
 
   // const requests = [
   //   {
   //     offset: 400,
-  //     pending: true,
+  //     pending: true, // failed request will get "false" value here
   //     failCount: 0   // idea
   //   }
   // ];
 
-  const requestPending = (currentOffset) => {
-    dispatch({
-      type: 'REQUEST_PENDING',
-      offset: currentOffset
-    });
+  // const onRequestStart = (currentOffset) => {
+  //   dispatch({
+  //     type: 'REQUEST_START',
+  //     offset: currentOffset
+  //   });
+  // };
+
+  // remove successful request obj from "requests"
+  const onRequestSuccess = (currentOffset, actionCreator) => (response) => {
+    dispatch(actionCreator(currentOffset));
+
+    if (!isSearchTerminated) {
+      return response;
+    }
+    throw Error('Unnecessary response, search is already terminated');
   };
 
-  // remove successful one from "requests"
-  const requestSuccess = currentOffset => (response) => {
-    dispatch({
-      type: 'REQUEST_SUCCESS',
-      offset: currentOffset
-    });
-    return response;
-  };
-
-  const requestFail = currentOffset => (e) => {
-    // TODO: add if (!finished) check
-    dispatch({
-      type: 'REQUEST_FAIL',
-      offset: currentOffset
-    });
-    throw Error(`Request with ${currentOffset} offset FAILED, ${e.message}`);
+  // add failed request obj with pending: false to "requests"
+  const onRequestFail = (currentOffset, actionCreator) => (e) => {
+    if (!isSearchTerminated) {
+      dispatch(actionCreator(currentOffset));
+      throw Error(`Request with ${currentOffset} offset FAILED, ${e.message}`);
+    }
+    throw Error('Unnecessary response, search is already terminated');
   };
 
   const setResponseCount = (response) => {
@@ -50,36 +50,18 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     return response;
   };
 
-  // to collect results in this middleware too (optionally)
-  // const collectResults = (resultsChunk) => {
-  //   if (resultsChunk && resultsChunk.length > 0) {
-  //     // TODO: prevent adding duplicate results
-  //     results = results.concat(resultsChunk);
-  //     return resultsChunk;
-  //   }
-  //   return false;
-  // };
-
-  // const addOrResetFailedRequest = (currentOffset) => {
-  //   const existing = requests.find(req => req.offset === currentOffset);
-  //   if (existing) {
-  //     existing.pending = false;
-  //   } else {
-  //     requests.push({ offset: currentOffset, pending: false });
-  //   }
-  //   console.log('F-REQUESTS 3: ', requests, 'must SET ', currentOffset, 'as FAILED');
-  // };
-
-  // TODO: add to action "responseStateTypes" field
-
   return next => (action) => {
     const { accessToken } = getState();
     const {
       callAPI,
       parseResponse,
       searchConfig,
+      addResults,
+      requestStart,
+      requestSuccess,
+      requestFail,
+      updateSearchProgress,
       completeSearch,
-      addResultsType,
       type
     } = action;
 
@@ -93,7 +75,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     }
 
     if (type === 'TERMINATE_SEARCH') {
-      finished = true;
+      isSearchTerminated = true;
       clearInterval(scannerIntervalId);
       // TODO: clear failedReuests in store
       return next(action);
@@ -107,8 +89,16 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       throw new Error('Expected parseResponse to be a function');
     }
 
+    if (typeof addResults !== 'function') {
+      throw new Error('Expected addResults to be function');
+    }
+
+    if (typeof updateSearchProgress !== 'function') {
+      throw new Error('Expected updateSearchProgress to be function');
+    }
+
     if (typeof completeSearch !== 'function') {
-      throw new Error('Expected completeSearch to be a function');
+      throw new Error('Expected completeSearch to be function');
     }
 
     if (typeof searchConfig !== 'object') {
@@ -120,22 +110,22 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       baseAPIReqUrl,
       searchResultsLimit,
       requestInterval,
-      waitPrevRequest
+      waitPending
     } = searchConfig;
 
     // doublecheck
     clearInterval(scannerIntervalId);
-    // dispatch({ type }); // TODO: replaced by next(action) to avoid
-    // dispatching of empty action witn "SOME_START" type
+    // to notify reducers of search start
+    // will also clear "requests" in store
     next(action);
     offset = 0;
     // results.length = 0;
-    // TODO: clear failedReuests in store:
-    // dispatch({ type: 'CLEAR_REQUESTS' });
-    finished = false;
+    isSearchTerminated = false;
 
     const performSingleCall = (currentOffset) => {
-      requestPending(currentOffset);
+      // add request obj with pending: true to in-store "requests"
+      // onRequestStart(currentOffset);
+      dispatch(requestStart(currentOffset));
 
       const currentAPIReqUrl = `${baseAPIReqUrl}` +
         `&access_token=${accessToken}` +
@@ -144,38 +134,32 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       // TODO: use timestamps - Date.now === timeout to track failed requests
 
       callAPI(currentAPIReqUrl)
-        .then(requestSuccess(currentOffset), requestFail(currentOffset))
+        .then(
+          onRequestSuccess(currentOffset, requestSuccess),
+          onRequestFail(currentOffset, requestFail)
+        )
         .then(setResponseCount)
+        // then(parseResponse) with wrapper function in "searchPostsAtWall"
         .then(parseResponse(authorId)) // TODO: throw there
         // .then(collectResults)
+        // TODO: replace by then(addPartOfResultsIfFound(searchResultsLimit))
         .then((chunk) => {
+          // TODO: consider doublechecking with "isSearchTerminated"
           if (chunk && chunk.length > 0) {
-            dispatch({
-              type: addResultsType,
-              results: chunk,
-              limit: searchResultsLimit // to cut results from within reducer
-            });
+            dispatch(addResults(chunk, searchResultsLimit));
           }
           return chunk;
         })
+        // TODO: replace by then(handleSearchProgress)
         .then(() => {
-          if (responseCount && !finished) {
-            dispatch({
-              type: 'UPDATE_SEARCH_PROGRESS',
-              total: responseCount,
-              processed: offset
-            });
+          if (responseCount && !isSearchTerminated) {
+            dispatch(updateSearchProgress(responseCount, offset));
           }
         })
         .catch(e => console.error(e));
     };
 
     scannerIntervalId = setInterval(() => {
-      // TODO: handle case with wrong wall owner id
-
-      // TODO: waitPending/sequential config: that determines to make or not
-      // new reqest if pending requests present
-
       const { requests } = getState();
 
       if (requests.length > 0) {
@@ -183,17 +167,34 @@ const scannerMiddleware = ({ dispatch, getState }) => {
 
         console.log('REQUESTS 4: ', JSON.stringify(requests, null, 2));
 
-        if (pendingReq && waitPrevRequest) {
+        if (pendingReq && waitPending) {
           return false;
         }
 
-        // only failed requests present, no pending requests, repeat first
+        // no pending requests, only failed requests present, repeat first
         if (!pendingReq) {
           console.log('Will call this FAILED request: ', requests[0].offset);
 
           performSingleCall(requests[0].offset);
           return false;
         }
+
+        const failedReq = requests.find(request => !request.pending);
+
+        // pending requests present but "waitPending" is false and failed
+        // requests present, repeat first of failed
+        if (failedReq) {
+          console.log('Not waiting for pending and call: ', failedReq.offset);
+
+          performSingleCall(failedReq.offset);
+          return false;
+        }
+
+        // // "waitPending" is false, no failed reqs, but pending reqs present
+        // if (pendingReq) {
+        //   // need to call next offset
+        //   return false;
+        // }
       }
 
       if (getState().results.length < searchResultsLimit) { // was results.length
@@ -202,9 +203,11 @@ const scannerMiddleware = ({ dispatch, getState }) => {
           offset += 100;
           return performSingleCall(offset);
         }
+        // TODO: add requests.length > 0 for case when "waitPending" is false, 
+        // no failed reqs, pending reqs present but offset > count
       }
 
-      finished = true;
+      isSearchTerminated = true;
       clearInterval(scannerIntervalId);
       // return dispatch(completeSearch(results));
       return dispatch(completeSearch());

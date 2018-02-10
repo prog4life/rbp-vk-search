@@ -23,6 +23,7 @@ export const formatWallPosts = posts => (
 );
 
 // TODO: add order to common config
+// TODO: maybe need to sort in reducer
 export const sortPosts = (posts, desc = true) => (
   posts && posts.sort((a, b) => (
     desc

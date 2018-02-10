@@ -1,26 +1,45 @@
 import {
-  apiVersion, count, extended, requestInterval, waitPrevRequest, inputDefaults
+  apiVersion, count, extended, requestInterval, waitPending, inputDefaults
 } from 'config/common';
-import fetchDataJSONP from 'utils/fetch';
-import requestViaAxiosJSONP from 'utils/axios-jsonp';
+import fetchJSONP from 'utils/fetch';
+import axiosJSONP from 'utils/axios-jsonp';
 import parsePostsFromWall from 'utils/responseHandling';
 
-export const addResults = results => ({
+export const addResults = (results, limit = null) => ({
   type: 'ADD_RESULTS',
-  results
+  results,
+  // to cut results from within reducer
+  limit
 });
 
-export function endUpSearch(results, searchStopType = 'FINISH_SEARCH') {
-  return {
-    type: searchStopType,
-    results
-  };
-}
+export const requestStart = offset => ({
+  type: 'REQUEST_START',
+  offset
+});
+
+export const requestSuccess = offset => ({
+  type: 'REQUEST_SUCCESS',
+  offset
+});
+
+export const requestFail = offset => ({
+  type: 'REQUEST_FAIL',
+  offset
+});
+
+export const updateSearchProgress = (total, processed) => ({
+  type: 'UPDATE_SEARCH_PROGRESS',
+  total,
+  processed
+});
+
+export const wallPostsSearchEnd = () => ({
+  type: 'WALL_POSTS_SEARCH_END'
+});
 
 // TODO: skip handling of pending requests results after search stop
-export const terminateSearch = results => ({
-  type: 'TERMINATE_SEARCH',
-  results
+export const terminateSearch = () => ({
+  type: 'TERMINATE_SEARCH'
 });
 
 // NOTE: can retrieve info about author of posts at wall using wall.get with
@@ -28,10 +47,8 @@ export const terminateSearch = results => ({
 // addition to "user_id" field also includes first_name, last_name, sex, online,
 // 2 avatar fields, so can search using corresponding queries
 
-// TODO: rename "wallOwnerShortName" to "wallOwnerScreenName" or "ShortName"
-
 export const searchPostsAtWall = (inputData) => {
-  // TEMP
+  // TEMP:
   const {
     searchResultsLimitDef, postAuthorIdDef, ownerIdDef, ownerDomainDef
   } = inputDefaults;
@@ -42,6 +59,7 @@ export const searchPostsAtWall = (inputData) => {
   const wallOwnerShortName = inputData.wallOwnerShortName || ownerDomainDef;
   const postAuthorId = Number(inputData.postAuthorId) || postAuthorIdDef;
   const searchResultsLimit = Number(inputData.searchResultsLimit) || searchResultsLimitDef;
+
   // TODO: add "&access_token=${accessToken}" here ?
   // TODO: use encodeURIComponent ?
   const baseAPIReqUrl = 'https://api.vk.com/method/wall.get?' +
@@ -52,18 +70,20 @@ export const searchPostsAtWall = (inputData) => {
   return {
     type: 'WALL_POSTS_SEARCH_START',
     searchConfig: {
-      authorId: postAuthorId,
+      authorId: postAuthorId, // TODO: remove after change below
       baseAPIReqUrl,
       searchResultsLimit,
       requestInterval,
-      waitPrevRequest
+      waitPending
     },
-    // callAPI: fetchDataJSONP,
-    callAPI: requestViaAxiosJSONP,
-    parseResponse: parsePostsFromWall,
-    addResultsType: 'ADD_RESULTS',
-    completeSearch: results => dispatch => (
-      dispatch(endUpSearch(results, 'WALL_POSTS_SEARCH_END'))
-    )
+    // callAPI: fetchJSONP,
+    callAPI: axiosJSONP,
+    parseResponse: parsePostsFromWall, // TODO: parsePostsFromWall(postAuthorId)
+    addResults,
+    requestStart,
+    requestSuccess,
+    requestFail,
+    updateSearchProgress,
+    completeSearch: wallPostsSearchEnd
   };
 };

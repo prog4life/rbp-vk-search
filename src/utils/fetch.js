@@ -1,4 +1,4 @@
-import fetchJSONP from 'fetch-jsonp';
+import fetchJsonp from 'fetch-jsonp';
 import { jsonpTimeout } from 'config/common';
 
 const getObjectFromJson = response => response.json();
@@ -26,12 +26,12 @@ const throwIfEmptyOrError = (resData) => {
 };
 
 // TODO: think over timeout modifying functionality
-const fetchDataJSONP = (url, updatedTimeout) => (
-  fetchJSONP(url, {
+const fetchJSONP = (url, updatedTimeout) => (
+  fetchJsonp(url, {
     timeout: updatedTimeout || jsonpTimeout // default - 5000
   })
     .then(getObjectFromJson)
     .then(throwIfEmptyOrError)
 );
 
-export default fetchDataJSONP;
+export default fetchJSONP;
