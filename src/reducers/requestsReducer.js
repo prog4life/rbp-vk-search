@@ -6,7 +6,7 @@ const changeRequestPendingState = (state, action, isPending) => (
   ))
 );
 
-// failed or pending requests
+// failed or pending requests, not all requests
 export default function requests(state = [], action) {
   switch (action.type) {
     case 'REQUEST_START':

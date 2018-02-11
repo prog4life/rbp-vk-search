@@ -19,7 +19,7 @@ const requestInterval = 350;
 // with jsonpTimeout lower than 1000 ms search may collapse !!!
 const jsonpTimeout = 1000; // default for fetch-jsonp: 5000
 // make or not next requests if previous one have not completed yet
-const waitPending = false;
+const waitPending = true;
 const waitTimeout = 3000;
 
 const inputDefaults = {

@@ -5,7 +5,7 @@ import { createLogger } from 'redux-logger';
 // to use with Chrome Extension
 // import { composeWithDevTools } from 'redux-devtools-extension';
 import { composeWithDevTools } from 'remote-redux-devtools';
-import scannerMiddleware from 'middleware/scannerMiddleware';
+import scanner from 'middleware/scannerMiddleware';
 import rootReducer from '../reducers';
 
 // must be the last middleware in chain
@@ -15,15 +15,16 @@ const logger = createLogger({
   predicate: (getState, action) => {
     const hiddenTypes = [
       'UPDATE_SEARCH_PROGRESS',
-      'REQUEST_START'
+      'REQUEST_START',
+      'REQUEST_SUCCESS'
     ];
     return !hiddenTypes.some(type => type === action.type);
   }
 });
 
 const middleware = process.env.NODE_ENV === 'development'
-  ? [immutabilityWatcher(), scannerMiddleware, thunk, logger]
-  : [scannerMiddleware, thunk];
+  ? [immutabilityWatcher(), scanner, thunk, logger]
+  : [scanner, thunk];
 
 export default (preloadedState = {}) => {
   /* eslint-disable no-underscore-dangle */
@@ -36,6 +37,7 @@ export default (preloadedState = {}) => {
   // call with "composeWithDevTools"
   const composeEnhancers = composeWithDevTools({
     realtime: true, // if process.env.NODE_ENV not set as 'development'
+    // host: '127.0.0.1', // default
     // port setting required to use with local "remotedev-server", OR
     // use remotedev.io/local alternatively
     // set same port in any monitor app (browser/Atom/VS Code extension)

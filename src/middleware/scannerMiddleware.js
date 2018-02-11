@@ -4,6 +4,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   let scannerIntervalId;
   let offset = 0;
   let responseCount;
+  let processed = 0;
   let isSearchTerminated = false;
 
   // const requests = [
@@ -11,6 +12,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   //     offset: 400,
   //     pending: true, // failed request will get "false" value here
   //     failCount: 0   // idea
+  //     timestamp: Number // idea
   //   }
   // ];
 
@@ -20,6 +22,8 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   //     offset: currentOffset
   //   });
   // };
+
+  // TODO: use timestamp - Date.now() === timeout to track failed requests
 
   // remove successful request obj from "requests"
   const onRequestSuccess = (currentOffset, actionCreator) => (response) => {
@@ -43,9 +47,6 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     responseCount = response && response.count
       ? response.count
       : responseCount;
-
-    console.log('RESPONSE from setResponseCount: ', response); // TEMP:
-
     return response;
   };
 
@@ -118,6 +119,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     // will also clear "requests" in store
     next(action);
     offset = 0;
+    processed = 0;
     // results.length = 0;
     isSearchTerminated = false;
 
@@ -129,8 +131,6 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       const currentAPIReqUrl = `${baseAPIReqUrl}` +
         `&access_token=${accessToken}` +
         `&offset=${currentOffset}`;
-
-      // TODO: use timestamps - Date.now === timeout to track failed requests
 
       callAPI(currentAPIReqUrl)
         .then(
@@ -152,7 +152,10 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         // TODO: replace by then(handleSearchProgress)
         .then(() => {
           if (responseCount && !isSearchTerminated) {
-            dispatch(updateSearchProgress(responseCount, offset));
+            processed = processed + 100 > responseCount
+              ? responseCount
+              : processed + 100;
+            dispatch(updateSearchProgress(responseCount, processed));
           }
         })
         .catch(e => console.error(e));
@@ -160,9 +163,6 @@ const scannerMiddleware = ({ dispatch, getState }) => {
 
     scannerIntervalId = setInterval(() => {
       const { requests } = getState();
-
-      // NOTE: should vary depending on the "count" value
-      offset += 100;
 
       if (requests.length > 0) {
         const pendingReq = requests.find(request => request.pending);
@@ -173,29 +173,29 @@ const scannerMiddleware = ({ dispatch, getState }) => {
           return;
         }
 
-        // no pending requests, only failed requests present, repeat first
-        if (!pendingReq) {
-          console.log('Will call this FAILED request: ', requests[0].offset);
-
-          performSingleCall(requests[0].offset);
-          return;
-        }
-
         const failedReq = requests.find(request => !request.pending);
 
-        // pending and failed requests present but "waitPending" is false -
-        // repeat first of failed
-        if (failedReq) {
+        // no pending requests, only failed requests present OR:
+        // "waitPending" is false and failed requests present -
+        // in both cases repeat first failed request
+        if (!pendingReq || failedReq) {
           console.log('Not waiting for pending and call: ', failedReq.offset);
 
           performSingleCall(failedReq.offset);
           return;
         }
 
-        // if some pending requests still present
-        if (offset > responseCount) {
+        offset += 100;
+        // no failed requests, "waitPending" is false,
+        // all items requested but some pending requests still present
+        if (offset > responseCount) { // TODO: add !responseCount ?
+          offset -= 100;
           return;
         }
+      } else {
+        // no pending or failed requests - increase offset to request next
+        // portion of items
+        offset += 100;
       }
 
       if (getState().results.length < searchResultsLimit) { // was results.length
@@ -205,15 +205,12 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         }
       }
 
-      // isSearchTerminated = true;
-      clearInterval(scannerIntervalId);
-      // return dispatch(completeSearch(results));
-      dispatch(completeSearch());
-
-      // NOTE: maybe add exit condition when get empty items(posts) few times
-      // if (responseData.items.length = 0) { ... }
+      if (requests.length === 0) {
+        clearInterval(scannerIntervalId);
+        dispatch(completeSearch());
+      }
     }, requestInterval);
-    // to make first request before timer tick, return for eslint
+    // to make first request before timer tick, return was added for eslint
     return performSingleCall(offset);
   };
 };

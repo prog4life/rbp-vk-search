@@ -30,15 +30,15 @@ export function search(state = defaultSearchState, action) {
     //   };
     case 'WALL_POSTS_SEARCH_START':
       return {
-        ...state,
-        isActive: true
+        isActive: true,
+        processed: 0
+        // progress: 0
       };
     case 'WALL_POSTS_SEARCH_END':
       // TODO: clean up search state values
       return {
-        isActive: false,
-        processed: 0
-        // progress: 0
+        ...state,
+        isActive: false
       };
     // NOTE: filtered in Redux logger config
     case 'UPDATE_SEARCH_PROGRESS':

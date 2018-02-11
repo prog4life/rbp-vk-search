@@ -5,7 +5,7 @@ import FormInputGroup from 'components/FormInputGroup';
 const PostAuthorId = ({ value, onChange }) => (
   <FormInputGroup
     id="postAuthorId"
-    label="ID of author of posts, that need to search"
+    label="ID of author of posts you want to find"
     onChange={onChange}
     placeholder="id of post author"
     required

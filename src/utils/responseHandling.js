@@ -7,14 +7,17 @@ export function extractPostsByAuthorId(response, authorId) {
   }
 
   if (Array.isArray(posts)) {
-    return posts.filter(post => post.from_id === authorId);
+    return posts.filter(post => (
+      post.from_id === authorId || post.signer_id === authorId
+    ));
   }
   throw Error('Posts from response is not array');
 }
 
 export const formatWallPosts = posts => (
   posts && posts.map(post => ({
-    fromId: post.from_id,
+    // TODO: resolve, must be signer_id in some cases; rename to postAuthor
+    fromId: post.signer_id || post.from_id,
     timestamp: post.date,
     postId: post.id,
     text: post.text,
