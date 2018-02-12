@@ -186,11 +186,11 @@ export const searchCommentsWithStoredProcedure = (procedure, token) => {
 //       //   : responseCountDef;
 //       // TODO: remove responseCountDef completely
 //       // return response;
-//       dispatch(parsePostsFromWall(response, postAuthorId, searchResultsLimit));
+//       dispatch(prepareWallPosts(response, postAuthorId, searchResultsLimit));
 //     } /* TODO: catch failed request and store it in [] */)
 //     .catch(e => console.warn('To catch uncaught ', e))
 //
-//     // .then(response => extractPostsByAuthorId(response, postAuthorId))
+//     // .then(response => extractPostsById(response, postAuthorId))
 //     // .then(posts => formatWallPosts(posts))
 //     // .then((results) => {
 //     //   if (results.length > 0) {

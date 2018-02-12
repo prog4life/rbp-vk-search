@@ -3,9 +3,11 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   // let results = [];
   let scannerIntervalId;
   let offset = 0;
-  let responseCount;
+  let responseCount; // total amount of items to search among
   let processed = 0;
   let isSearchTerminated = false;
+  // TODO: add "STEP" constant that will be equal to "offset" modifier
+  let STEP = 100;
 
   // const requests = [
   //   {
@@ -54,9 +56,9 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     const { accessToken } = getState();
     const {
       callAPI,
-      parseResponse,
+      handleResponse,
       searchConfig,
-      addResults,
+      saveResults,
       requestStart,
       requestSuccess,
       requestFail,
@@ -85,12 +87,12 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       throw new Error('Expected callAPI to be a function');
     }
 
-    if (typeof parseResponse !== 'function') {
-      throw new Error('Expected parseResponse to be a function');
+    if (typeof handleResponse !== 'function') {
+      throw new Error('Expected handleResponse to be a function');
     }
 
-    if (typeof addResults !== 'function') {
-      throw new Error('Expected addResults to be function');
+    if (typeof saveResults !== 'function') {
+      throw new Error('Expected saveResults to be function');
     }
 
     if (typeof updateSearchProgress !== 'function') {
@@ -120,8 +122,8 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     next(action);
     offset = 0;
     processed = 0;
-    // results.length = 0;
     isSearchTerminated = false;
+    // results.length = 0;
 
     const performSingleCall = (currentOffset) => {
       // add request obj with pending: true to in-store "requests"
@@ -138,14 +140,14 @@ const scannerMiddleware = ({ dispatch, getState }) => {
           onRequestFail(currentOffset, requestFail)
         )
         .then(setResponseCount)
-        // then(parseResponse) with wrapper function in "searchPostsAtWall"
-        .then(parseResponse(authorId)) // TODO: throw there
+        // then(handleResponse) with same function call in "wallPostsSearchStart"
+        .then(handleResponse(authorId)) // TODO: throw there
         // .then(collectResults)
         // TODO: replace by then(addPartOfResultsIfFound(searchResultsLimit))
         .then((chunk) => {
           // TODO: consider doublechecking with "isSearchTerminated"
           if (chunk && chunk.length > 0) {
-            dispatch(addResults(chunk, searchResultsLimit));
+            dispatch(saveResults(chunk, searchResultsLimit));
           }
           return chunk;
         })

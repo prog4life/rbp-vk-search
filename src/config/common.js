@@ -6,11 +6,12 @@ const scope = 'friends'; // 'wall,friends,groups';
 const responseType = 'token';
 const apiVersion = 5.71; // 5.68
 // amount of requested items (wall posts, comments), vk API max limit: 100
+// is equal to "offset" modifier/step
 const count = 100;
 // 0 OR 1 - specify to return or not additional "groups" and "profiles" fields
 const extended = 0;
-const state = 55555;
-// vk API limit is 3 requests per minute
+const state = 55555; // optional
+// vk API limit is 3 requests per second
 const requestInterval = 350;
 // search reuests are not sequential/serial (API data can be processed NOT in
 // strong order), if some requests have failed or were longer than interval,
@@ -21,6 +22,8 @@ const jsonpTimeout = 1000; // default for fetch-jsonp: 5000
 // make or not next requests if previous one have not completed yet
 const waitPending = true;
 const waitTimeout = 3000;
+
+const resultsSortOrder = 'desc';
 
 const inputDefaults = {
   searchResultsLimitDef: 10,
@@ -54,6 +57,7 @@ export {
   jsonpTimeout,
   waitPending,
   waitTimeout,
+  resultsSortOrder,
   inputDefaults,
   tokenRequestBaseURL,
   tokenRequestURL

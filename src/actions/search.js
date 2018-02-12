@@ -3,7 +3,7 @@ import {
 } from 'config/common';
 import fetchJSONP from 'utils/fetch';
 import axiosJSONP from 'utils/axios-jsonp';
-import parsePostsFromWall from 'utils/responseHandling';
+import prepareWallPosts from 'utils/response-handling';
 
 export const addResults = (results, limit = null) => ({
   type: 'ADD_RESULTS',
@@ -11,6 +11,23 @@ export const addResults = (results, limit = null) => ({
   // to cut results from within reducer
   limit
 });
+
+export const addSortedResults = (results, order, limit) => (
+  (dispatch, getState) => {
+    const allResults = getState().results.concat(results);
+
+    const sortedResults = allResults.sort((a, b) => (
+      order === 'desc'
+        ? b.timestamp - a.timestamp
+        : a.timestamp - b.timestamp
+    ));
+
+    return {
+      type: 'ADD_SORTED_RESULTS',
+      results: sortedResults.slice(0, limit)
+    };
+  }
+);
 
 export const requestStart = offset => ({
   type: 'REQUEST_START',
@@ -47,7 +64,7 @@ export const terminateSearch = () => ({
 // addition to "user_id" field also includes first_name, last_name, sex, online,
 // 2 avatar fields, so can search using corresponding queries
 
-export const searchPostsAtWall = (inputData) => {
+export const wallPostsSearchStart = (inputData) => {
   // TEMP:
   const {
     searchResultsLimitDef, postAuthorIdDef, ownerIdDef, ownerDomainDef
@@ -78,8 +95,8 @@ export const searchPostsAtWall = (inputData) => {
     },
     // callAPI: fetchJSONP,
     callAPI: axiosJSONP,
-    parseResponse: parsePostsFromWall, // TODO: parsePostsFromWall(postAuthorId)
-    addResults,
+    handleResponse: prepareWallPosts, // TODO: prepareWallPosts(postAuthorId)
+    saveResults: addSortedResults,
     requestStart,
     requestSuccess,
     requestFail,

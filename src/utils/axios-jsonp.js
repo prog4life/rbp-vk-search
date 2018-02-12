@@ -6,15 +6,11 @@ export default function axiosJSONP(url, customTimeout) {
     // url
     // timeout: 700
   })
-    .then((response) => {
-      // TODO: use timestamps - Date.now === timeout to track failed requests
-      if (response.error) {
-        throw Error(JSON.stringify(response, null, 2));
+    .then((resData) => {
+      if (resData.error) {
+        throw Error(JSON.stringify(resData.error, null, 2));
       }
-      console.log('axios response ', response);
-      return response.response;
-    })
-    .catch((error) => {
-      throw error;
+      console.log('axios response ', resData);
+      return resData.response;
     });
 }

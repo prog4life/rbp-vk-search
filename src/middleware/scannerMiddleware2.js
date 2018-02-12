@@ -103,10 +103,10 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     const { accessToken } = getState();
     const {
       callAPI,
-      parseResponse,
+      handleResponse,
       searchConfig,
       completeSearch,
-      addResultsType,
+      saveResultsType,
       type
     } = action;
 
@@ -129,8 +129,8 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       throw new Error('Expected callAPI to be a function');
     }
 
-    if (typeof parseResponse !== 'function') {
-      throw new Error('Expected parseResponse to be a function');
+    if (typeof handleResponse !== 'function') {
+      throw new Error('Expected handleResponse to be a function');
     }
 
     if (typeof completeSearch !== 'function') {
@@ -168,12 +168,12 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       callAPI(currentAPIReqUrl)
         .then(removeFailedRequest(currentOffset), onRequestFail(currentOffset))
         .then(setResponseCount)
-        .then(parseResponse(authorId)) // TODO: throw there
+        .then(handleResponse(authorId)) // TODO: throw there
         // .then(collectResults)
         .then((chunk) => {
           if (chunk && chunk.length > 0) {
             dispatch({
-              type: addResultsType,
+              type: saveResultsType,
               results: chunk,
               limit: searchResultsLimit // to cut results from within reducer
             });

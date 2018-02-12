@@ -5,14 +5,14 @@ import { ListGroupItem } from 'react-bootstrap';
 
 function SearchResult({ result, number }) {
   const {
-    timestamp, fromId, postId, text, link
+    timestamp, authorId, postId, text, link
   } = result;
 
   const resultNumber = `[${number}]`;
   const linkText = 'Link to post at wall';
-  const linkToUserPage = `https://vk.com/id${fromId}`;
+  const linkToUserPage = `https://vk.com/id${authorId}`;
   const postIdLabel = `[post id: ${postId}]`;
-  const fromIdLabel = `[id${fromId}]`;
+  const authorIdLabel = `[id${authorId}]`;
 
   return (
     <ListGroupItem>
@@ -26,7 +26,7 @@ function SearchResult({ result, number }) {
       </span>
       <span>{' '}
         <a href={linkToUserPage} target="_blank">
-          {fromIdLabel}
+          {authorIdLabel}
         </a>
       </span>
       <p>
@@ -43,7 +43,7 @@ SearchResult.propTypes = {
   number: PropTypes.number.isRequired,
   result: PropTypes.shape({
     timestamp: PropTypes.number.isRequired,
-    fromId: PropTypes.number.isRequired,
+    authorId: PropTypes.number.isRequired,
     postId: PropTypes.number.isRequired,
     text: PropTypes.string.isRequired,
     link: PropTypes.string.isRequired

@@ -1,9 +1,10 @@
 export function results(state = [], action) {
   switch (action.type) {
-    case 'ADD_RESULTS':
-      // TODO: prevent adding of same results
-      // TODO: maybe need to sort in reducer
-      return [...state, ...action.results].slice(0, action.limit);
+    // case 'ADD_RESULTS':
+    //   return [...state, ...action.results].slice(0, action.limit);
+    // TODO: prevent adding of same results
+    case 'ADD_SORTED_RESULTS':
+      return [...state, ...action.results];
     // clear results at search start
     // case 'PREPARE_SEARCH':
     //   return [];
