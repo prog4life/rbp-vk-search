@@ -4,6 +4,7 @@ import prepareWallPosts from 'utils/response-handling';
 import {
   apiVersion,
   count,
+  offsetModifier,
   requestInterval,
   waitPending,
   waitTimeout,
@@ -80,6 +81,7 @@ export const wallPostsSearchStart = (inputData) => {
       // authorId: postAuthorId, // replaced by "prepareWallPosts" call below
       baseAPIReqUrl,
       searchResultsLimit,
+      offsetModifier,
       requestInterval,
       waitPending,
       waitTimeout

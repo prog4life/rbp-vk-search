@@ -6,8 +6,6 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   let responseCount; // total amount of items to search among
   let processed = 0;
   let isSearchTerminated = false;
-  // TODO: add "STEP" constant that will be equal to "offset" modifier
-  let STEP = 100;
 
   // const requests = [
   //   {
@@ -111,6 +109,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       // authorId,
       baseAPIReqUrl,
       searchResultsLimit,
+      offsetModifier, // better to leave equaly to 100 (max)
       requestInterval,
       waitPending,
       waitTimeout
@@ -141,10 +140,9 @@ const scannerMiddleware = ({ dispatch, getState }) => {
           onRequestFail(currentOffset, requestFail)
         )
         .then(setResponseCount)
-        .then(handleResponse) // with same function call in "wallPostsSearchStart"
-        // .then(handleResponse(authorId)) // TODO: throw there
+        .then(handleResponse)
         // .then(collectResults)
-        // TODO: replace by then(addPartOfResultsIfFound(searchResultsLimit))
+        // TODO: replace by then(savePartOfResults(searchResultsLimit))
         .then((chunk) => {
           // TODO: consider doublechecking with "isSearchTerminated"
           if (chunk && chunk.length > 0) {
