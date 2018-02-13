@@ -6,29 +6,29 @@ const sortByTimestamp = (posts, order) => (
   ))
 );
 
-// TODO: replace by arrow function
-function addOnlyUniquePosts(state, { posts }) {
-  return posts.reduce((accum, post) => (
+const addOnlyUniquePosts = (state, posts) => (
+  posts.reduce((accum, post) => (
     accum.some(prev => prev.postId === post.postId)
       ? accum
       : accum.concat({ ...post })
-  ), [...state]);
-}
+  ), [...state])
+);
 
-// TODO: replace by arrow function
-function addNewResults(state, action) {
-  return [
-    ...state,
-    ...action.results.map(res => ({ ...res }))
-  ];
-}
+// const addNewResults = (state, action) => (
+//   [
+//     ...state,
+//     ...action.results.map(res => ({ ...res }))
+//   ]
+// );
 
 export default function results(state = [], action) {
   switch (action.type) {
     // TODO: prevent adding of same results
     case 'ADD_RESULTS':
-      return sortByTimestamp(addNewResults(state, action), action.order)
-        .slice(0, action.limit);
+      return sortByTimestamp(
+        addOnlyUniquePosts(state, action.results),
+        action.order
+      ).slice(0, action.limit);
     // to clear results at search start
     // case 'PREPARE_SEARCH':
     //   return [];

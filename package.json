@@ -47,7 +47,7 @@
     "style-loader": "^0.20.1",
     "url-loader": "^0.6.2",
     "uuid": "^3.2.1",
-    "webpack": "^3.10.0"
+    "webpack": "^3.11.0"
   },
   "devDependencies": {
     "clean-webpack-plugin": "^0.1.18",

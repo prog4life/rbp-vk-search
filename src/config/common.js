@@ -6,18 +6,23 @@ const scope = 'friends'; // 'wall,friends,groups';
 const responseType = 'token';
 const apiVersion = 5.71; // 5.68
 // amount of returned items (e.g. wall posts) per request, vk API max limit: 100
-const count = 100; // better to use 100
+const count = 100; // better to leave equal to 100
 const offsetModifier = count;
 // 0 OR 1 - specify to return or not additional "groups" and "profiles" fields
 const extended = 0;
 const state = 55555; // optional
-// vk API limit is 3 requests per second
+// vk API request frequency limit is 3 requests per second
 const requestInterval = 350;
-// with jsonpTimeout lower than 3000 ms search may collapse !!!
+// better to leave default
 const jsonpTimeout = 1000; // default for fetch-jsonp: 5000
 // make or not request with next offset if current one get no response yet
 const waitPending = true;
 const waitTimeout = 1000;
+// with maxPendingRetries > 0, request that exceeded "waitTimeout" will be
+// repeated but not canceled - if it get response, duplicate results can be
+// obtained. These extra results are currently filtered by results reducer
+const maxPendingRetries = 1;
+const maxFailedRetries = 2;
 
 const resultsSortOrder = 'asc'; // OR 'desc'
 
@@ -50,6 +55,8 @@ export {
   jsonpTimeout,
   waitPending,
   waitTimeout,
+  maxPendingRetries,
+  maxFailedRetries,
   resultsSortOrder,
   inputDefaults,
   tokenRequestURL

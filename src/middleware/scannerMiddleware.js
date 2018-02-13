@@ -1,3 +1,4 @@
+// TODO: rename to searchProcessor, extractor, e.t.c
 const scannerMiddleware = ({ dispatch, getState }) => {
   // let emptyResponsesCount = 0; // idea
   // let results = [];
@@ -11,8 +12,9 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   //   {
   //     offset: 400,
   //     pending: true, // failed request will get "false" value here
-  //     failCount: 0   // idea
-  //     timestamp: Number // idea
+  //     // how many times unresponded pending or failed request was sent again
+  //     retries: 0
+  //     startTime: Number // Date.now() value
   //   }
   // ];
 
@@ -23,7 +25,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   //   });
   // };
 
-  // TODO: use timestamp - Date.now() === timeout to track failed requests
+  // TODO: use startTime - Date.now() === timeout to track failed requests
 
   // remove successful request obj from "requests"
   const onRequestSuccess = (currentOffset, actionCreator) => (response) => {
@@ -35,9 +37,9 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   };
 
   // add failed request obj with pending: false to "requests"
-  const onRequestFail = (currentOffset, actionCreator) => (e) => {
+  const onRequestFail = (currentOffset, actionCreator, retries) => (e) => {
     if (!isSearchTerminated) {
-      dispatch(actionCreator(currentOffset));
+      dispatch(actionCreator(currentOffset, retries));
       throw Error(`Request with ${currentOffset} offset FAILED, ${e.message}`);
     }
     throw Error('Unnecessary response, search is already terminated');
@@ -109,7 +111,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       // authorId,
       baseAPIReqUrl,
       searchResultsLimit,
-      offsetModifier, // better to leave equaly to 100 (max)
+      offsetModifier, // should be equal to request url "count" param value
       requestInterval,
       waitPending,
       waitTimeout
@@ -125,10 +127,10 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     isSearchTerminated = false;
     // results.length = 0;
 
-    const performSingleCall = (currentOffset) => {
+    const performSingleCall = (currentOffset, retries) => {
       // add request obj with pending: true to in-store "requests"
       // onRequestStart(currentOffset);
-      dispatch(requestStart(currentOffset));
+      dispatch(requestStart(currentOffset, retries));
 
       const currentAPIReqUrl = `${baseAPIReqUrl}` +
         `&access_token=${accessToken}` +
@@ -137,7 +139,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       callAPI(currentAPIReqUrl)
         .then(
           onRequestSuccess(currentOffset, requestSuccess),
-          onRequestFail(currentOffset, requestFail)
+          onRequestFail(currentOffset, requestFail, retries)
         )
         .then(setResponseCount)
         .then(handleResponse)
@@ -150,12 +152,14 @@ const scannerMiddleware = ({ dispatch, getState }) => {
           }
           return chunk;
         })
-        // TODO: replace by then(handleSearchProgress)
+        // TODO: replace by then(handleSearchProgress(retries))
         .then(() => {
-          if (responseCount && !isSearchTerminated) {
-            processed = processed + 100 > responseCount
+          if (responseCount && !isSearchTerminated && !retries) {
+            // to get correct value of processed items (not bigger than total)
+            // at the end of search
+            processed = processed + offsetModifier > responseCount
               ? responseCount
-              : processed + 100;
+              : processed + offsetModifier;
             dispatch(updateSearchProgress(responseCount, processed));
           }
         })
@@ -166,27 +170,30 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       const { requests } = getState();
 
       if (requests.length > 0) {
-        // const overdue = requests.find(request => (
-        //   request.pending && Date.now() - request.timestamp > waitTimeout
-        // ));
-        const overdue = requests.find((request) => {
-          const difference = Date.now() - request.timestamp;
-          console.log('PENDING REQ DIFFERENCE: ', difference);
+        console.log('REQUESTS 4: ', JSON.stringify(requests, null, 2));
 
-          return request.pending && difference > waitTimeout;
+        // const expired = requests.find(request => (
+        //   request.pending && Date.now() - request.startTime > waitTimeout
+        // ));
+        const expired = requests.find((request) => {
+          const difference = Date.now() - request.startTime;
+
+          if (request.pending && difference > waitTimeout) {
+            console.log(`PENDING ${request.offset} REQ DIFFERENCE: ${difference}`);
+            return true;
+          }
+          return false;
         });
-        console.log('OVERDUE: ', JSON.stringify(overdue, null, 2));
-        // TODO: add overdue.repeats < 3 condition
-        if (overdue) {
+        console.log('EXPIRED: ', JSON.stringify(expired, null, 2));
+        // TODO: add expired.retries < maxPendingRetries condition
+        if (expired) {
           // cancel and repeat
-          console.log('NEED CANCEL AND REPEAT');
-          performSingleCall(overdue.offset);
+          console.log('WILL REPEAT with retries COUNT: ', expired.retries + 1);
+          performSingleCall(expired.offset, expired.retries + 1);
           return;
         }
 
         const pendingReq = requests.find(request => request.pending);
-
-        console.log('REQUESTS 4: ', JSON.stringify(requests, null, 2));
 
         if (pendingReq && waitPending) {
           return;
@@ -200,24 +207,26 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         if (!pendingReq || failedReq) {
           console.log('Not waiting for pending and call: ', failedReq.offset);
 
-          performSingleCall(failedReq.offset);
+          performSingleCall(failedReq.offset, failedReq.retries + 1);
           return;
         }
 
-        offset += 100;
+        offset += offsetModifier;
         // no failed requests, "waitPending" is false,
         // all items requested but some pending requests still present
         if (offset > responseCount) { // TODO: add !responseCount ?
-          offset -= 100;
+          offset -= offsetModifier;
           return;
         }
       } else {
         // no pending or failed requests - increase offset to request next
         // portion of items
-        offset += 100;
+        offset += offsetModifier;
       }
 
-      if (getState().results.length < searchResultsLimit) { // was results.length
+      const { results } = getState();
+      // was results.length
+      if (!searchResultsLimit || results.length < searchResultsLimit) {
         if (!responseCount || offset <= responseCount) {
           performSingleCall(offset);
           return;

@@ -15,14 +15,15 @@ import {
 export const addResults = (results, limit, order = defaultOrder) => ({
   type: 'ADD_RESULTS',
   results,
-  // to cut results from within reducer
   limit,
   order
 });
 
-export const requestStart = offset => ({
+export const requestStart = (offset, retries = 0) => ({
   type: 'REQUEST_START',
-  offset
+  offset,
+  startTime: Date.now(),
+  retries
 });
 
 export const requestSuccess = offset => ({
@@ -30,9 +31,10 @@ export const requestSuccess = offset => ({
   offset
 });
 
-export const requestFail = offset => ({
+export const requestFail = (offset, retries = 0) => ({
   type: 'REQUEST_FAIL',
-  offset
+  offset,
+  retries
 });
 
 export const updateSearchProgress = (total, processed) => ({
@@ -45,7 +47,6 @@ export const wallPostsSearchEnd = () => ({
   type: 'WALL_POSTS_SEARCH_END'
 });
 
-// TODO: skip handling of pending requests results after search stop
 export const terminateSearch = () => ({
   type: 'TERMINATE_SEARCH'
 });
@@ -55,18 +56,16 @@ export const terminateSearch = () => ({
 // addition to "user_id" field also includes first_name, last_name, sex, online,
 // 2 avatar fields, so can search using corresponding queries
 
+// will be utilized by searchProcessor middleware
 export const wallPostsSearchStart = (inputData) => {
   // TEMP:
-  const {
-    searchResultsLimitDef, postAuthorIdDef, ownerIdDef, ownerDomainDef
-  } = inputDefaults;
+  const { postAuthorIdDef, ownerIdDef } = inputDefaults;
 
-  const { wallOwnerType } = inputData;
+  const { wallOwnerType, wallOwnerShortName } = inputData;
   const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
   const wallOwnerId = inputData.wallOwnerId || ownerIdDef;
-  const wallOwnerShortName = inputData.wallOwnerShortName || ownerDomainDef;
   const postAuthorId = Number(inputData.postAuthorId) || postAuthorIdDef;
-  const searchResultsLimit = Number(inputData.searchResultsLimit) || searchResultsLimitDef;
+  const searchResultsLimit = Number(inputData.searchResultsLimit);
 
   // TODO: add "&access_token=${accessToken}" here ?
   // TODO: use encodeURIComponent ?
@@ -78,10 +77,11 @@ export const wallPostsSearchStart = (inputData) => {
   return {
     type: 'WALL_POSTS_SEARCH_START',
     searchConfig: {
-      // authorId: postAuthorId, // replaced by "prepareWallPosts" call below
+      // replaced by in place "prepareWallPosts" call below
+      // authorId: postAuthorId,
       baseAPIReqUrl,
       searchResultsLimit,
-      offsetModifier,
+      offsetModifier, // should be equal to request url "count" param value
       requestInterval,
       waitPending,
       waitTimeout

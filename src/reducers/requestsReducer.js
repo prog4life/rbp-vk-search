@@ -1,9 +1,24 @@
-const changeRequestPendingState = (state, action, isPending) => (
-  state.map(req => (
-    req.offset === action.offset
-      ? { ...req, pending: isPending }
-      : req
-  ))
+const changeExistingRequestState = (state, action, isPending) => (
+  state.map((req) => {
+    if (req.offset === action.offset) {
+      return {
+        ...req,
+        // alternatively (if not passed from action): req.retries + 1
+        retries: action.retries,
+        pending: isPending
+      };
+    }
+    return req;
+  })
+);
+
+const addNewRequest = (state, { offset, startTime, retries }, isPending) => (
+  [...state, {
+    offset,
+    startTime,
+    retries, // alternatively (if not passed from action): retries: 0,
+    pending: isPending
+  }]
 );
 
 // failed or pending requests, not all requests
@@ -13,8 +28,9 @@ export default function requests(state = [], action) {
       return state.filter(req => req.offset !== action.offset)
         .concat({
           offset: action.offset,
-          pending: true,
-          timestamp: Date.now()
+          startTime: action.startTime,
+          retries: action.retries,
+          pending: true
         });
       // return state.some(req => req.offset === action.offset)
       //   ? changeRequestPendingState(state, action, true)
@@ -25,6 +41,7 @@ export default function requests(state = [], action) {
       return state.filter(req => req.offset !== action.offset)
         .concat({
           offset: action.offset,
+          retries: action.retries,
           pending: false
         });
     case 'WALL_POSTS_SEARCH_START':
