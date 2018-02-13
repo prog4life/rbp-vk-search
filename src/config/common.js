@@ -21,9 +21,9 @@ const requestInterval = 350;
 const jsonpTimeout = 1000; // default for fetch-jsonp: 5000
 // make or not next requests if previous one have not completed yet
 const waitPending = true;
-const waitTimeout = 3000;
+const waitTimeout = 1000;
 
-const resultsSortOrder = 'desc';
+const resultsSortOrder = 'asc'; // OR 'desc'
 
 const inputDefaults = {
   searchResultsLimitDef: 10,

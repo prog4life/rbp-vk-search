@@ -13,7 +13,7 @@ const getObjectFromJson = response => response.json();
 // };
 
 const throwIfEmptyOrError = (resData) => {
-  const { response, error, ok } = resData;
+  const { response, error } = resData;
 
   if (response) {
     return response;

@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux';
 // import * as reducers from './auth';
 import { accessToken, tokenExpiry, userId, userName } from './authReducers';
-import { results, search } from './searchReducers';
+import search from './searchReducer';
+import results from './resultsReducer';
 import requests from './requestsReducer';
 
 // exporting of rootReducer

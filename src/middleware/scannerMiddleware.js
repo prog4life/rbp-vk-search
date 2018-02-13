@@ -108,11 +108,12 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     }
 
     const {
-      authorId,
+      // authorId,
       baseAPIReqUrl,
       searchResultsLimit,
       requestInterval,
-      waitPending
+      waitPending,
+      waitTimeout
     } = searchConfig;
 
     // doublecheck
@@ -140,8 +141,8 @@ const scannerMiddleware = ({ dispatch, getState }) => {
           onRequestFail(currentOffset, requestFail)
         )
         .then(setResponseCount)
-        // then(handleResponse) with same function call in "wallPostsSearchStart"
-        .then(handleResponse(authorId)) // TODO: throw there
+        .then(handleResponse) // with same function call in "wallPostsSearchStart"
+        // .then(handleResponse(authorId)) // TODO: throw there
         // .then(collectResults)
         // TODO: replace by then(addPartOfResultsIfFound(searchResultsLimit))
         .then((chunk) => {
@@ -167,6 +168,24 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       const { requests } = getState();
 
       if (requests.length > 0) {
+        // const overdue = requests.find(request => (
+        //   request.pending && Date.now() - request.timestamp > waitTimeout
+        // ));
+        const overdue = requests.find((request) => {
+          const difference = Date.now() - request.timestamp;
+          console.log('PENDING REQ DIFFERENCE: ', difference);
+
+          return request.pending && difference > waitTimeout;
+        });
+        console.log('OVERDUE: ', JSON.stringify(overdue, null, 2));
+        // TODO: add overdue.repeats < 3 condition
+        if (overdue) {
+          // cancel and repeat
+          console.log('NEED CANCEL AND REPEAT');
+          performSingleCall(overdue.offset);
+          return;
+        }
+
         const pendingReq = requests.find(request => request.pending);
 
         console.log('REQUESTS 4: ', JSON.stringify(requests, null, 2));

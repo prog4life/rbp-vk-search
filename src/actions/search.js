@@ -1,33 +1,23 @@
-import {
-  apiVersion, count, extended, requestInterval, waitPending, inputDefaults
-} from 'config/common';
 import fetchJSONP from 'utils/fetch';
 import axiosJSONP from 'utils/axios-jsonp';
 import prepareWallPosts from 'utils/response-handling';
+import {
+  apiVersion,
+  count,
+  requestInterval,
+  waitPending,
+  waitTimeout,
+  resultsSortOrder as defaultOrder,
+  inputDefaults
+} from 'config/common';
 
-export const addResults = (results, limit = null) => ({
+export const addResults = (results, limit, order = defaultOrder) => ({
   type: 'ADD_RESULTS',
   results,
   // to cut results from within reducer
-  limit
+  limit,
+  order
 });
-
-export const addSortedResults = (results, order, limit) => (
-  (dispatch, getState) => {
-    const allResults = getState().results.concat(results);
-
-    const sortedResults = allResults.sort((a, b) => (
-      order === 'desc'
-        ? b.timestamp - a.timestamp
-        : a.timestamp - b.timestamp
-    ));
-
-    return {
-      type: 'ADD_SORTED_RESULTS',
-      results: sortedResults.slice(0, limit)
-    };
-  }
-);
 
 export const requestStart = offset => ({
   type: 'REQUEST_START',
@@ -82,21 +72,22 @@ export const wallPostsSearchStart = (inputData) => {
   const baseAPIReqUrl = 'https://api.vk.com/method/wall.get?' +
     `owner_id=${wallOwnerTypePrefix}${wallOwnerId}` +
     `&domain=${wallOwnerShortName}` +
-    `&count=${count}&v=${apiVersion}&extended=${extended}`;
+    `&count=${count}&v=${apiVersion}&extended=0`;
 
   return {
     type: 'WALL_POSTS_SEARCH_START',
     searchConfig: {
-      authorId: postAuthorId, // TODO: remove after change below
+      // authorId: postAuthorId, // replaced by "prepareWallPosts" call below
       baseAPIReqUrl,
       searchResultsLimit,
       requestInterval,
-      waitPending
+      waitPending,
+      waitTimeout
     },
     // callAPI: fetchJSONP,
     callAPI: axiosJSONP,
-    handleResponse: prepareWallPosts, // TODO: prepareWallPosts(postAuthorId)
-    saveResults: addSortedResults,
+    handleResponse: prepareWallPosts(postAuthorId),
+    saveResults: addResults,
     requestStart,
     requestSuccess,
     requestFail,

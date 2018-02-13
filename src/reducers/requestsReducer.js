@@ -10,18 +10,20 @@ const changeRequestPendingState = (state, action, isPending) => (
 export default function requests(state = [], action) {
   switch (action.type) {
     case 'REQUEST_START':
-      // OR filter then add
-      return state.some(req => req.offset === action.offset)
-        ? changeRequestPendingState(state, action, true)
-        : [...state, { offset: action.offset, pending: true }];
+      return state.filter(req => req.offset !== action.offset)
+        .concat({
+          offset: action.offset,
+          pending: true,
+          timestamp: Date.now()
+        });
+      // return state.some(req => req.offset === action.offset)
+      //   ? changeRequestPendingState(state, action, true)
+      //   : [...state, { offset: action.offset, pending: true }];
     case 'REQUEST_SUCCESS':
       return state.filter(req => req.offset !== action.offset);
     case 'REQUEST_FAIL':
-      // OR filter then add
-      return state.some(req => req.offset === action.offset)
-        ? changeRequestPendingState(state, action, false)
-        :
-        state.concat({
+      return state.filter(req => req.offset !== action.offset)
+        .concat({
           offset: action.offset,
           pending: false
         });

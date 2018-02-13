@@ -1,20 +1,3 @@
-export function results(state = [], action) {
-  switch (action.type) {
-    // case 'ADD_RESULTS':
-    //   return [...state, ...action.results].slice(0, action.limit);
-    // TODO: prevent adding of same results
-    case 'ADD_SORTED_RESULTS':
-      return [...state, ...action.results];
-    // clear results at search start
-    // case 'PREPARE_SEARCH':
-    //   return [];
-    case 'WALL_POSTS_SEARCH_START':
-      return [];
-    default:
-      return state;
-  }
-}
-
 const defaultSearchState = {
   isActive: false,
   processed: 0
@@ -22,7 +5,7 @@ const defaultSearchState = {
   // progress: 0
 };
 
-export function search(state = defaultSearchState, action) {
+export default function search(state = defaultSearchState, action) {
   switch (action.type) {
     // case 'PREPARE_SEARCH':
     //   return {

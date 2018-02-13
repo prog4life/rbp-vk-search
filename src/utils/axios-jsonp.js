@@ -4,7 +4,7 @@ import axios from 'axios-jsonp-pro';
 export default function axiosJSONP(url, customTimeout) {
   return axios.jsonp(url, {
     // url
-    // timeout: 700
+    // timeout: 500
   })
     .then((resData) => {
       if (resData.error) {
@@ -14,3 +14,4 @@ export default function axiosJSONP(url, customTimeout) {
       return resData.response;
     });
 }
+

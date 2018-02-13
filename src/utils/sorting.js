@@ -2,9 +2,9 @@ import { resultsSortOrder as defaultOrder } from 'config/common';
 
 export const sortItemsByTimestamp = (posts, order = defaultOrder) => (
   posts && posts.sort((a, b) => (
-    order === 'desc'
-      ? b.timestamp - a.timestamp
-      : a.timestamp - b.timestamp
+    order === 'asc'
+      ? a.timestamp - b.timestamp
+      : b.timestamp - a.timestamp
   ))
 );
 
@@ -21,8 +21,8 @@ export const sortItemsByNumField = (items, sortBy, order = defaultOrder) => {
   }
 
   return items.sort((a, b) => (
-    order === 'desc'
-      ? b[sortBy] - a[sortBy]
-      : a[sortBy] - b[sortBy]
+    order === 'asc'
+      ? a[sortBy] - b[sortBy]
+      : b[sortBy] - a[sortBy]
   ));
 };
