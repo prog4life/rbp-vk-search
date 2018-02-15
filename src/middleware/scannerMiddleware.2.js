@@ -1,10 +1,3 @@
-import axiosJSONP from 'utils/axios-jsonp';
-import prepareWallPosts from 'utils/response-handling';
-
-export const PERFORM_SEARCH = 'Perform Search';
-
-// const determineNextActionOnIntervalTick = () => {}; // TODO:
-
 // TODO: rename to searchProcessor, extractor, e.t.c
 const scannerMiddleware = ({ dispatch, getState }) => {
   // let emptyResponsesCount = 0; // idea
@@ -14,16 +7,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   let responseCount; // total amount of items to search among
   let processed = 0;
   let isSearchTerminated = false;
-  const processedOffsets = []; // offsets that were used for successful requests
-
-  // IDEA
-  // const search = {
-  //   isActive: true,
-  //   processed: 0,
-  //   total: 0,
-  //   currentOffset: 100,
-  //   requests: []
-  // };
+  const processedOffsets = [];
 
   // const requests = [
   //   {
@@ -45,25 +29,18 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   // TODO: use startTime - Date.now() === timeout to track failed requests
 
   // remove successful request obj from "requests"
-  const onRequestSuccess = (currentOffset, type) => (response) => {
+  const onRequestSuccess = (currentOffset, actionCreator) => (response) => {
     if (!isSearchTerminated) {
-      dispatch({
-        type,
-        offset: currentOffset
-      });
+      dispatch(actionCreator(currentOffset));
       return response;
     }
     throw Error('Unnecessary response, search is already terminated');
   };
 
   // add failed request obj with pending: false to "requests"
-  const onRequestFail = (currentOffset, type, retries) => (e) => {
+  const onRequestFail = (currentOffset, actionCreator, retries) => (e) => {
     if (!isSearchTerminated) {
-      dispatch({
-        type,
-        offset: currentOffset,
-        retries
-      });
+      dispatch(actionCreator(currentOffset, retries));
       throw Error(`Request with ${currentOffset} offset FAILED, ${e.message}`);
     }
     throw Error('Unnecessary response, search is already terminated');
@@ -76,20 +53,15 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     return response;
   };
 
-  const savePartOfResults = (limit, addResultsType) => (chunk) => {
+  const savePartOfResults = limit => (chunk) => {
     // TODO: consider doublechecking with "isSearchTerminated"
     if (chunk && chunk.length > 0) {
-      // NOTE: but need to use "next" instead of dispatch
-      dispatch({
-        type: addResultsType,
-        results: chunk,
-        limit
-      });
+      dispatch(addResults(chunk, limit));
     }
     return chunk;
   };
 
-  const handleSearchProgress = (currentOffset, offsetModifier, type) => () => {
+  const handleSearchProgress = (currentOffset, offsetModifier, actionCreator) => () => {
     if (responseCount && !isSearchTerminated) {
       const currIndex = processedOffsets.indexOf(currentOffset);
 
@@ -103,27 +75,33 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       processed = processed + offsetModifier > responseCount
         ? responseCount
         : processed + offsetModifier;
-
-      dispatch({
-        type,
-        total: responseCount,
-        processed
-      });
+      dispatch(actionCreator(responseCount, processed));
     }
   };
 
   return next => (action) => {
     const { accessToken } = getState();
-    const { type } = action;
-    const performSearch = action[PERFORM_SEARCH];
+    const {
+      callAPI,
+      handleResponse,
+      searchConfig,
+      addResults,
+      requestStart,
+      requestSuccess,
+      requestFail,
+      updateSearchProgress,
+      completeSearch,
+      type
+    } = action;
 
-    if (typeof performSearch === 'undefined' && type !== 'TERMINATE_SEARCH') {
+    if (!searchConfig && type !== 'TERMINATE_SEARCH') {
       return next(action);
     }
 
-    // if (!types && type !== 'TERMINATE_SEARCH') { // + !searchConfig
-    //   return next(action);
-    // }
+    // NOTE: additional !type condition was added
+    if (!type) {
+      return next(action);
+    }
 
     if (type === 'TERMINATE_SEARCH') {
       isSearchTerminated = true;
@@ -132,30 +110,32 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       return next(action);
     }
 
-    const { types, searchConfig } = performSearch;
-
-    if (!Array.isArray(types) || types.length !== 7) {
-      throw new Error('Expected an array of seven action types.');
+    if (typeof callAPI !== 'function') {
+      throw new Error('Expected callAPI to be a function');
     }
+
+    if (typeof handleResponse !== 'function') {
+      throw new Error('Expected handleResponse to be a function');
+    }
+
+    if (typeof addResults !== 'function') {
+      throw new Error('Expected addResults to be function');
+    }
+
+    if (typeof updateSearchProgress !== 'function') {
+      throw new Error('Expected updateSearchProgress to be function');
+    }
+
+    if (typeof completeSearch !== 'function') {
+      throw new Error('Expected completeSearch to be function');
+    }
+
     if (typeof searchConfig !== 'object') {
       throw new Error('Expected an object of search config params');
     }
-    if (!types.every(t => typeof t === 'string')) {
-      throw new Error('Expected action types to be strings.');
-    }
-
-    const [
-      searchStartType,
-      requestStartType,
-      requestSuccessType,
-      requestFailType,
-      addResultsType,
-      updateProgressType,
-      searchEndType
-    ] = types;
 
     const {
-      authorId,
+      // authorId,
       baseAPIReqUrl,
       searchResultsLimit,
       offsetModifier, // should be equal to request url "count" param value
@@ -168,36 +148,32 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     clearInterval(scannerIntervalId);
     // to notify reducers about search start
     // will also clear "requests" in store
-    next({ type: searchStartType });
+    next(action);
     offset = 0;
     processed = 0;
     isSearchTerminated = false;
-    processedOffsets.length = 0;
     // results.length = 0;
 
     const performSingleCall = (currentOffset, retries) => {
       // add request obj with pending: true to in-store "requests"
       // onRequestStart(currentOffset);
-      next({
-        type: requestStartType,
-        offset: currentOffset,
-        startTime: Date.now(),
-        retries
-      });
+      dispatch(requestStart(currentOffset, retries));
 
       const currentAPIReqUrl = `${baseAPIReqUrl}` +
         `&access_token=${accessToken}` +
         `&offset=${currentOffset}`;
 
-      axiosJSONP(currentAPIReqUrl)
+      callAPI(currentAPIReqUrl)
         .then(
-          onRequestSuccess(currentOffset, requestSuccessType),
-          onRequestFail(currentOffset, requestFailType, retries)
+          onRequestSuccess(currentOffset, requestSuccess),
+          onRequestFail(currentOffset, requestFail, retries)
         )
         .then(setResponseCount)
-        .then(prepareWallPosts(authorId))
+        .then(handleResponse)
         // .then(collectResults)
-        .then(savePartOfResults(searchResultsLimit, addResultsType))
+        // TODO: replace by then(savePartOfResults(searchResultsLimit))
+        .then()
+        // TODO: replace by then(handleSearchProgress)
         .then(handleSearchProgress(
           currentOffset,
           offsetModifier,
@@ -275,7 +251,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
 
       if (requests.length === 0) {
         clearInterval(scannerIntervalId);
-        next({ type: searchEndType });
+        dispatch(completeSearch());
       }
     }, requestInterval);
     // to make first request before timer tick, return was added for eslint

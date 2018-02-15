@@ -106,7 +106,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       handleResponse,
       searchConfig,
       completeSearch,
-      saveResultsType,
+      addResultsType,
       type
     } = action;
 
@@ -173,7 +173,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         .then((chunk) => {
           if (chunk && chunk.length > 0) {
             dispatch({
-              type: saveResultsType,
+              type: addResultsType,
               results: chunk,
               limit: searchResultsLimit // to cut results from within reducer
             });

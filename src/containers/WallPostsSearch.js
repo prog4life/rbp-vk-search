@@ -27,7 +27,7 @@ const propTypes = {
     processed: PropTypes.number,
     progress: PropTypes.number
   }).isRequired,
-  wallPostsSearchStart: PropTypes.func.isRequired,
+  startWallPostsSearch: PropTypes.func.isRequired,
   terminateSearch: PropTypes.func.isRequired,
   // tokenExpiresAt: PropTypes.number.isRequired
   userId: PropTypes.string.isRequired,
@@ -83,8 +83,8 @@ class WallPostsSearch extends React.Component {
     // }
   }
   handleSearchForWallPosts(inputData) {
-    const { wallPostsSearchStart } = this.props;
-    wallPostsSearchStart(inputData);
+    const { startWallPostsSearch } = this.props;
+    startWallPostsSearch(inputData);
     // TEMP:
     console.log('FORM STATE: ', inputData);
   }

@@ -11,6 +11,7 @@ import {
   resultsSortOrder as defaultOrder,
   inputDefaults
 } from 'config/common';
+import { PERFORM_SEARCH } from 'middleware/scannerMiddleware';
 
 export const addResults = (results, limit, order = defaultOrder) => ({
   type: 'ADD_RESULTS',
@@ -57,7 +58,49 @@ export const terminateSearch = () => ({
 // 2 avatar fields, so can search using corresponding queries
 
 // will be utilized by searchProcessor middleware
-export const wallPostsSearchStart = (inputData) => {
+// export const startWallPostsSearch = (inputData) => {
+//   // TEMP:
+//   const { postAuthorIdDef, ownerIdDef } = inputDefaults;
+
+//   const { wallOwnerType, wallOwnerShortName } = inputData;
+//   const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
+//   const wallOwnerId = inputData.wallOwnerId || ownerIdDef;
+//   const postAuthorId = Number(inputData.postAuthorId) || postAuthorIdDef;
+//   const searchResultsLimit = Number(inputData.searchResultsLimit);
+
+//   // TODO: add "&access_token=${accessToken}" here ?
+//   // TODO: use encodeURIComponent ?
+//   const baseAPIReqUrl = 'https://api.vk.com/method/wall.get?' +
+//     `owner_id=${wallOwnerTypePrefix}${wallOwnerId}` +
+//     `&domain=${wallOwnerShortName}` +
+//     `&count=${count}&v=${apiVersion}&extended=0`;
+
+//   return {
+//     type: 'WALL_POSTS_SEARCH_START',
+//     searchConfig: {
+//       // replaced by in place "prepareWallPosts" call below
+//       // authorId: postAuthorId,
+//       baseAPIReqUrl,
+//       searchResultsLimit,
+//       offsetModifier, // should be equal to request url "count" param value
+//       requestInterval,
+//       waitPending,
+//       waitTimeout
+//     },
+//     // callAPI: fetchJSONP,
+//     callAPI: axiosJSONP,
+//     handleResponse: prepareWallPosts(postAuthorId),
+//     addResults,
+//     requestStart,
+//     requestSuccess,
+//     requestFail,
+//     updateSearchProgress,
+//     completeSearch: wallPostsSearchEnd
+//   };
+// };
+
+// alternative version
+export const startWallPostsSearch = (inputData) => {
   // TEMP:
   const { postAuthorIdDef, ownerIdDef } = inputDefaults;
 
@@ -65,7 +108,7 @@ export const wallPostsSearchStart = (inputData) => {
   const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
   const wallOwnerId = inputData.wallOwnerId || ownerIdDef;
   const postAuthorId = Number(inputData.postAuthorId) || postAuthorIdDef;
-  const searchResultsLimit = Number(inputData.searchResultsLimit);
+  const searchResultsLimit = Number(inputData.searchResultsLimit) || undefined;
 
   // TODO: add "&access_token=${accessToken}" here ?
   // TODO: use encodeURIComponent ?
@@ -75,25 +118,26 @@ export const wallPostsSearchStart = (inputData) => {
     `&count=${count}&v=${apiVersion}&extended=0`;
 
   return {
-    type: 'WALL_POSTS_SEARCH_START',
-    searchConfig: {
-      // replaced by in place "prepareWallPosts" call below
-      // authorId: postAuthorId,
+    [PERFORM_SEARCH]: {
+      types: [
+        'WALL_POSTS_SEARCH_START',
+        'REQUEST_START',
+        'REQUEST_SUCCESS',
+        'REQUEST_FAIL',
+        'ADD_RESULTS',
+        'UPDATE_SEARCH_PROGRESS',
+        'WALL_POSTS_SEARCH_END'
+      ],
       baseAPIReqUrl,
-      searchResultsLimit,
-      offsetModifier, // should be equal to request url "count" param value
-      requestInterval,
-      waitPending,
-      waitTimeout
-    },
-    // callAPI: fetchJSONP,
-    callAPI: axiosJSONP,
-    handleResponse: prepareWallPosts(postAuthorId),
-    saveResults: addResults,
-    requestStart,
-    requestSuccess,
-    requestFail,
-    updateSearchProgress,
-    completeSearch: wallPostsSearchEnd
+      searchConfig: {
+        authorId: postAuthorId,
+        baseAPIReqUrl,
+        searchResultsLimit,
+        offsetModifier, // should be equal to request url "count" param value
+        requestInterval,
+        waitPending,
+        waitTimeout
+      }
+    }
   };
 };
