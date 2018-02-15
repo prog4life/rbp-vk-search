@@ -11,12 +11,12 @@ import rootReducer from '../reducers';
 // must be the last middleware in chain
 const logger = createLogger({
   duration: true,
-  // predicate: (getState, action) => action.type !== 'UPDATE_SEARCH_PROGRESS'
+  // predicate: (getState, action) => action.type !== 'SEARCH_UPDATE_PROGRESS'
   predicate: (getState, action) => {
     const hiddenTypes = [
-      'UPDATE_SEARCH_PROGRESS',
-      'REQUEST_START',
-      'REQUEST_SUCCESS'
+      // 'SEARCH_UPDATE_PROGRESS',
+      // 'REQUEST_START',
+      // 'REQUEST_SUCCESS'
     ];
     return !hiddenTypes.some(type => type === action.type);
   }

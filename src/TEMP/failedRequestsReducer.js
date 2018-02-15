@@ -5,7 +5,7 @@ export default function failedRequests(state = [], action) {
         if (failedReq.offset === action.offset) {
           return {
             offset: action.offset,
-            pending: true
+            isPending: true
           };
         }
         return failedReq;
@@ -16,7 +16,7 @@ export default function failedRequests(state = [], action) {
       return state.filter(failedReq => failedReq.offset !== action.offset)
         .concat([{
           offset: action.offset,
-          pending: false
+          isPending: false
         }]);
 
       // return state.some(failedReq => failedReq.offset === action.offset)
@@ -24,7 +24,7 @@ export default function failedRequests(state = [], action) {
       //   :
       //   state.concat([{
       //     offset: action.offset,
-      //     pending: false
+      //     isPending: false
       //   }]);
 
       // if (state.some(failedReq => failedReq.offset === action.offset)) {
@@ -32,7 +32,7 @@ export default function failedRequests(state = [], action) {
       // }
       // return state.concat([{
       //   offset: action.offset,
-      //   pending: false
+      //   isPending: false
       // }]);
     default:
       return state;

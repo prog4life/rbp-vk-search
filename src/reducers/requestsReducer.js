@@ -1,23 +1,28 @@
-const changeExistingRequestState = (state, action, isPending) => (
+const changeExistingRequestState = (state, action, isPending, isDone) => (
   state.map((req) => {
     if (req.offset === action.offset) {
       return {
         ...req,
         // alternatively (if not passed from action): req.retries + 1
         retries: action.retries,
-        pending: isPending
+        isPending,
+        isDone
       };
     }
     return req;
   })
 );
 
-const addNewRequest = (state, { offset, startTime, retries }, isPending) => (
+// const addNewRequest = (state, action, isPending, isDone) => (
+const addNewRequest = (state, { type, ...rest }, isPending, isDone) => (
   [...state, {
-    offset,
-    startTime,
-    retries, // alternatively (if not passed from action): retries: 0,
-    pending: isPending
+    // offset: action.offset,
+    // startTime: action.startTime,
+    // endTime: action.endTime,
+    // retries: action.retries, // alternatively (if not passing from action): retries: 0,
+    ...rest,
+    isPending,
+    isDone
   }]
 );
 
@@ -30,22 +35,34 @@ export default function requests(state = [], action) {
           offset: action.offset,
           startTime: action.startTime,
           retries: action.retries,
-          pending: true
+          isPending: true,
+          isDone: false
         });
       // return state.some(req => req.offset === action.offset)
       //   ? changeRequestPendingState(state, action, true)
-      //   : [...state, { offset: action.offset, pending: true }];
+      //   : [...state, { offset: action.offset, isPending: true }];
     case 'REQUEST_SUCCESS':
-      return state.filter(req => req.offset !== action.offset);
+      // TEMP: deleting only requests with same offset that have failed
+      // probably better to remove later pending and successful reqs too
+      return state.filter(req => !(req.offset === action.offset && !req.isPending && !req.isDone))
+        .concat({
+          offset: action.offset,
+          endTime: Date.now(), // TODO: change to action.endTime later?
+          // retries: action.retries,
+          isPending: false,
+          isDone: true
+        });
     case 'REQUEST_FAIL':
       return state.filter(req => req.offset !== action.offset)
         .concat({
           offset: action.offset,
+          endTime: Date.now(), // TODO: remove or change to action.endTime later?
           retries: action.retries,
-          pending: false
+          isPending: false,
+          isDone: false
         });
     case 'WALL_POSTS_SEARCH_START':
-    case 'TERMINATE_SEARCH':
+    case 'SEARCH_TERMINATE':
       return [];
     default:
       return state;

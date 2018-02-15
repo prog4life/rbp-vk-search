@@ -249,9 +249,9 @@ export const searchCommentsWithStoredProcedure = (procedure, token) => {
 //
 //     // TODO: handle case with wrong wall owner id
 //
-//     // TODO: add and check pending requests state                                !!!
+//     // TODO: add and check isPending requests state                                !!!
 //     if (failedRequests.length > 0) {
-//       const req = failedRequests.find(failedReq => !failedReq.pending);
+//       const req = failedRequests.find(failedReq => !failedReq.isPending);
 //       if (req) {
 //         dispatch(getPartOfResults(req.offset));
 //       }

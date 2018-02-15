@@ -3,12 +3,12 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     // 'offset300': {
     //   id: 7901,
     //   offset: 300,
-    //   pending: false
+    //   isPending: false
     // },
     // 'offset700': {
     //   id: 2313,
     //   offset: 700,
-    //   pending: true
+    //   isPending: true
     // }
   };
   // let emptyResponsesCount = 0; // idea
@@ -24,7 +24,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   // const requests = [
   //   {
   //     offset: 400,
-  //     pending: true,
+  //     isPending: true,
   //     failCount: 0   // idea
   //   }
   // ];
@@ -35,10 +35,10 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     const current = `offset${currentOffset}`;
 
     if (failedRequests[current]) {
-      failedRequests[current].pending = true;
+      failedRequests[current].isPending = true;
     }
 
-    // console.log('REQUEST 1: ', JSON.stringify(failedRequests, null, 2), 'MUST BE SET ', currentOffset, 'as PENDING');
+    // console.log('REQUEST 1: ', JSON.stringify(failedRequests, null, 2), 'MUST BE SET ', currentOffset, 'as isPending');
   };
 
   // remove successful one from "failedRequests"
@@ -57,13 +57,13 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     const current = `offset${currentOffset}`;
 
     if (failedRequests[current]) {
-      failedRequests[current].pending = false;
+      failedRequests[current].isPending = false;
       // console.log('FAIL 3: ', JSON.stringify(failedRequests, null, 2), 'must SET ', current, ' as FAILED');
     } else {
       failedRequests[current] = {
         offset: currentOffset,
         id: genId(4),
-        pending: false
+        isPending: false
       };
       // console.log('FAIL 3: ', JSON.stringify(failedRequests, null, 2), 'must ADD ', current, 'to FAILED');
     }
@@ -92,9 +92,9 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   // const addOrResetFailedRequest = (currentOffset) => {
   //   const existing = failedRequests.find(req => req.offset === currentOffset);
   //   if (existing) {
-  //     existing.pending = false;
+  //     existing.isPending = false;
   //   } else {
-  //     failedRequests.push({ offset: currentOffset, pending: false });
+  //     failedRequests.push({ offset: currentOffset, isPending: false });
   //   }
   //   console.log('F-REQUESTS 3: ', failedRequests, 'must SET ', currentOffset, 'as FAILED');
   // };
@@ -110,7 +110,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       type
     } = action;
 
-    if (!searchConfig && type !== 'TERMINATE_SEARCH') {
+    if (!searchConfig && type !== 'SEARCH_TERMINATE') {
       return next(action);
     }
 
@@ -119,7 +119,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       return next(action);
     }
 
-    if (type === 'TERMINATE_SEARCH') {
+    if (type === 'SEARCH_TERMINATE') {
       finished = true;
       clearInterval(scannerIntervalId);
       return next(action);
@@ -183,7 +183,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         .then(() => {
           if (responseCount && !finished) {
             dispatch({
-              type: 'UPDATE_SEARCH_PROGRESS',
+              type: 'SEARCH_UPDATE_PROGRESS',
               total: responseCount,
               processed: offset
             });
@@ -198,7 +198,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       const reqs = Object.keys(failedRequests);
 
       if (reqs.length > 0) {
-        const failed = reqs.find(req => failedRequests[req].pending !== true);
+        const failed = reqs.find(req => failedRequests[req].isPending !== true);
 
         if (failed) {
           // console.log('Failed request FOUND, will call with: ', failed);

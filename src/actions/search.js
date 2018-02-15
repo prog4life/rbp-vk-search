@@ -39,7 +39,7 @@ export const requestFail = (offset, retries = 0) => ({
 });
 
 export const updateSearchProgress = (total, processed) => ({
-  type: 'UPDATE_SEARCH_PROGRESS',
+  type: 'SEARCH_UPDATE_PROGRESS',
   total,
   processed
 });
@@ -49,7 +49,7 @@ export const wallPostsSearchEnd = () => ({
 });
 
 export const terminateSearch = () => ({
-  type: 'TERMINATE_SEARCH'
+  type: 'SEARCH_TERMINATE'
 });
 
 // NOTE: can retrieve info about author of posts at wall using wall.get with
@@ -125,7 +125,7 @@ export const startWallPostsSearch = (inputData) => {
         'REQUEST_SUCCESS',
         'REQUEST_FAIL',
         'ADD_RESULTS',
-        'UPDATE_SEARCH_PROGRESS',
+        'SEARCH_UPDATE_PROGRESS',
         'WALL_POSTS_SEARCH_END'
       ],
       baseAPIReqUrl,

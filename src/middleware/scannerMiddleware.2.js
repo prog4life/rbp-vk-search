@@ -12,7 +12,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   // const requests = [
   //   {
   //     offset: 400,
-  //     pending: true, // failed request will get "false" value here
+  //     isPending: true, // failed request will get "false" value here
   //     // how many times unresponded pending or failed request was sent again
   //     retries: 0
   //     startTime: Number // Date.now() value
@@ -37,7 +37,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     throw Error('Unnecessary response, search is already terminated');
   };
 
-  // add failed request obj with pending: false to "requests"
+  // add failed request obj with isPending: false to "requests"
   const onRequestFail = (currentOffset, actionCreator, retries) => (e) => {
     if (!isSearchTerminated) {
       dispatch(actionCreator(currentOffset, retries));
@@ -94,7 +94,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       type
     } = action;
 
-    if (!searchConfig && type !== 'TERMINATE_SEARCH') {
+    if (!searchConfig && type !== 'SEARCH_TERMINATE') {
       return next(action);
     }
 
@@ -103,7 +103,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       return next(action);
     }
 
-    if (type === 'TERMINATE_SEARCH') {
+    if (type === 'SEARCH_TERMINATE') {
       isSearchTerminated = true;
       clearInterval(scannerIntervalId);
       // TODO: clear failedReuests in store
@@ -155,7 +155,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     // results.length = 0;
 
     const performSingleCall = (currentOffset, retries) => {
-      // add request obj with pending: true to in-store "requests"
+      // add request obj with isPending: true to in-store "requests"
       // onRequestStart(currentOffset);
       dispatch(requestStart(currentOffset, retries));
 
@@ -189,12 +189,12 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         console.log('REQUESTS 4: ', JSON.stringify(requests, null, 2));
 
         // const expired = requests.find(request => (
-        //   request.pending && Date.now() - request.startTime > waitTimeout
+        //   request.isPending && Date.now() - request.startTime > waitTimeout
         // ));
         const expired = requests.find((request) => {
           const difference = Date.now() - request.startTime;
 
-          if (request.pending && difference > waitTimeout) {
+          if (request.isPending && difference > waitTimeout) {
             console.log(`PENDING ${request.offset} REQ DIFFERENCE: ${difference}`);
             return true;
           }
@@ -209,13 +209,13 @@ const scannerMiddleware = ({ dispatch, getState }) => {
           return;
         }
 
-        const pendingReq = requests.find(request => request.pending);
+        const pendingReq = requests.find(request => request.isPending);
 
         if (pendingReq && waitPending) {
           return;
         }
 
-        const failedReq = requests.find(request => !request.pending);
+        const failedReq = requests.find(request => !request.isPending);
 
         // no pending requests, only failed requests present OR:
         // "waitPending" is false and failed requests present -

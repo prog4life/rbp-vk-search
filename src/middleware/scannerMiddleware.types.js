@@ -10,11 +10,11 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   // let emptyResponsesCount = 0; // idea
   // let results = [];
   let scannerIntervalId;
-  // let offset = 0;
-  // let responseCount; // total amount of items to search among
-  // let processed = 0;
-  // let isSearchTerminated = false;
-  // const processedOffsets = []; // offsets that were used for successful requests
+  let offset = 0;
+  let responseCount; // total amount of items to search among
+  let processed = 0;
+  let isSearchTerminated = false;
+  const processedOffsets = []; // offsets that were used for successful requests
 
   // IDEA
   // const search = {
@@ -45,14 +45,11 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   // TODO: use startTime - Date.now() === timeout to track failed requests
 
   // remove successful request obj from "requests"
-  const onRequestSuccess = (next, offset, type) => (response) => {
-    const { isActive } = getState().search;
-
-    if (isActive) {
-      // NOTE: more suitable to use "next" instead of dispatch
-      next({
+  const onRequestSuccess = (currentOffset, type) => (response) => {
+    if (!isSearchTerminated) {
+      dispatch({
         type,
-        offset
+        offset: currentOffset
       });
       return response;
     }
@@ -60,36 +57,30 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   };
 
   // add failed request obj with isPending: false to "requests"
-  const onRequestFail = (next, offset, type, retries) => (e) => {
-    const { isActive } = getState().search;
-
-    if (isActive) {
-      // NOTE: more suitable to use "next" instead of dispatch
-      next({
+  const onRequestFail = (currentOffset, type, retries) => (e) => {
+    if (!isSearchTerminated) {
+      dispatch({
         type,
-        offset,
+        offset: currentOffset,
         retries
       });
-      throw Error(`Request with ${offset} offset FAILED, ${e.message}`);
+      throw Error(`Request with ${currentOffset} offset FAILED, ${e.message}`);
     }
     throw Error('Unnecessary response, search is already terminated');
   };
 
-  // const setTotal = next => (response) => {
-  //   if (response && response.count) {
-  //     next({
-  //       type: 'SEARCH_SET_TOTAL', // TODO: check if it will be logged
-  //       total: response.count
-  //     });
-  //   }
-  //   return response;
-  // };
+  const setResponseCount = (response) => {
+    responseCount = response && response.count
+      ? response.count
+      : responseCount;
+    return response;
+  };
 
-  const savePartOfResults = (next, limit, addResultsType) => (chunk) => {
+  const savePartOfResults = (limit, addResultsType) => (chunk) => {
     // TODO: consider doublechecking with "isSearchTerminated"
     if (chunk && chunk.length > 0) {
-      // NOTE: more suitable to use "next" instead of dispatch
-      next({
+      // NOTE: but need to use "next" instead of dispatch
+      dispatch({
         type: addResultsType,
         results: chunk,
         limit
@@ -98,34 +89,31 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     return chunk;
   };
 
-  const onSearchProgress = (next, offset, offsetModifier, type) => (response) => {
-    const { search: { isActive, total, processed }, requests } = getState();
+  const handleSearchProgress = (currentOffset, offsetModifier, type) => () => {
+    if (responseCount && !isSearchTerminated) {
+      const currIndex = processedOffsets.indexOf(currentOffset);
 
-    // to get updated "total"
-    const responseCount = response && response.count ? response.count : total;
-
-    if (isActive) {
+      if (currIndex >= 0) {
+        throw Error(`Request with ${currentOffset} is counted already
+          under index of ${currIndex}`);
+      }
+      processedOffsets.push(currentOffset);
       // to get correct value of processed items (not bigger than total)
       // at the end of search
-      const updatedProcessed = processed + offsetModifier > responseCount
+      processed = processed + offsetModifier > responseCount
         ? responseCount
         : processed + offsetModifier;
 
-      const successful = requests.find(r => r.offset === offset && r.isDone);
-
-      if (!successful || requests.length < 0) {
-        next({
-          type,                            // TODO: check if it will be logged
-          total: responseCount,
-          processed: updatedProcessed
-        });
-      }
+      dispatch({
+        type,
+        total: responseCount,
+        processed
+      });
     }
-    return response;
   };
 
   return next => (action) => {
-    // const { accessToken } = getState();
+    const { accessToken } = getState();
     const { type } = action;
     const performSearch = action[PERFORM_SEARCH];
 
@@ -138,9 +126,9 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     // }
 
     if (type === 'SEARCH_TERMINATE') {
-      // isSearchTerminated = true;
+      isSearchTerminated = true;
       clearInterval(scannerIntervalId);
-      // TODO: clear failedRequests in store
+      // TODO: clear failedReuests in store
       return next(action);
     }
 
@@ -166,11 +154,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       searchEndType
     ] = types;
 
-    // TODO: import offsetModifier, requestInterval, waitPending and waitTimeout
-    // from common config and set as defaults here
     const {
-      // TODO: not destructure authorId here and pass whole searchConfig obj to
-      // handleResponse (prepareWallPosts)
       authorId,
       baseAPIReqUrl,
       searchResultsLimit,
@@ -180,21 +164,18 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       waitTimeout
     } = searchConfig;
 
-    // TODO: validate authorId, baseAPIReqUrl
-
     // doublecheck
     clearInterval(scannerIntervalId);
     // to notify reducers about search start
     // will also clear "requests" in store
     next({ type: searchStartType });
-    // offset = 0;
-    // processed = 0;
-    // isSearchTerminated = false;
-    // processedOffsets.length = 0;
+    offset = 0;
+    processed = 0;
+    isSearchTerminated = false;
+    processedOffsets.length = 0;
     // results.length = 0;
 
-    const performSingleCall = (currentOffset = 0, retries) => {
-      const { accessToken } = getState();
+    const performSingleCall = (currentOffset, retries) => {
       // add request obj with isPending: true to in-store "requests"
       // onRequestStart(currentOffset);
       next({
@@ -209,30 +190,24 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         `&offset=${currentOffset}`;
 
       axiosJSONP(currentAPIReqUrl)
-        // NOTE: must use offset value that was actual at request start
-        // i.e. "performSingleCall" call
         .then(
-          onRequestSuccess(next, currentOffset, requestSuccessType),
-          onRequestFail(next, currentOffset, requestFailType, retries)
+          onRequestSuccess(currentOffset, requestSuccessType),
+          onRequestFail(currentOffset, requestFailType, retries)
         )
-        // .then(setTotal(next))
-        .then(onSearchProgress(
-          next,
+        .then(setResponseCount)
+        .then(prepareWallPosts(authorId))
+        // .then(collectResults)
+        .then(savePartOfResults(searchResultsLimit, addResultsType))
+        .then(handleSearchProgress(
           currentOffset,
           offsetModifier,
           updateProgressType
         ))
-        // TODO: change to more generic then(handleResponse(searchConfig))
-        .then(prepareWallPosts(authorId))
-        // .then(collectResults)
-        .then(savePartOfResults(next, searchResultsLimit, addResultsType))
         .catch(e => console.error(e));
     };
 
     scannerIntervalId = setInterval(() => {
-      const { requests, offset, total: responseCount } = getState();
-
-      let nextOffset = offset + offsetModifier;
+      const { requests } = getState();
 
       if (requests.length > 0) {
         console.log('REQUESTS 4: ', JSON.stringify(requests, null, 2));
@@ -240,11 +215,11 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         // const expired = requests.find(request => (
         //   request.isPending && Date.now() - request.startTime > waitTimeout
         // ));
-        const expired = requests.find((req) => {
-          const difference = Date.now() - req.startTime;
+        const expired = requests.find((request) => {
+          const difference = Date.now() - request.startTime;
 
-          if (req.isPending && difference > waitTimeout) {
-            console.log(`PENDING ${req.offset} REQ DIFFERENCE: ${difference}`);
+          if (request.isPending && difference > waitTimeout) {
+            console.log(`PENDING ${request.offset} REQ DIFFERENCE: ${difference}`);
             return true;
           }
           return false;
@@ -264,7 +239,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
           return;
         }
 
-        const failedReq = requests.find(req => !req.isPending && !req.isDone);
+        const failedReq = requests.find(request => !request.isPending);
 
         // no pending requests, only failed requests present OR:
         // "waitPending" is false and failed requests present -
@@ -276,30 +251,24 @@ const scannerMiddleware = ({ dispatch, getState }) => {
           return;
         }
 
+        offset += offsetModifier;
         // no failed requests, "waitPending" is false,
-        // all items requested but some pending requests that have not exceeded
-        // waitTimeout are still present
-        if (nextOffset > responseCount) { // TODO: add !responseCount ?
-          nextOffset -= offsetModifier;
-          next({
-            type: 'SEARCH_SET_OFFSET',
-            offset: nextOffset
-          });
+        // all items requested but some pending requests still present
+        if (offset > responseCount) { // TODO: add !responseCount ?
+          offset -= offsetModifier;
           return;
         }
+      } else {
+        // no pending or failed requests - increase offset to request next
+        // portion of items
+        offset += offsetModifier;
       }
-
-      // request next portion of items using increased offset OR end search
-      next({
-        type: 'SEARCH_SET_OFFSET',
-        offset: nextOffset
-      });
 
       const { results } = getState();
       // was results.length
       if (!searchResultsLimit || results.length < searchResultsLimit) {
-        if (!responseCount || nextOffset <= responseCount) {
-          performSingleCall(nextOffset);
+        if (!responseCount || offset <= responseCount) {
+          performSingleCall(offset);
           return;
         }
       }
@@ -310,7 +279,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       }
     }, requestInterval);
     // to make first request before timer tick, return was added for eslint
-    return performSingleCall();
+    return performSingleCall(offset);
   };
 };
 
