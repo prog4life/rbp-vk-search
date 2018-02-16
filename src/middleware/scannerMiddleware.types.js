@@ -30,7 +30,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   //     offset: 400,
   //     isPending: true, // failed request will get "false" value here
   //     // how many times unresponded pending or failed request was sent again
-  //     retries: 0
+  //     attempt: 0
   //     startTime: Number // Date.now() value
   //   }
   // ];
@@ -57,12 +57,12 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   };
 
   // add failed request obj with isPending: false to "requests"
-  const onRequestFail = (currentOffset, type, retries) => (e) => {
+  const onRequestFail = (currentOffset, type, attempt) => (e) => {
     if (!isSearchTerminated) {
       dispatch({
         type,
         offset: currentOffset,
-        retries
+        attempt
       });
       throw Error(`Request with ${currentOffset} offset FAILED, ${e.message}`);
     }
@@ -175,14 +175,14 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     processedOffsets.length = 0;
     // results.length = 0;
 
-    const performSingleCall = (currentOffset, retries) => {
+    const performSingleCall = (currentOffset, attempt) => {
       // add request obj with isPending: true to in-store "requests"
       // onRequestStart(currentOffset);
       next({
         type: requestStartType,
         offset: currentOffset,
         startTime: Date.now(),
-        retries
+        attempt
       });
 
       const currentAPIReqUrl = `${baseAPIReqUrl}` +
@@ -192,7 +192,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       axiosJSONP(currentAPIReqUrl)
         .then(
           onRequestSuccess(currentOffset, requestSuccessType),
-          onRequestFail(currentOffset, requestFailType, retries)
+          onRequestFail(currentOffset, requestFailType, attempt)
         )
         .then(setResponseCount)
         .then(prepareWallPosts(authorId))
@@ -225,11 +225,11 @@ const scannerMiddleware = ({ dispatch, getState }) => {
           return false;
         });
         console.log('EXPIRED: ', JSON.stringify(expired, null, 2));
-        // TODO: add expired.retries < maxPendingRetries condition
+        // TODO: add expired.attempt < maxAttemptsPending condition
         if (expired) {
           // cancel and repeat
-          console.log('WILL REPEAT with retries COUNT: ', expired.retries + 1);
-          performSingleCall(expired.offset, expired.retries + 1);
+          console.log('WILL REPEAT with attempt COUNT: ', expired.attempt + 1);
+          performSingleCall(expired.offset, expired.attempt + 1);
           return;
         }
 
@@ -247,7 +247,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         if (!pendingReq || failedReq) {
           console.log('Not waiting for pending and call: ', failedReq.offset);
 
-          performSingleCall(failedReq.offset, failedReq.retries + 1);
+          performSingleCall(failedReq.offset, failedReq.attempt + 1);
           return;
         }
 

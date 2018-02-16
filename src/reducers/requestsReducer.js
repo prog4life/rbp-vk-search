@@ -3,8 +3,8 @@ const changeExistingRequestState = (state, action, isPending, isDone) => (
     if (req.offset === action.offset) {
       return {
         ...req,
-        // alternatively (if not passed from action): req.retries + 1
-        retries: action.retries,
+        // alternatively (if not passed from action): req.attempt + 1
+        attempt: action.attempt,
         isPending,
         isDone
       };
@@ -19,7 +19,7 @@ const addNewRequest = (state, { type, ...rest }, isPending, isDone) => (
     // offset: action.offset,
     // startTime: action.startTime,
     // endTime: action.endTime,
-    // retries: action.retries, // alternatively (if not passing from action): retries: 0,
+    // attempt: action.attempt, // alternatively (if not passing from action): attempt: 0,
     ...rest,
     isPending,
     isDone
@@ -34,7 +34,7 @@ export default function requests(state = [], action) {
         .concat({
           offset: action.offset,
           startTime: action.startTime,
-          retries: action.retries,
+          attempt: action.attempt,
           isPending: true,
           isDone: false
         });
@@ -44,20 +44,20 @@ export default function requests(state = [], action) {
     case 'REQUEST_SUCCESS':
       // TEMP: deleting only requests with same offset that have failed
       // probably better to remove later pending and successful reqs too
-      return state.filter(req => !(req.offset === action.offset && !req.isPending && !req.isDone))
-        .concat({
-          offset: action.offset,
-          endTime: Date.now(), // TODO: change to action.endTime later?
-          // retries: action.retries,
-          isPending: false,
-          isDone: true
-        });
+      return state.filter(req => !(req.offset === action.offset));
+      // .concat({
+      //   offset: action.offset,
+      //   endTime: Date.now(), // TODO: change to action.endTime later?
+      //   attempt: action.attempt,
+      //   isPending: false,
+      //   isDone: true
+      // });
     case 'REQUEST_FAIL':
       return state.filter(req => req.offset !== action.offset)
         .concat({
           offset: action.offset,
           endTime: Date.now(), // TODO: remove or change to action.endTime later?
-          retries: action.retries,
+          attempt: action.attempt,
           isPending: false,
           isDone: false
         });
@@ -68,3 +68,54 @@ export default function requests(state = [], action) {
       return state;
   }
 }
+
+// const requests = (state = {}, action) => {
+//   const key = `offset_${action.offset}`;
+
+//   switch (action.type) {
+//     case 'REQUEST_START':
+//       return {
+//         ...state,
+//         [`offset_${action.offset}`]: {
+//           id: `offset_${action.offset}`,
+//           offset: action.offset,
+//           startTime: action.startTime,
+//           attempt: action.attempt,
+//           isPending: true,
+//           isDone: false
+//         }
+//       };
+//     case 'REQUEST_SUCCESS':
+//       return {
+//         ...state,
+//         [key]: {
+//           id: key,
+//           offset: action.offset,
+//           startTime: (state[key] && state[key].startTime) || undefined,
+//           endTime: Date.now(), // TODO: change to action.endTime later?
+//           attempt: action.attempt,
+//           isPending: false,
+//           isDone: true
+//         }
+//       };
+//     case 'REQUEST_FAIL':
+//       return {
+//         ...state,
+//         [key]: {
+//           id: key,
+//           offset: action.offset,
+//           startTime: (state[key] && state[key].startTime) || undefined,
+//           attempt: action.attempt,
+//           isPending: false,
+//           isDone: false
+//         }
+//       };
+//     case 'WALL_POSTS_SEARCH_START':
+//     case 'SEARCH_TERMINATE':
+//       return {};
+//     default:
+//       return state;
+//   }
+// };
+
+// export default requests;

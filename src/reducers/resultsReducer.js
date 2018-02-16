@@ -21,6 +21,7 @@ const addOnlyUniquePosts = (state, posts) => (
 //   ]
 // );
 
+// TODO: refactor to hashmap-like object
 export default function results(state = [], action) {
   switch (action.type) {
     // TODO: prevent adding of same results

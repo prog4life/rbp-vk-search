@@ -20,11 +20,11 @@ export const addResults = (results, limit, order = defaultOrder) => ({
   order
 });
 
-export const requestStart = (offset, retries = 0) => ({
+export const requestStart = (offset, attempt = 1) => ({
   type: 'REQUEST_START',
   offset,
   startTime: Date.now(),
-  retries
+  attempt
 });
 
 export const requestSuccess = offset => ({
@@ -32,10 +32,10 @@ export const requestSuccess = offset => ({
   offset
 });
 
-export const requestFail = (offset, retries = 0) => ({
+export const requestFail = (offset, attempt = 1) => ({
   type: 'REQUEST_FAIL',
   offset,
-  retries
+  attempt
 });
 
 export const updateSearchProgress = (total, processed) => ({

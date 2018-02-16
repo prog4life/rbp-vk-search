@@ -1,6 +1,8 @@
 const defaultSearchState = {
   isActive: false,
-  processed: 0
+  processed: 0,
+  offset: 0,
+  successful: []
   // total: undefined
   // progress: 0
 };
@@ -51,14 +53,14 @@ const search = (state = defaultSearchState, action) => {
       return {
         isActive: true,
         processed: 0,
-        offset: 0
+        offset: 0,
+        successful: []
         // progress: 0
       };
     case 'WALL_POSTS_SEARCH_END':
       return {
         ...state,
-        isActive: false,
-        total: action.total // equal to response.count
+        isActive: false
       };
     // case 'SEARCH_SET_TOTAL':
     //   return {
@@ -68,8 +70,10 @@ const search = (state = defaultSearchState, action) => {
     case 'SEARCH_UPDATE_PROGRESS':
       return {
         ...state,
-        total: action.total || state.total,
-        processed: action.processed || state.processed
+        total: action.total || state.total, // equal to response.count
+        processed: action.processed || state.processed,
+        successful: state.successful.filter(offset => offset !== action.offset)
+          .concat(action.offset)
       };
     case 'SEARCH_SET_OFFSET':
       return {
@@ -79,7 +83,8 @@ const search = (state = defaultSearchState, action) => {
     case 'SEARCH_TERMINATE':
       return {
         isActive: false,
-        processed: 0
+        processed: 0,
+        successful: []
         // progress: 0
       };
     default:
