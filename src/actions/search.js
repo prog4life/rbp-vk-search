@@ -120,9 +120,9 @@ export const startWallPostsSearch = (inputData) => {
   return {
     types: [
       'WALL_POSTS_SEARCH_START',
-      'REQUEST_START',
-      'REQUEST_SUCCESS',
-      'REQUEST_FAIL',
+      // 'REQUEST_START',
+      // 'REQUEST_SUCCESS',
+      // 'REQUEST_FAIL',
       'ADD_RESULTS',
       'SEARCH_UPDATE',
       'WALL_POSTS_SEARCH_END'
