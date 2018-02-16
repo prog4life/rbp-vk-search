@@ -1,8 +1,6 @@
 const defaultSearchState = {
   isActive: false,
-  processed: 0,
-  offset: 0,
-  successful: []
+  processed: 0
   // total: undefined
   // progress: 0
 };
@@ -27,7 +25,7 @@ const defaultSearchState = {
 //         isActive: false
 //       };
 //     // NOTE: filtered in Redux logger config
-//     case 'SEARCH_UPDATE_PROGRESS':
+//     case 'SEARCH_UPDATE':
 //       return {
 //         ...state,
 //         total: action.total || state.total,
@@ -52,9 +50,7 @@ const search = (state = defaultSearchState, action) => {
     case 'WALL_POSTS_SEARCH_START':
       return {
         isActive: true,
-        processed: 0,
-        offset: 0,
-        successful: []
+        processed: 0
         // progress: 0
       };
     case 'WALL_POSTS_SEARCH_END':
@@ -67,24 +63,16 @@ const search = (state = defaultSearchState, action) => {
     //     ...state,
     //     total: action.total
     //   };
-    case 'SEARCH_UPDATE_PROGRESS':
+    case 'SEARCH_UPDATE':
       return {
         ...state,
         total: action.total || state.total, // equal to response.count
-        processed: action.processed || state.processed,
-        successful: state.successful.filter(offset => offset !== action.offset)
-          .concat(action.offset)
-      };
-    case 'SEARCH_SET_OFFSET':
-      return {
-        ...state,
-        offset: action.offset
+        processed: action.processed || state.processed
       };
     case 'SEARCH_TERMINATE':
       return {
         isActive: false,
-        processed: 0,
-        successful: []
+        processed: 0
         // progress: 0
       };
     default:

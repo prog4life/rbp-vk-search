@@ -183,7 +183,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         .then(() => {
           if (responseCount && !finished) {
             dispatch({
-              type: 'SEARCH_UPDATE_PROGRESS',
+              type: 'SEARCH_UPDATE',
               total: responseCount,
               processed: offset
             });

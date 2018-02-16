@@ -11,7 +11,7 @@ import {
   resultsSortOrder as defaultOrder,
   inputDefaults
 } from 'config/common';
-import { PERFORM_SEARCH } from 'middleware/scannerMiddleware';
+import { SEARCH_CONFIG } from 'middleware/scannerMiddleware';
 
 export const addResults = (results, limit, order = defaultOrder) => ({
   type: 'ADD_RESULTS',
@@ -38,8 +38,8 @@ export const requestFail = (offset, attempt = 1) => ({
   attempt
 });
 
-export const updateSearchProgress = (total, processed) => ({
-  type: 'SEARCH_UPDATE_PROGRESS',
+export const updateSearch = (total, processed) => ({
+  type: 'SEARCH_UPDATE',
   total,
   processed
 });
@@ -94,7 +94,7 @@ export const terminateSearch = () => ({
 //     requestStart,
 //     requestSuccess,
 //     requestFail,
-//     updateSearchProgress,
+//     updateSearch,
 //     completeSearch: wallPostsSearchEnd
 //   };
 // };
@@ -118,26 +118,23 @@ export const startWallPostsSearch = (inputData) => {
     `&count=${count}&v=${apiVersion}&extended=0`;
 
   return {
-    [PERFORM_SEARCH]: {
-      types: [
-        'WALL_POSTS_SEARCH_START',
-        'REQUEST_START',
-        'REQUEST_SUCCESS',
-        'REQUEST_FAIL',
-        'ADD_RESULTS',
-        'SEARCH_UPDATE_PROGRESS',
-        'WALL_POSTS_SEARCH_END'
-      ],
+    types: [
+      'WALL_POSTS_SEARCH_START',
+      'REQUEST_START',
+      'REQUEST_SUCCESS',
+      'REQUEST_FAIL',
+      'ADD_RESULTS',
+      'SEARCH_UPDATE',
+      'WALL_POSTS_SEARCH_END'
+    ],
+    [SEARCH_CONFIG]: {
+      authorId: postAuthorId,
       baseAPIReqUrl,
-      searchConfig: {
-        authorId: postAuthorId,
-        baseAPIReqUrl,
-        searchResultsLimit,
-        offsetModifier, // should be equal to request url "count" param value
-        requestInterval,
-        waitPending,
-        waitTimeout
-      }
+      searchResultsLimit,
+      offsetModifier, // should be equal to request url "count" param value
+      requestInterval,
+      waitPending,
+      waitTimeout
     }
   };
 };

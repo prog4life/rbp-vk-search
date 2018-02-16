@@ -89,7 +89,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       requestStart,
       requestSuccess,
       requestFail,
-      updateSearchProgress,
+      updateSearch,
       completeSearch,
       type
     } = action;
@@ -122,8 +122,8 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       throw new Error('Expected addResults to be function');
     }
 
-    if (typeof updateSearchProgress !== 'function') {
-      throw new Error('Expected updateSearchProgress to be function');
+    if (typeof updateSearch !== 'function') {
+      throw new Error('Expected updateSearch to be function');
     }
 
     if (typeof completeSearch !== 'function') {
@@ -177,7 +177,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         .then(handleSearchProgress(
           currentOffset,
           offsetModifier,
-          updateProgressType
+          updateSearchType
         ))
         .catch(e => console.error(e));
     };

@@ -1,7 +1,7 @@
 import axiosJSONP from 'utils/axios-jsonp';
 import prepareWallPosts from 'utils/response-handling';
 
-export const PERFORM_SEARCH = 'Perform Search';
+export const SEARCH_CONFIG = 'Search Config';
 
 // const determineNextActionOnIntervalTick = () => {}; // TODO:
 
@@ -114,10 +114,10 @@ const scannerMiddleware = ({ dispatch, getState }) => {
 
   return next => (action) => {
     const { accessToken } = getState();
-    const { type } = action;
-    const performSearch = action[PERFORM_SEARCH];
+    const { type, types } = action;
+    const searchConfig = action[SEARCH_CONFIG];
 
-    if (typeof performSearch === 'undefined' && type !== 'SEARCH_TERMINATE') {
+    if (typeof searchConfig === 'undefined' && type !== 'SEARCH_TERMINATE') {
       return next(action);
     }
 
@@ -131,8 +131,6 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       // TODO: clear failedReuests in store
       return next(action);
     }
-
-    const { types, searchConfig } = performSearch;
 
     if (!Array.isArray(types) || types.length !== 7) {
       throw new Error('Expected an array of seven action types.');
@@ -150,7 +148,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       requestSuccessType,
       requestFailType,
       addResultsType,
-      updateProgressType,
+      updateSearchType,
       searchEndType
     ] = types;
 
@@ -201,7 +199,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         .then(handleSearchProgress(
           currentOffset,
           offsetModifier,
-          updateProgressType
+          updateSearchType
         ))
         .catch(e => console.error(e));
     };

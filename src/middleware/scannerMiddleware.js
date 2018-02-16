@@ -1,7 +1,7 @@
 import axiosJSONP from 'utils/axios-jsonp';
 import prepareWallPosts from 'utils/response-handling';
 
-export const PERFORM_SEARCH = 'Perform Search';
+export const SEARCH_CONFIG = 'Search Config';
 
 // const determineNextActionOnIntervalTick = () => {}; // TODO:
 
@@ -10,11 +10,11 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   // let emptyResponsesCount = 0; // idea
   // let results = [];
   let scannerIntervalId;
-  // let offset = 0;
+  let offset = 0;
   // let responseCount; // total amount of items to search among
   // let processed = 0;
   // let isSearchTerminated = false;
-  // const processedOffsets = []; // offsets that were used for successful requests
+  const processedOffsets = []; // offsets of successful requests
 
   // IDEA
   // const search = {
@@ -41,8 +41,6 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   //     offset: currentOffset
   //   });
   // };
-
-  // TODO: REMOVE offset and successful OUT OF STORE                             !!!
 
   // remove successful request obj from "requests"
   const onRequestSuccess = (next, offset, type, attempt) => (response) => {
@@ -87,7 +85,6 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   // };
 
   const savePartOfResults = (next, limit, addResultsType) => (chunk) => {
-    // TODO: consider doublechecking with "isSearchTerminated"
     if (chunk && chunk.length > 0) {
       // NOTE: more suitable to use "next" instead of dispatch
       next({
@@ -100,15 +97,15 @@ const scannerMiddleware = ({ dispatch, getState }) => {
   };
 
   const onSearchProgress = (next, offset, offsetModifier, type) => (response) => {
-    const { isActive, total, successful, processed } = getState().search;
-
-    // to get updated "total"
-    const responseCount = response && response.count ? response.count : total;
+    const { isActive, total, processed } = getState().search;
 
     if (isActive) {
-      let updated = successful.find(o => o === offset)
+      // to get updated "total"
+      const responseCount = response && response.count ? response.count : total;
+
+      let updated = processedOffsets.some(o => o === offset)
         ? processed
-        : processed + offsetModifier;
+        : processedOffsets.push(offset) * offsetModifier;
 
       // to get correct value of processed items (not bigger than total)
       // at the end of search
@@ -116,37 +113,35 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         ? responseCount
         : updated;
 
-      next({
-        type,                              // TODO: check if it will be logged
-        total: responseCount,
-        processed: updated,
-        offset
-      });
+      if (responseCount !== total || updated !== processed) {
+        next({
+          type,
+          total: responseCount,
+          processed: updated
+        });
+      }
     }
     return response;
   };
 
   return next => (action) => {
     // const { accessToken } = getState();
-    const { type } = action;
-    const performSearch = action[PERFORM_SEARCH];
+    const { type, types } = action;
+    const searchConfig = action[SEARCH_CONFIG];
 
-    if (typeof performSearch === 'undefined' && type !== 'SEARCH_TERMINATE') {
+    if (typeof searchConfig === 'undefined' && type !== 'SEARCH_TERMINATE') {
       return next(action);
     }
 
-    // if (!types && type !== 'SEARCH_TERMINATE') { // + !searchConfig
-    //   return next(action);
-    // }
+    if (!types && type !== 'SEARCH_TERMINATE') {
+      return next(action);
+    }
 
     if (type === 'SEARCH_TERMINATE') {
       // isSearchTerminated = true;
       clearInterval(scannerIntervalId);
-      // TODO: clear failedRequests in store
       return next(action);
     }
-
-    const { types, searchConfig } = performSearch;
 
     if (!Array.isArray(types) || types.length !== 7) {
       throw new Error('Expected an array of seven action types.');
@@ -164,7 +159,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       requestSuccessType,
       requestFailType,
       addResultsType,
-      updateProgressType,
+      updateSearchType,
       searchEndType
     ] = types;
 
@@ -189,7 +184,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     // to notify reducers about search start
     // will also clear "requests" in store
     next({ type: searchStartType });
-    // offset = 0;
+    offset = 0;
     // processed = 0;
     // isSearchTerminated = false;
     // processedOffsets.length = 0;
@@ -212,7 +207,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
 
       axiosJSONP(currentAPIReqUrl)
         // NOTE: must use offset value that was actual at request start
-        // i.e. "performSingleCall" call
+        // i.e. at "performSingleCall" call moment
         .then(
           onRequestSuccess(next, currentOffset, requestSuccessType, attempt),
           onRequestFail(next, currentOffset, requestFailType, attempt)
@@ -222,7 +217,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
           next,
           currentOffset,
           offsetModifier,
-          updateProgressType
+          updateSearchType
         ))
         // TODO: change to more generic then(handleResponse(searchConfig))
         .then(prepareWallPosts(authorId))
@@ -232,9 +227,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     };
 
     scannerIntervalId = setInterval(() => {
-      const { requests, search: { offset, total } } = getState();
-
-      let nextOffset = offset + offsetModifier;
+      const { requests, search: { total } } = getState();
 
       if (requests.length > 0) {
         console.log('REQUESTS 4: ', JSON.stringify(requests, null, 2));
@@ -277,15 +270,12 @@ const scannerMiddleware = ({ dispatch, getState }) => {
           return;
         }
 
+        offset += offsetModifier;
         // no failed requests, "waitPending" is false,
         // all items requested but some pending requests that have not exceeded
         // waitTimeout are still present
-        if (nextOffset > total) { // TODO: add !total ?
-          nextOffset -= offsetModifier;
-          next({
-            type: 'SEARCH_SET_OFFSET',
-            offset: nextOffset
-          });
+        if (offset > total) { // TODO: add !total ?
+          offset -= offsetModifier;
           return;
         }
       }
@@ -293,13 +283,10 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       const { results } = getState();
       // was results.length
       if (!searchResultsLimit || results.length < searchResultsLimit) {
+        offset += offsetModifier;
         // request next portion of items using increased offset OR end search
-        if (!total || nextOffset <= total) {
-          next({
-            type: 'SEARCH_SET_OFFSET',
-            offset: nextOffset
-          });
-          performSingleCall(nextOffset);
+        if (!total || offset <= total) {
+          performSingleCall(offset);
           return;
         }
       }
@@ -310,7 +297,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       }
     }, requestInterval);
     // to make first request before timer tick, return was added for eslint
-    return performSingleCall();
+    return performSingleCall(offset);
   };
 };
 
