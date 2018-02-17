@@ -1,5 +1,5 @@
 // TODO: rename to searchProcessor, extractor, e.t.c
-const scannerMiddleware = ({ dispatch, getState }) => {
+const searchProcessor = ({ dispatch, getState }) => {
   // let emptyResponsesCount = 0; // idea
   // let results = [];
   let scannerIntervalId;
@@ -154,7 +154,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     isSearchTerminated = false;
     // results.length = 0;
 
-    const performSingleCall = (currentOffset, attempt) => {
+    const makeCallToAPI = (currentOffset, attempt) => {
       // add request obj with isPending: true to in-store "requests"
       // onRequestStart(currentOffset);
       dispatch(requestStart(currentOffset, attempt));
@@ -205,7 +205,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         if (expired) {
           // cancel and repeat
           console.log('WILL REPEAT with attempt COUNT: ', expired.attempt + 1);
-          performSingleCall(expired.offset, expired.attempt + 1);
+          makeCallToAPI(expired.offset, expired.attempt + 1);
           return;
         }
 
@@ -223,7 +223,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         if (!pendingReq || failedReq) {
           console.log('Not waiting for pending and call: ', failedReq.offset);
 
-          performSingleCall(failedReq.offset, failedReq.attempt + 1);
+          makeCallToAPI(failedReq.offset, failedReq.attempt + 1);
           return;
         }
 
@@ -244,7 +244,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       // was results.length
       if (!searchResultsLimit || results.length < searchResultsLimit) {
         if (!responseCount || offset <= responseCount) {
-          performSingleCall(offset);
+          makeCallToAPI(offset);
           return;
         }
       }
@@ -255,8 +255,8 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       }
     }, requestInterval);
     // to make first request before timer tick, return was added for eslint
-    return performSingleCall(offset);
+    return makeCallToAPI(offset);
   };
 };
 
-export default scannerMiddleware;
+export default searchProcessor;

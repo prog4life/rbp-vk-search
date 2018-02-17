@@ -10,7 +10,7 @@ export const SEARCH_CONFIG = 'Search Config';
 // const determineNextActionOnIntervalTick = () => {}; // TODO:
 
 // TODO: rename to searchProcessor, extractor, e.t.c
-const scannerMiddleware = ({ dispatch, getState }) => {
+const searchProcessor = ({ dispatch, getState }) => {
   // let emptyResponsesCount = 0; // idea
   // let results = [];
   let scannerIntervalId;
@@ -196,7 +196,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     // processedOffsets.length = 0;
     // results.length = 0;
 
-    const performSingleCall = (currentOffset = 0, attempt = 1) => {
+    const makeCallToAPI = (currentOffset = 0, attempt = 1) => {
       const { accessToken } = getState();
       // add request obj with isPending: true to in-store "requests"
       // onRequestStart(currentOffset);
@@ -213,7 +213,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
 
       axiosJSONP(currentAPIReqUrl)
         // NOTE: must use offset value that was actual at request start
-        // i.e. at "performSingleCall" call moment
+        // i.e. at "makeCallToAPI" call moment
         .then(
           onRequestSuccess(next, currentOffset, requestSuccessType, attempt),
           onRequestFail(next, currentOffset, requestFailType, attempt)
@@ -258,7 +258,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         if (expired) {
           // cancel and repeat
           console.log('WILL REPEAT with attempt: ', expired.attempt + 1);
-          performSingleCall(expired.offset, expired.attempt + 1);
+          makeCallToAPI(expired.offset, expired.attempt + 1);
           return;
         }
 
@@ -277,7 +277,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         if ((!pendingReq || !waitPending) && failedReq) {
           console.log('Not waiting for pending and call: ', failedReq.offset);
 
-          performSingleCall(failedReq.offset, failedReq.attempt + 1);
+          makeCallToAPI(failedReq.offset, failedReq.attempt + 1);
           return;
         }
 
@@ -298,7 +298,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       if (!searchResultsLimit || results.length < searchResultsLimit) {
         // request next portion of items using increased offset OR end search
         if (!total || offset <= total) {
-          performSingleCall(offset);
+          makeCallToAPI(offset);
           return;
         }
       }
@@ -309,8 +309,8 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       }
     }, requestInterval);
     // to make first request before timer tick, return was added for eslint
-    return performSingleCall(offset);
+    return makeCallToAPI(offset);
   };
 };
 
-export default scannerMiddleware;
+export default searchProcessor;

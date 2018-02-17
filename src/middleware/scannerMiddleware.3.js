@@ -1,4 +1,4 @@
-const scannerMiddleware = ({ dispatch, getState }) => {
+const searchProcessor = ({ dispatch, getState }) => {
   let failedRequests = {
     // 'offset300': {
     //   id: 7901,
@@ -158,7 +158,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
     failedRequests = {};
     finished = false;
 
-    const performSingleCall = (currentOffset) => {
+    const makeCallToAPI = (currentOffset) => {
       setFailedRequestAsPending(currentOffset);
 
       const currentAPIReqUrl = `${baseAPIReqUrl}` +
@@ -203,7 +203,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         if (failed) {
           // console.log('Failed request FOUND, will call with: ', failed);
 
-          performSingleCall(failedRequests[failed].offset);
+          makeCallToAPI(failedRequests[failed].offset);
         }
         // console.log('F-REQUESTS 4: ', JSON.stringify(failedRequests, null, 2));
         return false;
@@ -214,7 +214,7 @@ const scannerMiddleware = ({ dispatch, getState }) => {
         if (!responseCount || offset < responseCount) {
           // NOTE: should vary depending on the "count" value
           offset += 100;
-          return performSingleCall(offset);
+          return makeCallToAPI(offset);
         }
       }
 
@@ -227,8 +227,8 @@ const scannerMiddleware = ({ dispatch, getState }) => {
       // if (responseData.items.length = 0) { ... }
     }, requestInterval);
     // to make first request before timer tick
-    return performSingleCall(offset);
+    return makeCallToAPI(offset);
   };
 };
 
-export default scannerMiddleware;
+export default searchProcessor;

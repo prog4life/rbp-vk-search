@@ -1,33 +1,44 @@
-const sortByTimestamp = (posts, order) => (
-  posts.sort((a, b) => (
-    order === 'asc'
-      ? a.timestamp - b.timestamp
-      : b.timestamp - a.timestamp
-  ))
-);
+// const sortByTimestamp = (posts, order) => (
+//   posts.sort((a, b) => (
+//     order === 'asc'
+//       ? a.timestamp - b.timestamp
+//       : b.timestamp - a.timestamp
+//   ))
+// );
 
-const addOnlyUniquePosts = (state, posts) => (
-  posts.reduce((accum, post) => (
-    accum.some(prev => prev.postId === post.postId)
+export const sortItemsByNumField = (items, sortBy, order = 'desc') => {
+  if (!Array.isArray(items)) {
+    throw Error('Expected sorted items to be an array');
+  }
+  if (typeof sortBy !== 'string') {
+    throw Error('Expected sortBy to be a string');
+  }
+  if (order && (order !== 'desc' || order !== 'asc')) {
+    throw Error('Expected order to be a string "desc" or "asc"');
+  }
+
+  return items.sort((a, b) => (
+    order === 'asc'
+      ? a[sortBy] - b[sortBy]
+      : b[sortBy] - a[sortBy]
+  ));
+};
+
+const addOnlyUniqueItems = (state, items, compareBy) => (
+  items.reduce((accum, item) => (
+    accum.some(prev => prev[compareBy] === item[compareBy])
       ? accum
-      : accum.concat({ ...post })
+      : accum.concat({ ...item })
   ), [...state])
 );
 
-// const addNewResults = (state, action) => (
-//   [
-//     ...state,
-//     ...action.results.map(res => ({ ...res }))
-//   ]
-// );
-
-// TODO: refactor to hashmap-like object
+// TODO: refactor to storing results as hashmap-like object
 export default function results(state = [], action) {
   switch (action.type) {
-    // TODO: prevent adding of same results
     case 'ADD_RESULTS':
-      return sortByTimestamp(
-        addOnlyUniquePosts(state, action.results),
+      return sortItemsByNumField(
+        addOnlyUniqueItems(state, action.results, 'postId'),
+        'timestamp',
         action.order
       ).slice(0, action.limit);
     // to clear results at search start

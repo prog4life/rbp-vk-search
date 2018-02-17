@@ -11,7 +11,7 @@ import {
   resultsSortOrder as defaultOrder,
   inputDefaults
 } from 'config/common';
-import { SEARCH_CONFIG } from 'middleware/scannerMiddleware';
+import { SEARCH_CONFIG } from 'middleware/searchProcessor';
 
 export const addResults = (results, limit, order = defaultOrder) => ({
   type: 'ADD_RESULTS',

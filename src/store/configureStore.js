@@ -5,7 +5,7 @@ import { createLogger } from 'redux-logger';
 // to use with Chrome Extension
 // import { composeWithDevTools } from 'redux-devtools-extension';
 import { composeWithDevTools } from 'remote-redux-devtools';
-import scanner from 'middleware/scannerMiddleware';
+import search from 'middleware/searchProcessor';
 import rootReducer from '../reducers';
 
 // must be the last middleware in chain
@@ -22,9 +22,11 @@ const logger = createLogger({
   }
 });
 
+const watcher = immutabilityWatcher();
+
 const middleware = process.env.NODE_ENV === 'development'
-  ? [immutabilityWatcher(), thunk, scanner, logger]
-  : [thunk, scanner];
+  ? [watcher, search, thunk, logger]
+  : [search, thunk];
 
 export default (preloadedState = {}) => {
   /* eslint-disable no-underscore-dangle */
