@@ -16,7 +16,7 @@ export const sortItemsByNumField = (items, sortBy, order = defaultOrder) => {
   if (typeof sortBy !== 'string') {
     throw Error('Expected sortBy to be a string');
   }
-  if (order && (order !== 'desc' || order !== 'asc')) {
+  if (order !== 'desc' && order !== 'asc') {
     throw Error('Expected order to be a string "desc" or "asc"');
   }
 

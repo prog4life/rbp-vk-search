@@ -6,16 +6,22 @@
 //   ))
 // );
 
-export const sortItemsByNumField = (items, sortBy, order = 'desc') => {
+// TODO: sort in selector
+const sortItemsByNumField = (items, sortBy, order = 'desc') => {
   if (!Array.isArray(items)) {
     throw Error('Expected sorted items to be an array');
   }
   if (typeof sortBy !== 'string') {
     throw Error('Expected sortBy to be a string');
   }
-  if (order && (order !== 'desc' || order !== 'asc')) {
+  if (order !== 'desc' && order !== 'asc') {
     throw Error('Expected order to be a string "desc" or "asc"');
   }
+
+  // if (prev.length === items.length ||
+  //     prev.every((one, index) => one === items[index])) {
+  //   return prev;
+  // }
 
   return items.sort((a, b) => (
     order === 'asc'

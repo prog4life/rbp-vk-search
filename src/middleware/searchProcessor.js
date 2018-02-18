@@ -72,6 +72,7 @@ const searchProcessor = ({ dispatch, getState }) => {
     console.log('fail isActive: ', isActive);
     if (isActive) {
       const key = `offset_${offset}`;
+      // TODO: cannot read property startTime of undefined                       !!!
       const { startTime } = requests[key]; // TODO: replace with object spread
 
       requests[key] = {
@@ -131,6 +132,7 @@ const searchProcessor = ({ dispatch, getState }) => {
       next({
         type: addResultsType,
         results: chunk,
+        // oredr: 'desc',
         limit
       });
     }
@@ -237,7 +239,9 @@ const searchProcessor = ({ dispatch, getState }) => {
         .then(savePartOfResults(next, searchResultsLimit, addResultsType))
         .catch(e => console.error(e));
     };
-
+// TODO: remove failed and pending which attempt values have exceeded max limit
+// OR simply skip them on exit condition, clirify why 500 offset with 
+// attempt: 2 and both states as false was not removed                           !!!
     scannerIntervalId = setInterval(() => {
       const { offset } = search;
       let nextOffset;
@@ -291,8 +295,8 @@ const searchProcessor = ({ dispatch, getState }) => {
           makeCallToAPI(failedReq.offset, failedReq.attempt + 1);
           return;
         }
+        const { total: tempTotal } = getState().search;
 
-        const { total: tempTotal } = getState();
         nextOffset = offset + offsetModifier;
         // no failed requests, "waitPending" is false,
         // all items requested but some pending requests that have not exceeded
@@ -306,7 +310,7 @@ const searchProcessor = ({ dispatch, getState }) => {
       }
       search.offset = nextOffset;
 
-      const { results, total } = getState();
+      const { results, search: { total } } = getState();
 
       if (!searchResultsLimit || results.length < searchResultsLimit) {
         // request next portion of items using increased offset OR end search
@@ -316,7 +320,7 @@ const searchProcessor = ({ dispatch, getState }) => {
         }
       }
 
-      if (reqs.length === 0) {
+      if (reqs.length === 0) { // OR req.every(req => )
         // search.isActive = false;
         clearInterval(scannerIntervalId);
         next({ type: searchEndType });
