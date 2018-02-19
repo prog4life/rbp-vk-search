@@ -34,7 +34,7 @@ const searchProcessor = ({ dispatch, getState }) => {
   //     offset: 400,
   //     isPending: true, // failed request will get "false" value here
   //     // how many times unresponded pending or failed request was sent again
-  //     attempt: 0
+  //     attempts: 0
   //     startTime: Number // Date.now() value
   //   }
   // ];
@@ -47,7 +47,7 @@ const searchProcessor = ({ dispatch, getState }) => {
   // };
 
   // remove successful request obj from "requests"
-  const onRequestSuccess = (next, offset, type, attempt) => (response) => {
+  const onRequestSuccess = (next, offset, type, attempts) => (response) => {
     const { isActive } = getState().search;
 
     if (isActive) {
@@ -55,7 +55,7 @@ const searchProcessor = ({ dispatch, getState }) => {
       next({
         type,
         offset,
-        attempt
+        attempts
       });
       return response;
     }
@@ -63,7 +63,7 @@ const searchProcessor = ({ dispatch, getState }) => {
   };
 
   // add failed request obj with isPending: false to "requests"
-  const onRequestFail = (next, offset, type, attempt) => (e) => {
+  const onRequestFail = (next, offset, type, attempts) => (e) => {
     const { isActive } = getState().search;
 
     if (isActive) {
@@ -71,7 +71,7 @@ const searchProcessor = ({ dispatch, getState }) => {
       next({
         type,
         offset,
-        attempt
+        attempts
       });
       throw Error(`Request with ${offset} offset FAILED, ${e.message}`);
     }
@@ -105,22 +105,30 @@ const searchProcessor = ({ dispatch, getState }) => {
 
     if (isActive) {
       // to get updated "total"
-      const responseCount = response && response.count ? response.count : total;
+      const resCount = response && response.count ? response.count : total;
 
+      // let updated = processedOffsets.indexOf(offset) === -1 // OR
       let updated = processedOffsets.some(o => o === offset)
         ? processed
         : processedOffsets.push(offset) * offsetModifier;
 
       // to get correct value of processed items (not bigger than total)
       // at the end of search
-      updated = updated > responseCount
-        ? responseCount
+      updated = updated > resCount
+        ? resCount
         : updated;
 
-      if (responseCount !== total || updated !== processed) {
+
+      // to get correct value of processed items (not bigger than total)
+      // at the end of search
+      // updated = updated > resCount
+      //   ? resCount
+      //   : updated;
+
+      if (resCount !== total || updated !== processed) {
         next({
           type,
-          total: responseCount,
+          total: resCount,
           processed: updated
         });
       }
@@ -196,7 +204,7 @@ const searchProcessor = ({ dispatch, getState }) => {
     // processedOffsets.length = 0;
     // results.length = 0;
 
-    const makeCallToAPI = (currentOffset = 0, attempt = 1) => {
+    const makeCallToAPI = (currentOffset = 0, attempts = 1) => {
       const { accessToken } = getState();
       // add request obj with isPending: true to in-store "requests"
       // onRequestStart(currentOffset);
@@ -204,7 +212,7 @@ const searchProcessor = ({ dispatch, getState }) => {
         type: requestStartType,
         offset: currentOffset,
         startTime: Date.now(),
-        attempt
+        attempts
       });
 
       const currentAPIReqUrl = `${baseAPIReqUrl}` +
@@ -215,8 +223,8 @@ const searchProcessor = ({ dispatch, getState }) => {
         // NOTE: must use offset value that was actual at request start
         // i.e. at "makeCallToAPI" call moment
         .then(
-          onRequestSuccess(next, currentOffset, requestSuccessType, attempt),
-          onRequestFail(next, currentOffset, requestFailType, attempt)
+          onRequestSuccess(next, currentOffset, requestSuccessType, attempts),
+          onRequestFail(next, currentOffset, requestFailType, attempts)
         )
         // .then(setTotal(next))
         .then(onSearchProgress(
@@ -240,15 +248,15 @@ const searchProcessor = ({ dispatch, getState }) => {
 
         // const expired = requests.find(request => (
         //   request.isPending && Date.now() - request.startTime > waitTimeout
-        //   && expired.attempt < maxAttemptsPending
+        //   && expired.attempts < maxAttemptsPending
         // ));
         const expired = requests.find((req) => {
           const difference = Date.now() - req.startTime;
 
           if (req.isPending
             && difference > waitTimeout
-            && req.attempt < maxAttemptsPending) {
-            console.warn(`PENDING attempt ${req.attempt} REQ DIFFERENCE: ${difference}`);
+            && req.attempts < maxAttemptsPending) {
+            console.warn(`PENDING attempts ${req.attempts} REQ DIFFERENCE: ${difference}`);
             return true;
           }
           return false;
@@ -257,8 +265,8 @@ const searchProcessor = ({ dispatch, getState }) => {
 
         if (expired) {
           // cancel and repeat
-          console.log('WILL REPEAT with attempt: ', expired.attempt + 1);
-          makeCallToAPI(expired.offset, expired.attempt + 1);
+          console.log('WILL REPEAT with attempts: ', expired.attempts + 1);
+          makeCallToAPI(expired.offset, expired.attempts + 1);
           return;
         }
 
@@ -269,7 +277,7 @@ const searchProcessor = ({ dispatch, getState }) => {
         }
 
         const failedReq = requests.find(req => (
-          !req.isPending && !req.isDone && req.attempt < maxAttemptsFailed
+          !req.isPending && !req.isDone && req.attempts < maxAttemptsFailed
         ));
 
         // no pending requests OR "waitPending" is false and failed requests
@@ -277,7 +285,7 @@ const searchProcessor = ({ dispatch, getState }) => {
         if ((!pendingReq || !waitPending) && failedReq) {
           console.log('Not waiting for pending and call: ', failedReq.offset);
 
-          makeCallToAPI(failedReq.offset, failedReq.attempt + 1);
+          makeCallToAPI(failedReq.offset, failedReq.attempts + 1);
           return;
         }
 

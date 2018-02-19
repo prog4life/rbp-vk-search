@@ -1,28 +1,25 @@
-const changeExistingRequestState = (state, action, isPending, isDone) => (
+const changeExistingRequestState = (state, action, isPending) => (
   state.map((req) => {
     if (req.offset === action.offset) {
       return {
         ...req,
-        // alternatively (if not passed from action): req.attempt + 1
-        attempt: action.attempt,
-        isPending,
-        isDone
+        // alternatively (if not passed from action): req.attempts + 1
+        attempts: action.attempts,
+        isPending
       };
     }
     return req;
   })
 );
 
-// const addNewRequest = (state, action, isPending, isDone) => (
-const addNewRequest = (state, { type, ...rest }, isPending, isDone) => (
+// const addNewRequest = (state, action, isPending) => (
+const addNewRequest = (state, { type, ...rest }, isPending) => (
   [...state, {
     // offset: action.offset,
     // startTime: action.startTime,
-    // endTime: action.endTime,
-    // attempt: action.attempt, // alternatively (if not passing from action): attempt: 1,
+    // attempts: action.attempts, // alternatively (if not passing from action): attempts: 1,
     ...rest,
-    isPending,
-    isDone
+    isPending
   }]
 );
 
@@ -34,9 +31,8 @@ export default function requests(state = [], action) {
         .concat({
           offset: action.offset,
           startTime: action.startTime,
-          attempt: action.attempt,
-          isPending: true,
-          isDone: false
+          attempts: action.attempts,
+          isPending: true
         });
     case 'REQUEST_SUCCESS':
       return state.filter(req => !(req.offset === action.offset));
@@ -45,9 +41,8 @@ export default function requests(state = [], action) {
         .concat({
           offset: action.offset,
           endTime: Date.now(), // TODO: remove or change to action.endTime later?
-          attempt: action.attempt,
-          isPending: false,
-          isDone: false
+          attempts: action.attempts,
+          isPending: false
         });
     case 'WALL_POSTS_SEARCH_START':
     case 'SEARCH_TERMINATE':

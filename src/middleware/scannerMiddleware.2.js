@@ -14,7 +14,7 @@ const searchProcessor = ({ dispatch, getState }) => {
   //     offset: 400,
   //     isPending: true, // failed request will get "false" value here
   //     // how many times unresponded pending or failed request was sent again
-  //     attempt: 0
+  //     attempts: 0
   //     startTime: Number // Date.now() value
   //   }
   // ];
@@ -38,9 +38,9 @@ const searchProcessor = ({ dispatch, getState }) => {
   };
 
   // add failed request obj with isPending: false to "requests"
-  const onRequestFail = (currentOffset, actionCreator, attempt) => (e) => {
+  const onRequestFail = (currentOffset, actionCreator, attempts) => (e) => {
     if (!isSearchTerminated) {
-      dispatch(actionCreator(currentOffset, attempt));
+      dispatch(actionCreator(currentOffset, attempts));
       throw Error(`Request with ${currentOffset} offset FAILED, ${e.message}`);
     }
     throw Error('Unnecessary response, search is already terminated');
@@ -154,10 +154,10 @@ const searchProcessor = ({ dispatch, getState }) => {
     isSearchTerminated = false;
     // results.length = 0;
 
-    const makeCallToAPI = (currentOffset, attempt) => {
+    const makeCallToAPI = (currentOffset, attempts) => {
       // add request obj with isPending: true to in-store "requests"
       // onRequestStart(currentOffset);
-      dispatch(requestStart(currentOffset, attempt));
+      dispatch(requestStart(currentOffset, attempts));
 
       const currentAPIReqUrl = `${baseAPIReqUrl}` +
         `&access_token=${accessToken}` +
@@ -166,7 +166,7 @@ const searchProcessor = ({ dispatch, getState }) => {
       callAPI(currentAPIReqUrl)
         .then(
           onRequestSuccess(currentOffset, requestSuccess),
-          onRequestFail(currentOffset, requestFail, attempt)
+          onRequestFail(currentOffset, requestFail, attempts)
         )
         .then(setResponseCount)
         .then(handleResponse)
@@ -201,11 +201,11 @@ const searchProcessor = ({ dispatch, getState }) => {
           return false;
         });
         console.log('EXPIRED: ', JSON.stringify(expired, null, 2));
-        // TODO: add expired.attempt < maxAttemptsPending condition
+        // TODO: add expired.attempts < maxAttemptsPending condition
         if (expired) {
           // cancel and repeat
-          console.log('WILL REPEAT with attempt COUNT: ', expired.attempt + 1);
-          makeCallToAPI(expired.offset, expired.attempt + 1);
+          console.log('WILL REPEAT with attempts COUNT: ', expired.attempts + 1);
+          makeCallToAPI(expired.offset, expired.attempts + 1);
           return;
         }
 
@@ -223,7 +223,7 @@ const searchProcessor = ({ dispatch, getState }) => {
         if (!pendingReq || failedReq) {
           console.log('Not waiting for pending and call: ', failedReq.offset);
 
-          makeCallToAPI(failedReq.offset, failedReq.attempt + 1);
+          makeCallToAPI(failedReq.offset, failedReq.attempts + 1);
           return;
         }
 

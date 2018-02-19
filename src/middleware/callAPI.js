@@ -11,7 +11,7 @@ export const kindsOfRequest = {
 export default ({ getState, dispatch }) => next => (action) => {
   const middlewareKey = action[CALL_API];
   const { kindOfRequest } = action;
-  const { types, url, attempt, authorId, searchResultsLimit } = action;
+  const { types, url, attempts, authorId, searchResultsLimit } = action;
 
   if (middlewareKey !== 'Call API') {
     return next(action);
@@ -33,7 +33,7 @@ export default ({ getState, dispatch }) => next => (action) => {
 
   const [ requestType, successType, failureType ] = types;
 
-  next({ type: requestType, attempt });
+  next({ type: requestType, attempts });
 
   axiosJSONP(url)
     .then(

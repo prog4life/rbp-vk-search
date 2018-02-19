@@ -1,4 +1,5 @@
 import axiosJSONP from 'utils/axios-jsonp';
+// import fetchJSONP from 'utils/fetch';
 import prepareWallPosts from 'utils/response-handling';
 import {
   maxAttemptsPending as maxAttemptsPendingDefault,
@@ -13,6 +14,9 @@ export const kindsOfData = {
 };
 
 // const determineNextActionOnIntervalTick = () => {}; // TODO:
+
+// const checkAndRepeatBelated = () => {} // OR name it Overdue
+// const checkAndRepeatFailed = () => {}
 
 // TODO: rename to searchProcessor, extractor, e.t.c
 const searchProcessor = ({ dispatch, getState }) => {
@@ -31,62 +35,68 @@ const searchProcessor = ({ dispatch, getState }) => {
   //     id: 'offset_400'
   //     offset: 400,
   //     // how many times unresponded pending or failed request was sent again
-  //     attempt: 0
+  //     attempts: 0
   //     startTime: Number // Date.now() value
   //     isPending: true, // failed request will get "false" value here
-  //     isDone: false
+  //     isDone: false // was removed
   //   }
   // };
 
-  const onRequestStart = (offset, attempt) => {
+  const onRequestStart = (offset, attempts) => {
     const key = `offset_${offset}`;
 
     requests[key] = {
       id: key,
       offset,
       startTime: Date.now(),
-      attempt,
-      isPending: true,
-      isDone: false
+      attempts,
+      isPending: true
     };
   };
 
   // remove successful request obj from "requests"
   const onRequestSuccess = (getState, offset) => (response) => {
     const { search: searchState } = getState();
-    // const { search } = getState();
-    console.log('success searchState: ', searchState);
+
     if (searchState.isActive) {
       const key = `offset_${offset}`;
 
       delete requests[key];
-      // add searchState for chained further onSearchProgress handler
+      // add searchState for chained next onSearchProgress handler
       return { response, searchState };
     }
-    throw Error(`Unnecessary response ${offset}, search is terminated already`);
+    throw Error(`Needless response, offset: ${offset}, search is over already`);
   };
 
   // add failed request obj with isPending: false to "requests"
-  const onRequestFail = (getState, offset, attempt) => (e) => {
+  const onRequestFail = (getState, offset, attempts) => (e) => {
     const { isActive } = getState().search;
-    console.log('fail isActive: ', isActive);
-    if (isActive) {
-      const key = `offset_${offset}`;
-      // TODO: cannot read property startTime of undefined                       !!!
-      const { startTime } = requests[key]; // TODO: replace with object spread
+
+    if (!isActive) {
+      throw Error(`Needless failed request ${offset}, search is over already`);
+    }
+    const key = `offset_${offset}`;
+    // if other request with same offset was successful (and therefore deleted
+    // from "requests") - no need to add this one
+    if (!requests[key]) {
+      throw Error(`Request with ${offset} offset got response already, ` +
+        `attempt ${attempts} was unnecessary`);
+    }
+    // to check that it's fail of same request, not skipped earlier one
+    if (requests[key].attempts === attempts) {
+      const { startTime } = requests[key];
 
       requests[key] = {
         id: key,
         offset,
         startTime,
-        attempt,
-        isPending: false,
-        isDone: false
+        attempts,
+        isPending: false
       };
-
-      throw Error(`Request with ${offset} offset FAILED, ${e.message}`);
+      throw Error(`Request with ${offset} offset failed, ${e.message}`);
     }
-    throw Error(`Unnecessary response ${offset}, search is terminated already`);
+    throw Error(`Request with ${offset} offset was repeated ` +
+      `${requests[key].attempts} time, skip response for attempt ${attempts}`);
   };
 
   // const updateResponseCount = searchState => (response) => {
@@ -101,20 +111,20 @@ const searchProcessor = ({ dispatch, getState }) => {
       const { isActive, total, processed } = searchState;
 
       if (isActive) {
+        console.log('search progress state: ', searchState);
         // to get updated "total"
         const resCount = response && response.count ? response.count : total;
+        const itemsLength = response && response.items && response.items.length;
 
-        let updated = offsets.some(o => o === offset)
-          ? processed
-          : offsets.push(offset) * offsetModifier;
+        let updated = processed;
 
-        // to get correct value of processed items (not bigger than total)
-        // at the end of search
-        updated = updated > resCount
-          ? resCount
-          : updated;
+        if (offsets.indexOf(offset) === -1 && itemsLength) {
+          offsets.push(offset);
+          updated += itemsLength;
+        }
 
         if (resCount !== total || updated !== processed) {
+          console.info(`next processed ${updated} and total ${resCount}`);
           next({
             type,
             total: resCount,
@@ -208,9 +218,16 @@ const searchProcessor = ({ dispatch, getState }) => {
     processedOffsets.length = 0;
     // results.length = 0;
 
-    const makeCallToAPI = (offset = 0, attempt = 1) => {
+    let checkpoint = performance.now(); // TEMP:
+    let checkpoint2 = performance.now(); // TEMP:
+
+    const makeCallToAPI = (offset = 0, attempts = 1) => {
+      const tempCheckpoint2 = checkpoint2;
+      checkpoint2 = performance.now();
+      console.warn(`NEW REQUEST with ${offset} offset, attempt: ` +
+        `${attempts}, interval: ${checkpoint2 - tempCheckpoint2} and shift: ${performance.now() - checkpoint}`);
       // add request obj with isPending: true to "requests"
-      onRequestStart(offset, attempt);
+      onRequestStart(offset, attempts);
 
       const currentAPIReqUrl = `${baseAPIReqUrl}` +
         `&access_token=${accessToken}` +
@@ -220,10 +237,10 @@ const searchProcessor = ({ dispatch, getState }) => {
       // at interval tick moment, i.e. passed to "makeCallToAPI"
       axiosJSONP(currentAPIReqUrl)
         .then(
-          // TODO: maybe it will be rational to get attempt value from
+          // TODO: maybe it will be rational to get attempts value from
           //  existing request with same key
           onRequestSuccess(getState, offset),
-          onRequestFail(getState, offset, attempt)
+          onRequestFail(getState, offset, attempts)
         )
         // .then(updateResponseCount(search))
         .then(onSearchProgress(
@@ -239,41 +256,45 @@ const searchProcessor = ({ dispatch, getState }) => {
         .then(savePartOfResults(next, searchResultsLimit, addResultsType))
         .catch(e => console.error(e));
     };
-// TODO: remove failed and pending which attempt values have exceeded max limit
-// OR simply skip them on exit condition, clirify why 500 offset with 
-// attempt: 2 and both states as false was not removed                           !!!
+
     scannerIntervalId = setInterval(() => {
       const { offset } = search;
       let nextOffset;
+
+      const tempCheckpoint = checkpoint;
+      checkpoint = performance.now();
+      console.warn(`NEW REQUEST interval: ${checkpoint - tempCheckpoint}`);
+
+      const { results, search: { total } } = getState();
 
       // TODO: think over search.isActive check
 
       const reqs = Object.values(requests);
 
       if (reqs.length > 0) {
-        console.log('REQUESTS 4: ', JSON.stringify(reqs, null, 2));
+        console.log('REQUESTS LEFT: ', JSON.stringify(reqs, null, 2));
 
-        // const expired = reqs.find(request => (
+        // to send again pending request that have exceeded waitTimeout but
+        // have not exceeded maxAttemptsLimit yet
+        // const belated = reqs.find(request => (
         //   request.isPending && Date.now() - request.startTime > waitTimeout
-        //   && expired.attempt < maxAttemptsPending
+        //   && belated.attempts < maxAttemptsPending
         // ));
-        const expired = reqs.find((req) => {
+        const belated = reqs.find((req) => {
           const difference = Date.now() - req.startTime;
 
           if (req.isPending
             && difference > waitTimeout
-            && req.attempt < maxAttemptsPending) {
-            console.warn(`PENDING attempt ${req.attempt} REQ DIFFERENCE: ${difference}`);
+            && req.attempts < maxAttemptsPending) {
+            console.warn(`EXPIRED PENDING with offset: ${req.offset} and attempts ${req.attempts}, DIFFERENCE: ${difference}`);
             return true;
           }
           return false;
         });
-        console.warn('EXPIRED: ', JSON.stringify(expired, null, 2));
 
-        if (expired) {
-          // cancel and repeat
-          console.log('WILL REPEAT with attempt: ', expired.attempt + 1);
-          makeCallToAPI(expired.offset, expired.attempt + 1);
+        if (belated) {
+          console.log(`REPEAT EXPIRED PENDING with offset: ${belated.offset} and attempts: ${belated.attempts + 1}`);
+          makeCallToAPI(belated.offset, belated.attempts + 1);
           return;
         }
 
@@ -284,25 +305,37 @@ const searchProcessor = ({ dispatch, getState }) => {
         }
 
         const failedReq = reqs.find(req => (
-          !req.isPending && !req.isDone && req.attempt < maxAttemptsFailed
+          // !req.isPending && !req.isDone && req.attempts < maxAttemptsFailed
+          !req.isPending && req.attempts < maxAttemptsFailed
         ));
 
         // no pending requests OR "waitPending" is false and failed requests
         // present - in both cases repeat first failed request
-        if ((!pendingReq || !waitPending) && failedReq) {
-          console.log('Not waiting for pending and call: ', failedReq.offset);
+        if (failedReq) {
+          console.log(`Not waiting and call FAILED with ${failedReq.offset} ` +
+            `offset and ${failedReq.attempts + 1} attempt`);
 
-          makeCallToAPI(failedReq.offset, failedReq.attempt + 1);
+          makeCallToAPI(failedReq.offset, failedReq.attempts + 1);
           return;
         }
-        const { total: tempTotal } = getState().search;
+        // const { total: tempTotal } = getState().search;
 
         nextOffset = offset + offsetModifier;
         // no failed requests, "waitPending" is false,
         // all items requested but some pending requests that have not exceeded
-        // waitTimeout are still present
-        if (nextOffset > tempTotal) { // TODO: add !tempTotal ?
+        // waitTimeout may be still present
+        if (nextOffset > total) { // TODO: add !tempTotal ?
           nextOffset -= offsetModifier;
+
+          // NOTE: or just not add such requests to "requests" on start
+          // to remove requests that have exceeded their max attempts limit
+          const exceeded = reqs.filter(req => (
+            (req.isPending && req.attempts >= maxAttemptsPending) ||
+            (!req.isPending && req.attempts >= maxAttemptsFailed)
+          ));
+          console.warn('exceeded: ', exceeded);
+          exceeded.forEach(req => delete requests[req.id]);
+          console.info('requests after exceeded were removed: ', requests);
           return;
         }
       } else {
@@ -310,7 +343,7 @@ const searchProcessor = ({ dispatch, getState }) => {
       }
       search.offset = nextOffset;
 
-      const { results, search: { total } } = getState();
+      // const { results, search: { total } } = getState();
 
       if (!searchResultsLimit || results.length < searchResultsLimit) {
         // request next portion of items using increased offset OR end search
@@ -320,8 +353,7 @@ const searchProcessor = ({ dispatch, getState }) => {
         }
       }
 
-      if (reqs.length === 0) { // OR req.every(req => )
-        // search.isActive = false;
+      if (reqs.length === 0) {
         clearInterval(scannerIntervalId);
         next({ type: searchEndType });
       }

@@ -14,15 +14,15 @@ const state = 55555; // optional
 // vk API request frequency limit is 3 requests per second
 const requestInterval = 350;
 // better to leave default
-const jsonpTimeout = 1000; // default for fetch-jsonp: 5000
+const jsonpTimeout = 5000; // default for fetch-jsonp: 5000
 // make or not request with next offset if current one get no response yet
 const waitPending = false;
-const waitTimeout = 500;
+const waitTimeout = 700;
 // with maxAttemptsPending > 1, request that exceeded "waitTimeout" will be
 // repeated but not canceled - if it get response, duplicate results can be
 // obtained. These extra results are currently filtered by results reducer
 const maxAttemptsPending = 2; // min: 1 - no retry attempts
-const maxAttemptsFailed = 2; // min: 1 - no retry attempts
+const maxAttemptsFailed = 5; // min: 1 - no retry attempts
 
 const resultsSortOrder = 'asc'; // OR 'desc'
 
