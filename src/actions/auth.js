@@ -37,7 +37,7 @@ export const getUserName = (id) => {
     const [{ first_name: firstName, last_name: lastName }] = response;
 
     return `${firstName} ${lastName}`;
-  });
+  }).catch(e => console.warn(e));
 };
 
 export const parseAccessTokenHash = hash => (dispatch) => {
@@ -86,9 +86,7 @@ export const parseAccessTokenHash = hash => (dispatch) => {
 
     if (userId) {
       dispatch(setUserId(userId));
-      getUserName(userId)
-        .then(userName => dispatch(setUserName(userName)))
-        .catch(e => console.warn(e));
+      getUserName(userId).then(userName => dispatch(setUserName(userName)));
     }
     return result;
   }

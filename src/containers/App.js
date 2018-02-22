@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import WallPostsSearch from 'containers/WallPostsSearch';
 import NotFoundPage from 'components/NotFoundPage';
 import configureStore from 'store/configureStore';
+import { loadState, saveState } from 'utils/localStorage';
 
 const results = [
   {
@@ -25,11 +26,25 @@ const results = [
   }
 ];
 
+const persistedState = loadState('vk-search-state') || {};
+
+// TODO: replace store creation to index.js and pass it as prop into here
+// and make this component presentational, not container
 const store = configureStore({
+  ...persistedState,
   results
 });
 
 // store.subscribe(() => console.log('Updated state ', store.getState()));
+store.subscribe(() => {
+  const { userId, accessToken, tokenExpiresAt } = store.getState();
+  const stateSliceToStore = {
+    userId,
+    accessToken,
+    tokenExpiresAt
+  };
+  saveState(stateSliceToStore, 'vk-search-state');
+});
 
 const App = () => (
   <Provider store={store}>
