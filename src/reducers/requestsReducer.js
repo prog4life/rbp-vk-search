@@ -23,31 +23,83 @@ const addNewRequest = (state, { type, ...rest }, isPending) => (
   }]
 );
 
-// failed or pending requests, not all requests
-export default function requests(state = [], action) {
+export default function requests(state = {}, action) {
   switch (action.type) {
     case 'REQUEST_START':
-      return state.filter(req => req.offset !== action.offset)
-        .concat({
-          offset: action.offset,
-          startTime: action.startTime,
+      return {
+        ...state,
+        [action.id]: {
+          id: action.id,
           attempts: action.attempts,
-          isPending: true
-        });
-    case 'REQUEST_SUCCESS':
-      return state.filter(req => !(req.offset === action.offset));
+          isPending: true,
+          // isDone: false,
+          offset: action.offset,
+          startTime: action.startTime
+        }
+      };
+    case 'REQUEST_SUCCESS': {
+      // return {
+      //   ...state,
+      //   [action.id]: {
+      //     id: action.id,
+      //     // attempts: action.attempts,
+      //     isPending: false,
+      //     isDone: true,
+      //     offset: action.offset,
+      //     startTime: action.startTime,
+      //     endTime: action.endTime
+      //   }
+      // };
+      const { [action.id]: successful, ...rest } = state;
+      return { ...rest };
+    }
     case 'REQUEST_FAIL':
-      return state.filter(req => req.offset !== action.offset)
-        .concat({
-          offset: action.offset,
-          endTime: Date.now(), // TODO: remove or change to action.endTime later?
+      return {
+        ...state,
+        [action.id]: {
+          id: action.id,
           attempts: action.attempts,
-          isPending: false
-        });
+          isPending: false,
+          // isDone: false,
+          offset: action.offset,
+          startTime: state[action.id].startTime
+        }
+      };
     case 'WALL_POSTS_SEARCH_START':
     case 'SEARCH_TERMINATE':
-      return [];
+      return {};
     default:
       return state;
   }
 }
+
+// failed or pending requests, not all requests
+// export default function requests(state = [], action) {
+//   switch (action.type) {
+//     case 'REQUEST_START':
+//       return state.filter(req => req.offset !== action.offset)
+//         .concat({
+//           offset: action.offset,
+//           startTime: action.startTime,
+//           attempts: action.attempts,
+//           isPending: true,
+//           isDone: false
+//         });
+//     case 'REQUEST_SUCCESS':
+//       return state.filter(req => !(req.offset === action.offset));
+//     case 'REQUEST_FAIL':
+//       return state.filter(req => req.offset !== action.offset)
+//         .concat({
+//           offset: action.offset,
+//           endTime: Date.now(), // TODO: remove or change to action.endTime later?
+//           attempts: action.attempts,
+//           isPending: false,
+//           isDone: false
+//         });
+//     case 'WALL_POSTS_SEARCH_START':
+//     case 'SEARCH_TERMINATE':
+//       return [];
+//     default:
+//       return state;
+//   }
+// }

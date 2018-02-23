@@ -1,4 +1,5 @@
 import axiosJSONP from 'utils/axios-jsonp';
+// import fetchJSONP from 'utils/fetch';
 import prepareWallPosts from 'utils/response-handling';
 import {
   maxAttemptsPending as maxAttemptsPendingDefault,
@@ -7,37 +8,38 @@ import {
 
 export const SEARCH_CONFIG = 'Search Config';
 
+export const kindsOfData = {
+  wallPosts: 'WALL_POSTS'
+  // wallComments: 'WALL_COMMENTS'
+};
+
 // const determineNextActionOnIntervalTick = () => {}; // TODO:
+
+// const checkAndRepeatBelated = () => {} // OR name it Overdue
+// const checkAndRepeatFailed = () => {}
 
 // TODO: rename to searchProcessor, extractor, e.t.c
 const searchProcessor = ({ dispatch, getState }) => {
-  // let emptyResponsesCount = 0; // idea
-  // let results = [];
-  let scannerIntervalId;
-  let offset = 0;
-  // let responseCount; // total amount of items to search among
-  // let processed = 0;
-  // let isSearchTerminated = false;
+  const search = {
+    // isActive: false,
+    offset: 0 // TODO: rename to currentOffset
+    // total: undefined, // total amount of items to search among
+    // processed: 0,
+  };
   const processedOffsets = []; // offsets of successful requests
+  let scannerIntervalId;
+  let requests = {};
 
-  // IDEA
-  // const search = {
-  //   isActive: true,
-  //   processed: 0,
-  //   total: 0,
-  //   currentOffset: 100,
-  //   requests: []
-  // };
-
-  // const requests = [
-  //   {
-  //     offset: 400,
-  //     isPending: true, // failed request will get "false" value here
+  // const requests = {
+  //   'offset_400': {
+  //     id: 'offset_400'
   //     // how many times unresponded pending or failed request was sent again
   //     attempts: 0
   //     startTime: Number // Date.now() value
+  //     isPending: true, // failed request will get "false" value here
+  //     isDone: false // was removed
   //   }
-  // ];
+  // };
 
   // const onRequestStart = (currentOffset) => {
   //   dispatch({

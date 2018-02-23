@@ -14,9 +14,11 @@ const logger = createLogger({
   // predicate: (getState, action) => action.type !== 'SEARCH_UPDATE'
   predicate: (getState, action) => {
     const hiddenTypes = [
-      'SEARCH_UPDATE'
-      // 'REQUEST_START',
-      // 'REQUEST_SUCCESS'
+      'SET_OFFSET',
+      'SEARCH_UPDATE',
+      'REQUEST_START',
+      'REQUEST_SUCCESS',
+      'REQUEST_FAIL'
     ];
     return !hiddenTypes.some(type => type === action.type);
   }

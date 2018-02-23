@@ -27,6 +27,7 @@ const propTypes = {
     processed: PropTypes.number,
     progress: PropTypes.number
   }).isRequired,
+  signOut: PropTypes.func.isRequired,
   startWallPostsSearch: PropTypes.func.isRequired,
   terminateSearch: PropTypes.func.isRequired,
   // tokenExpiresAt: PropTypes.number.isRequired
@@ -38,7 +39,7 @@ class WallPostsSearch extends React.Component {
   constructor(props) {
     super(props);
 
-    this.handleSearchForWallPosts = this.handleSearchForWallPosts.bind(this);
+    this.handleSearchStart = this.handleSearchStart.bind(this);
     this.handleSearchStop = this.handleSearchStop.bind(this);
     this.handleNavSelect = this.handleNavSelect.bind(this);
   }
@@ -82,7 +83,10 @@ class WallPostsSearch extends React.Component {
     //   }, 3000);
     // }
   }
-  handleSearchForWallPosts(inputData) {
+  componentWillUnmount() {
+    this.handleSearchStop();
+  }
+  handleSearchStart = (inputData) => {
     const { startWallPostsSearch } = this.props;
     startWallPostsSearch(inputData);
     // TEMP:
@@ -97,6 +101,7 @@ class WallPostsSearch extends React.Component {
     const { signOut } = this.props;
     if (eventKey === 1.2) {
       signOut();
+      this.handleSearchStop();
     }
     console.log('Select: ', eventKey);
   }
@@ -114,7 +119,7 @@ class WallPostsSearch extends React.Component {
           userName={userName}
         />
         <SearchForm
-          onStartSearch={this.handleSearchForWallPosts}
+          onStartSearch={this.handleSearchStart}
           onStopSearch={this.handleSearchStop}
           // search={search}
         />

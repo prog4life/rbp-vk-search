@@ -17,7 +17,7 @@ const requestInterval = 350;
 const jsonpTimeout = 5000; // default for fetch-jsonp: 5000
 // make or not request with next offset if current one get no response yet
 const waitPending = false;
-const waitTimeout = 700;
+const waitTimeout = 500;
 // with maxAttemptsPending > 1, request that exceeded "waitTimeout" will be
 // repeated but not canceled - if it get response, duplicate results can be
 // obtained. These extra results are currently filtered by results reducer
