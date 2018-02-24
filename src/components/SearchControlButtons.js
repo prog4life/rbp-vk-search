@@ -1,24 +1,24 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { ButtonToolbar, Button } from 'react-bootstrap';
 
-const SearchControlButtons = ({ isSearching, onStopClick }) => (
-  // <ButtonToolbar className="search-control-buttons">
+const SearchControlButtons = ({ isSearchActive, onStopClick }) => (
+  // <ButtonToolbar className="search-buttons">
   //   <Button
   //     bsStyle="info"
-  //     disabled={isSearching}
+  //     disabled={isSearchActive}
   //     type="submit"
   //   >
-  //     {isSearching ? 'Searching...' : 'Start Search'}
+  //     {isSearchActive ? 'Searching...' : 'Start Search'}
   //   </Button>
-  //   {isSearching &&
+  //   {isSearchActive &&
   //     <Button onClick={onStopClick} type="button">
   //       {'Stop Search'}
   //     </Button>
   //   }
   // </ButtonToolbar>
-  <ButtonToolbar className="search-control-buttons">
-    {isSearching
+  <ButtonToolbar className="search-buttons">
+    {isSearchActive
       ?
         <Button onClick={onStopClick} type="button">
           {'Stop Search'}
@@ -35,7 +35,7 @@ const SearchControlButtons = ({ isSearching, onStopClick }) => (
 );
 
 SearchControlButtons.propTypes = {
-  isSearching: PropTypes.bool.isRequired,
+  isSearchActive: PropTypes.bool.isRequired,
   onStopClick: PropTypes.func.isRequired
 };
 

@@ -29,7 +29,7 @@
 
 .search-form {
   /* margin: 0 auto; */
-  margin-bottom: 1.5rem;
+  margin-bottom: 1em;
 
   /* width: 70%; */
 }
@@ -38,17 +38,21 @@
   outline: none;
 }
 
-.search-control-buttons {
-  display: inline-block;
+.search-controls {
   margin-top: 0.25em;
+  margin-bottom: 10px;
 }
 
-.progress-viewer {
+.search-controls__search-buttons {
+  display: inline-block;
+}
+
+.search-controls__progress-viewer {
   float: right;
-  margin-top: 0.25em;
   min-width: 63%;
 }
 
+/* TODO: cut overflowing text if it is too long */
 .progress-viewer__processed-info {
   margin-bottom: 0;
   line-height: 1;
@@ -56,7 +60,6 @@
   text-align: center;
 }
 
-/* TODO: cut it if too long */
 .progress-viewer__progress-bar {
   margin-bottom: 0;
 }
@@ -69,11 +72,7 @@
 }
 
 @media (min-width: 768px) {
-  .search-control-buttons {
-    margin-top: 1.75em;
-  }
-
-  .progress-viewer {
+  .search-controls {
     margin-top: 1.75em;
   }
 }

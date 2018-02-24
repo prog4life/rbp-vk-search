@@ -24,7 +24,7 @@ const searchProcessor = ({ dispatch, getState }) => {
   //   total: undefined, // total amount of items to search among
   //   processed: 0,
   // };
-  const processedOffsets = []; // offsets of successful requests
+  // const processedOffsets = []; // offsets of successful requests
   let scannerIntervalId;
   // let requests = {};
 
@@ -70,7 +70,7 @@ const searchProcessor = ({ dispatch, getState }) => {
       id: key
     });
     // add searchState for chained further onSearchProgress handler
-    return { response, searchState };
+    return { response, searchState, requests };
   };
 
   // add failed request obj with isPending: false to "requests"
@@ -109,29 +109,42 @@ const searchProcessor = ({ dispatch, getState }) => {
   //   return response;
   // };
 
-  const onSearchProgress = (next, offsets, offset, offsetModifier, type) => (
-    ({ response, searchState }) => {
-      const { isActive, total, processed } = searchState;
+  const onSearchProgress = (next, offset, offsetModifier, type) => (
+    ({ response, searchState, requests }) => {
+      const { isActive, total, processed, progress } = searchState;
 
       if (isActive) {
         console.log('search progress state: ', searchState);
         // to get updated "total"
-        const resCount = response && response.count ? response.count : total;
+        const nextTotal = response && response.count ? response.count : total;
         const itemsLength = response && response.items && response.items.length;
 
-        let updated = processed;
+        // let updated = processed;
+        //
+        // if (offsets.indexOf(offset) === -1 && itemsLength) {
+        //   offsets.push(offset);
+        //   updated += itemsLength;
+        // }
+        let nextProcessed = processed;
 
-        if (offsets.indexOf(offset) === -1 && itemsLength) {
-          offsets.push(offset);
-          updated += itemsLength;
+        if (itemsLength) {
+          nextProcessed += itemsLength;
         }
 
-        if (resCount !== total || updated !== processed) {
-          console.info(`next processed ${updated} and total ${resCount}`);
+        if (nextTotal !== total || nextProcessed !== processed) {
+          let nextProgress = progress;
+
+          if (Number.isInteger(nextTotal) && Number.isInteger(nextProcessed)) {
+            // return Number(((nextProcessed / nextTotal) * 100).toFixed());
+            nextProgress = Math.round(((nextProcessed / nextTotal) * 100));
+          }
+          console.info(`next processed ${nextProcessed}, total ${nextTotal} ` +
+            ` and progress ${nextProgress}`);
           next({
             type,
-            total: resCount,
-            processed: updated
+            total: nextTotal,
+            processed: nextProcessed,
+            progress: nextProgress
           });
         }
       }
@@ -217,7 +230,7 @@ const searchProcessor = ({ dispatch, getState }) => {
     // search.processed = 0;
     // search.isActive = true;
     // search.processedOffsets.length = 0;
-    processedOffsets.length = 0;
+    // processedOffsets.length = 0;
     // results.length = 0;
 
     let checkpoint = performance.now(); // TEMP:
@@ -247,7 +260,6 @@ const searchProcessor = ({ dispatch, getState }) => {
         // .then(updateResponseCount(search))
         .then(onSearchProgress(
           next,
-          processedOffsets,
           offset,
           offsetModifier,
           updateSearchType
@@ -307,7 +319,7 @@ const searchProcessor = ({ dispatch, getState }) => {
         // present - in both cases repeat first failed request
         if (failedReq) {
           console.log(`Not waiting and call FAILED with ${failedReq.offset} ` +
-            `offset and ${failedReq.attempts + 1} attempt`);
+            `offset and attempt ${failedReq.attempts + 1} `);
 
           makeCallToAPI(failedReq.offset, failedReq.attempts + 1);
           return;
@@ -318,14 +330,15 @@ const searchProcessor = ({ dispatch, getState }) => {
         if (nextOffset > total) { // TODO: add !total ?
           nextOffset -= offsetModifier;
           // NOTE: or just not add such requests to "requests" on start
+          // OR just count them and do: reqs.length - completelyFailed.length === 0
           // to remove requests that have exceeded their max attempts limit
-          const exceeded = reqs.filter(req => (
+          const completelyFailed = reqs.filter(req => (
             // (req.isPending && req.attempts >= maxAttemptsPending) ||
             !req.isPending && req.attempts >= maxAttemptsFailed
           ));
-          console.warn('exceeded: ', exceeded);
-          // exceeded.forEach(req => delete requests[req.id]);
-          // console.info('requests after exceeded were removed: ', requests);
+          console.warn('completelyFailed: ', completelyFailed);
+          // completelyFailed.forEach(req => delete requests[req.id]);
+          // console.info('requests after completelyFailed were removed: ', requests);
           return;
         }
       } else {
@@ -342,7 +355,7 @@ const searchProcessor = ({ dispatch, getState }) => {
         }
       }
 
-      // TODO: replace by if (reqs.length - exceeded.length === 0)
+      // TODO: replace by if (reqs.length - completelyFailed.length === 0)
       if (reqs.length === 0) {
         clearInterval(scannerIntervalId);
         next({ type: searchEndType });

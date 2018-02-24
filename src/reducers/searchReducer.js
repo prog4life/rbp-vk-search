@@ -2,8 +2,8 @@ const defaultSearchState = {
   isActive: false,
   offset: 0,
   processed: 0,
-  progress: 0
-  // total: undefined
+  progress: 0,
+  total: undefined
 };
 
 const search = (state = defaultSearchState, action) => {
@@ -34,15 +34,15 @@ const search = (state = defaultSearchState, action) => {
       return {
         ...state,
         total: action.total || state.total, // equal to response.count
-        processed: action.processed || state.processed
-        // progress: 0
+        processed: action.processed || state.processed,
+        progress: action.progress
       };
     case 'SEARCH_TERMINATE':
       return {
         isActive: false,
         offset: 0,
-        processed: 0
-        // progress: 0
+        processed: 0,
+        progress: 0
       };
     default:
       return state;

@@ -18,10 +18,10 @@ const jsonpTimeout = 5000; // default for fetch-jsonp: 5000
 // make or not request with next offset if current one get no response yet
 const waitPending = false;
 const waitTimeout = 500;
-// with maxAttemptsPending > 1, request that exceeded "waitTimeout" will be
-// repeated but not canceled - if it get response, duplicate results can be
-// obtained. These extra results are currently filtered by results reducer
-const maxAttemptsPending = 2; // min: 1 - no retry attempts
+// pending request that exceeded "waitTimeout" will be considered as failed
+// (get isPending: false) and it will be repeated but not canceled - if it then
+// receives a response, duplicate results can be obtained. These extra results
+// must be filtered by reducer OR response handler
 const maxAttemptsFailed = 5; // min: 1 - no retry attempts
 
 const resultsSortOrder = 'asc'; // OR 'desc'
@@ -55,7 +55,6 @@ export {
   jsonpTimeout,
   waitPending,
   waitTimeout,
-  maxAttemptsPending,
   maxAttemptsFailed,
   resultsSortOrder,
   inputDefaults,

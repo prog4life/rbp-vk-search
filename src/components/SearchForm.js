@@ -137,7 +137,10 @@ class SearchForm extends React.PureComponent {
                   total={search.total}
                 />
               } */}
-              <ControlsContainer onStopBtnClick={this.handleStopBtnClick} />
+              <ControlsContainer
+                itemsName="posts"
+                onStopBtnClick={this.handleStopBtnClick}
+              />
             </Col>
           </Row>
           {/* <Row>
@@ -157,4 +160,3 @@ class SearchForm extends React.PureComponent {
 SearchForm.propTypes = propTypes;
 
 export default SearchForm;
-
