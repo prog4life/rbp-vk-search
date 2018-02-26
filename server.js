@@ -46,5 +46,5 @@ app.get('*', (req, res, next) => {
 app.set('port', port);
 
 app.listen(port, () => {
-  console.log(`Server is up at http://localhost:${port}`);
+  console.log(`Server is listening at http://localhost:${port}`);
 });

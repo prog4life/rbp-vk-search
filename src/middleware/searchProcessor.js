@@ -1,10 +1,11 @@
 import axiosJSONP from 'utils/axios-jsonp';
 // import fetchJSONP from 'utils/fetch';
 import prepareWallPosts from 'utils/response-handling';
-import { maxAttemptsFailed as maxAttemptsFailedDefault } from 'config/common';
+import { maxAttempts as maxAttemptsDefault } from 'config/common';
 
 export const SEARCH_CONFIG = 'Search Config';
 
+// IDEA
 export const kindsOfData = {
   wallPosts: 'WALL_POSTS'
   // wallComments: 'WALL_COMMENTS'
@@ -12,31 +13,25 @@ export const kindsOfData = {
 
 // const determineNextActionOnIntervalTick = () => {}; // TODO:
 
-// TODO: not repeat pending, just make them failed instead
-// const checkAndRepeatBelated = () => {} // OR name it Overdue
+// TODO: not repeat pending, just make them failed instead; Belated Overdue
 // const checkAndRepeatFailed = () => {}
 
-// TODO: rename to searchProcessor, extractor, e.t.c
 const searchProcessor = ({ dispatch, getState }) => {
+  let scannerIntervalId;
   // const search = {
   //   isActive: false,
-  //   offset: 0 // TODO: rename to prevOffset
+  //   offset: 0
   //   total: undefined, // total amount of items to search among
   //   processed: 0,
   // };
-  // const processedOffsets = []; // offsets of successful requests
-  let scannerIntervalId;
-  // let requests = {};
 
   // const requests = {
   //   'offset_400': {
   //     id: 'offset_400'
   //     offset: 400,
-  //     // how many times unresponded pending or failed request was sent again
-  //     attempts: 0
-  //     startTime: Number // Date.now() value
+  //     attempts: 1, // how many times request was sent/sent again
+  //     startTime: integer // Date.now() value
   //     isPending: true, // failed request will get "false" value here
-  //     isDone: false // was removed
   //   }
   // };
 
@@ -61,16 +56,16 @@ const searchProcessor = ({ dispatch, getState }) => {
     }
     const key = `offset_${offset}`;
 
-    // if request with such offset have been removed(succeeded) already
+    // if other request with such offset has been succeeded(removed) already
     if (!requests[key]) {
-      throw Error(`Other request with ${offset} offset have succeeded earlier`);
+      throw Error(`Other request with ${offset} offset has succeeded earlier`);
     }
     next({
       type: 'REQUEST_SUCCESS',
       id: key
     });
     // add searchState for chained further onSearchProgress handler
-    return { response, searchState, requests };
+    return { response, searchState };
   };
 
   // add failed request obj with isPending: false to "requests"
@@ -87,7 +82,8 @@ const searchProcessor = ({ dispatch, getState }) => {
       throw Error(`Other request with ${offset} offset have succeeded ` +
         `earlier, attempt ${attempts} became unnecessary`);
     }
-    // to check that it's fail of same attempt, not one that was considered failed
+    // to check that it's fail of latest attempt, not one that was considered
+    // as failed earlier (due to exceeding of waitTimeout)
     if (requests[key].attempts === attempts) {
       next({
         type: 'REQUEST_FAIL',
@@ -99,54 +95,39 @@ const searchProcessor = ({ dispatch, getState }) => {
       throw Error(`Request with ${offset} offset failed, ${e.message}`);
     }
     throw Error(`Request with ${offset} offset was resended ` +
-      `${requests[key].attempts} time, skip response for attempt ${attempts}`);
+      `${requests[key].attempts} time, ignoring result of ${attempts} attempt`);
   };
 
-  // const updateResponseCount = searchState => (response) => {
-  //   searchState.total = response && response.count
-  //     ? response.count
-  //     : searchState.total;
-  //   return response;
-  // };
-
   const onSearchProgress = (next, offset, offsetModifier, type) => (
-    ({ response, searchState, requests }) => {
-      const { isActive, total, processed, progress } = searchState;
+    ({ response, searchState }) => {
+      const { total, processed, progress } = searchState;
 
-      if (isActive) {
-        console.log('search progress state: ', searchState);
-        // to get updated "total"
-        const nextTotal = response && response.count ? response.count : total;
-        const itemsLength = response && response.items && response.items.length;
+      console.log('search progress state: ', searchState);
+      // to get updated "total"
+      const nextTotal = response && response.count ? response.count : total;
+      const itemsLength = response && response.items && response.items.length;
 
-        // let updated = processed;
-        //
-        // if (offsets.indexOf(offset) === -1 && itemsLength) {
-        //   offsets.push(offset);
-        //   updated += itemsLength;
-        // }
-        let nextProcessed = processed;
+      let nextProcessed = processed;
 
-        if (itemsLength) {
-          nextProcessed += itemsLength;
+      if (itemsLength) {
+        nextProcessed += itemsLength;
+      }
+
+      if (nextTotal !== total || nextProcessed !== processed) {
+        let nextProgress = progress;
+        // count progress in percents
+        if (Number.isInteger(nextTotal) && Number.isInteger(nextProcessed)) {
+          // return Number(((nextProcessed / nextTotal) * 100).toFixed());
+          nextProgress = Math.round(((nextProcessed / nextTotal) * 100));
         }
-
-        if (nextTotal !== total || nextProcessed !== processed) {
-          let nextProgress = progress;
-
-          if (Number.isInteger(nextTotal) && Number.isInteger(nextProcessed)) {
-            // return Number(((nextProcessed / nextTotal) * 100).toFixed());
-            nextProgress = Math.round(((nextProcessed / nextTotal) * 100));
-          }
-          console.info(`next processed ${nextProcessed}, total ${nextTotal} ` +
-            ` and progress ${nextProgress}`);
-          next({
-            type,
-            total: nextTotal,
-            processed: nextProcessed,
-            progress: nextProgress
-          });
-        }
+        console.info(`next processed ${nextProcessed}, total ${nextTotal} ` +
+          ` and progress ${nextProgress}`);
+        next({
+          type,
+          total: nextTotal,
+          processed: nextProcessed,
+          progress: nextProgress
+        });
       }
       return response;
     }
@@ -154,11 +135,9 @@ const searchProcessor = ({ dispatch, getState }) => {
 
   const savePartOfResults = (next, limit, addResultsType) => (chunk) => {
     if (chunk && chunk.length > 0) {
-      // NOTE: more suitable to use "next" instead of dispatch
       next({
         type: addResultsType,
         results: chunk,
-        // oredr: 'desc',
         limit
       });
     }
@@ -181,7 +160,6 @@ const searchProcessor = ({ dispatch, getState }) => {
     }
 
     if (type === 'SEARCH_TERMINATE') {
-      // search.isActive = false;
       clearInterval(scannerIntervalId);
       return next(action);
     }
@@ -207,7 +185,7 @@ const searchProcessor = ({ dispatch, getState }) => {
     // from common config and set as defaults here
     const {
       // TODO: not destructure authorId here and pass whole searchConfig obj to
-      // handleResponse (prepareWallPosts)
+      // handleResponse(prepareWallPosts)
       authorId,
       baseAPIReqUrl,
       searchResultsLimit,
@@ -215,7 +193,7 @@ const searchProcessor = ({ dispatch, getState }) => {
       requestInterval,
       waitPending,
       waitTimeout,
-      maxAttemptsFailed = maxAttemptsFailedDefault
+      maxAttempts = maxAttemptsDefault
     } = searchConfig;
 
     // TODO: validate authorId, baseAPIReqUrl
@@ -225,13 +203,6 @@ const searchProcessor = ({ dispatch, getState }) => {
     // to notify reducers about search start
     // will also clear "requests" in store
     next({ type: searchStartType });
-    // requests = {};
-    // search.offset = 0;
-    // search.processed = 0;
-    // search.isActive = true;
-    // search.processedOffsets.length = 0;
-    // processedOffsets.length = 0;
-    // results.length = 0;
 
     let checkpoint = performance.now(); // TEMP:
     let checkpoint2 = performance.now(); // TEMP:
@@ -257,7 +228,6 @@ const searchProcessor = ({ dispatch, getState }) => {
           onRequestSuccess(next, getState, offset),
           onRequestFail(next, getState, offset, attempts)
         )
-        // .then(updateResponseCount(search))
         .then(onSearchProgress(
           next,
           offset,
@@ -266,7 +236,6 @@ const searchProcessor = ({ dispatch, getState }) => {
         ))
         // TODO: change to more generic then(handleResponse(searchConfig))
         .then(prepareWallPosts(authorId))
-        // .then(collectResults)
         .then(savePartOfResults(next, searchResultsLimit, addResultsType))
         .catch(e => console.error(e));
     };
@@ -276,7 +245,6 @@ const searchProcessor = ({ dispatch, getState }) => {
       checkpoint = performance.now();
       console.warn(`NEW interval TICK: ${checkpoint - tempCheckpoint}`);
 
-      // const { offset } = search;
       const { results, requests, search: { offset, total } } = getState();
       const reqs = Object.values(requests);
       let nextOffset;
@@ -285,7 +253,7 @@ const searchProcessor = ({ dispatch, getState }) => {
       if (reqs.length > 0) {
         // console.log('REQUESTS LEFT: ', JSON.stringify(reqs, null, 2));
         let nonOverduePending;
-
+        // check for overdue pending requests
         reqs.forEach((req) => {
           if (!req.isPending) {
             return;
@@ -307,13 +275,11 @@ const searchProcessor = ({ dispatch, getState }) => {
           }
         });
         // const pendingReq = reqs.some(request => request.isPending);
-
         if (nonOverduePending && waitPending) {
           return;
         }
         const failedReq = reqs.find(req => (
-          // !req.isPending && !req.isDone && req.attempts < maxAttemptsFailed
-          !req.isPending && req.attempts < maxAttemptsFailed
+          !req.isPending && req.attempts < maxAttempts
         ));
         // no pending requests OR "waitPending" is false and failed requests
         // present - in both cases repeat first failed request
@@ -333,18 +299,15 @@ const searchProcessor = ({ dispatch, getState }) => {
           // OR just count them and do: reqs.length - completelyFailed.length === 0
           // to remove requests that have exceeded their max attempts limit
           const completelyFailed = reqs.filter(req => (
-            // (req.isPending && req.attempts >= maxAttemptsPending) ||
-            !req.isPending && req.attempts >= maxAttemptsFailed
+            !req.isPending && req.attempts >= maxAttempts
           ));
           console.warn('completelyFailed: ', completelyFailed);
-          // completelyFailed.forEach(req => delete requests[req.id]);
           // console.info('requests after completelyFailed were removed: ', requests);
           return;
         }
       } else {
         nextOffset = offset + offsetModifier;
       }
-      // search.offset = nextOffset;
       next({ type: 'SET_OFFSET', offset: nextOffset });
 
       if (!searchResultsLimit || results.length < searchResultsLimit) {
@@ -362,7 +325,6 @@ const searchProcessor = ({ dispatch, getState }) => {
       }
     }, requestInterval);
     // to make first request before timer tick, return was added for eslint
-    // return makeCallToAPI(search.offset);
     return makeCallToAPI(getState().search.offset);
   };
 };

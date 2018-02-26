@@ -3,7 +3,7 @@ import axiosJSONP from 'utils/axios-jsonp';
 import prepareWallPosts from 'utils/response-handling';
 import {
   maxAttemptsPending as maxAttemptsPendingDefault,
-  maxAttemptsFailed as maxAttemptsFailedDefault
+  maxAttempts as maxAttemptsDefault
 } from 'config/common';
 
 export const SEARCH_CONFIG = 'Search Config';
@@ -190,7 +190,7 @@ const searchProcessor = ({ dispatch, getState }) => {
       waitPending,
       waitTimeout,
       maxAttemptsPending = maxAttemptsPendingDefault,
-      maxAttemptsFailed = maxAttemptsFailedDefault
+      maxAttempts = maxAttemptsDefault
     } = searchConfig;
 
     // TODO: validate authorId, baseAPIReqUrl
@@ -279,7 +279,7 @@ const searchProcessor = ({ dispatch, getState }) => {
         }
 
         const failedReq = requests.find(req => (
-          !req.isPending && !req.isDone && req.attempts < maxAttemptsFailed
+          !req.isPending && !req.isDone && req.attempts < maxAttempts
         ));
 
         // no pending requests OR "waitPending" is false and failed requests

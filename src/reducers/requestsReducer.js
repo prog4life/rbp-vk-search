@@ -38,18 +38,6 @@ export default function requests(state = {}, action) {
         }
       };
     case 'REQUEST_SUCCESS': {
-      // return {
-      //   ...state,
-      //   [action.id]: {
-      //     id: action.id,
-      //     // attempts: action.attempts,
-      //     isPending: false,
-      //     isDone: true,
-      //     offset: action.offset,
-      //     startTime: action.startTime,
-      //     endTime: action.endTime
-      //   }
-      // };
       const { [action.id]: successful, ...rest } = state;
       return { ...rest };
     }
@@ -62,7 +50,7 @@ export default function requests(state = {}, action) {
           isPending: false,
           // isDone: false,
           offset: action.offset,
-          startTime: state[action.id].startTime
+          startTime: action.startTime
         }
       };
     case 'WALL_POSTS_SEARCH_START':

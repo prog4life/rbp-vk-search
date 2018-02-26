@@ -4,7 +4,6 @@ import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 
 import * as actionCreators from 'actions';
-import countSearchProgressInPercents from 'selectors/selectors';
 import { tokenRequestURL } from 'config/common';
 import TopBar from 'components/TopBar';
 import SearchForm from 'components/SearchForm';
@@ -70,7 +69,7 @@ class WallPostsSearch extends React.Component {
     // TODO: remove this temp redirect later and sign in at search start
     setTimeout(() => {
       // localStorage.setItem('url', tokenRequestURL);
-      window.location.replace(tokenRequestURL); // req to external vk api url
+      // window.location.replace(tokenRequestURL); // req to external vk api url
     }, 3000);
 
     // if (!accessToken) {
@@ -141,10 +140,6 @@ const mapStateToProps = state => ({
   accessToken: state.accessToken,
   tokenExpiresAt: state.tokenExpiresAt,
   results: state.results,
-  // search: {
-  //   ...state.search,
-  //   progress: countSearchProgressInPercents(state.search)
-  // }
   search: state.search
 });
 

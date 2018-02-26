@@ -3,7 +3,7 @@ import axiosJSONP from 'utils/axios-jsonp';
 import prepareWallPosts from 'utils/response-handling';
 import {
   maxAttemptsPending as maxAttemptsPendingDefault,
-  maxAttemptsFailed as maxAttemptsFailedDefault
+  maxAttempts as maxAttemptsDefault
 } from 'config/common';
 
 export const SEARCH_CONFIG = 'Search Config';
@@ -200,7 +200,7 @@ const searchProcessor = ({ dispatch, getState }) => {
       waitPending,
       waitTimeout,
       maxAttemptsPending = maxAttemptsPendingDefault,
-      maxAttemptsFailed = maxAttemptsFailedDefault
+      maxAttempts = maxAttemptsDefault
     } = searchConfig;
 
     // TODO: validate authorId, baseAPIReqUrl
@@ -305,8 +305,8 @@ const searchProcessor = ({ dispatch, getState }) => {
         }
 
         const failedReq = reqs.find(req => (
-          // !req.isPending && !req.isDone && req.attempts < maxAttemptsFailed
-          !req.isPending && req.attempts < maxAttemptsFailed
+          // !req.isPending && !req.isDone && req.attempts < maxAttempts
+          !req.isPending && req.attempts < maxAttempts
         ));
 
         // no pending requests OR "waitPending" is false and failed requests
@@ -331,7 +331,7 @@ const searchProcessor = ({ dispatch, getState }) => {
           // to remove requests that have exceeded their max attempts limit
           const exceeded = reqs.filter(req => (
             (req.isPending && req.attempts >= maxAttemptsPending) ||
-            (!req.isPending && req.attempts >= maxAttemptsFailed)
+            (!req.isPending && req.attempts >= maxAttempts)
           ));
           console.warn('exceeded: ', exceeded);
           exceeded.forEach(req => delete requests[req.id]);

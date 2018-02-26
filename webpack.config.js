@@ -1,5 +1,5 @@
-const path = require('path');
 const webpack = require('webpack');
+const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 // const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
@@ -71,8 +71,13 @@ module.exports = {
           plugins: ['transform-class-properties'],
           presets: [
             ['env', {
-              // useBuiltIns: 'entry', // or 'usage'
-              debug: true
+              useBuiltIns: 'usage',
+              // useBuiltIns: 'entry', // or false
+              debug: true,
+              targets: {
+                // browsers: ['defaults', 'firefox 52', 'not ie <= 11'],
+                browsers: ['last 2 versions']
+              }
             }],
             'react',
             'stage-3'

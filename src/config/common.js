@@ -22,7 +22,7 @@ const waitTimeout = 500;
 // (get isPending: false) and it will be repeated but not canceled - if it then
 // receives a response, duplicate results can be obtained. These extra results
 // must be filtered by reducer OR response handler
-const maxAttemptsFailed = 5; // min: 1 - no retry attempts
+const maxAttempts = 5; // min: 1 - no retry attempts
 
 const resultsSortOrder = 'asc'; // OR 'desc'
 
@@ -55,7 +55,7 @@ export {
   jsonpTimeout,
   waitPending,
   waitTimeout,
-  maxAttemptsFailed,
+  maxAttempts,
   resultsSortOrder,
   inputDefaults,
   tokenRequestURL

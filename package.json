@@ -6,9 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run build && node server.js",
-    "build": "webpack -p --progress --color",
+    "build": "webpack -p --color --progress",
     "build-prod": "cross-env NODE_ENV=production webpack -p --color --progress",
-    "watch": "webpack -w --progress --color",
+    "watch": "webpack -w --color --progress",
     "serve": "webpack-dev-server --color",
     "srv": "webpack-dev-server --color",
     "up": "node server.js",
@@ -59,6 +59,9 @@
     "webpack-dev-server": "^2.11.1",
     "webpack-merge": "^4.1.2"
   },
+  "browserslist": [
+    "last 2 versions"
+  ],
   "author": "",
   "license": "ISC"
 }

@@ -30,7 +30,7 @@ const middleware = process.env.NODE_ENV === 'development'
   ? [watcher, search, thunk, logger]
   : [search, thunk];
 
-export default (preloadedState = {}) => {
+const configureStore = (preloadedState = {}) => {
   /* eslint-disable no-underscore-dangle */
   /* to use with Chrome Extension without 'redux-devtools-extension' package: */
   // const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ||
@@ -48,11 +48,11 @@ export default (preloadedState = {}) => {
     port: 8000 // the port local "remotedev-server" is running at
   });
 
-  const store = createStore(
+  return createStore(
     rootReducer,
     preloadedState,
     composeEnhancers(applyMiddleware(...middleware))
   );
-
-  return store;
 };
+
+export default configureStore;
