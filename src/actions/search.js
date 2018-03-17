@@ -1,6 +1,6 @@
 import fetchJSONP from 'utils/fetch';
-import axiosJSONP from 'utils/axios-jsonp';
-import prepareWallPosts from 'utils/response-handling';
+import axiosJSONP from 'utils/axiosJSONP';
+import prepareWallPosts from 'utils/responseHandling';
 import {
   apiVersion,
   count,

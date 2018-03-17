@@ -35,6 +35,7 @@ const store = configureStore({
   results
 });
 
+// TODO: wrap in throttle or debounce
 // store.subscribe(() => console.log('Updated state ', store.getState()));
 store.subscribe(() => {
   const { userId, accessToken, tokenExpiresAt } = store.getState();

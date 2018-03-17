@@ -1,5 +1,5 @@
-import axiosJSONP from 'utils/axios-jsonp';
-import prepareWallPosts from 'utils/response-handling';
+import axiosJSONP from 'utils/axiosJSONP';
+import prepareWallPosts from 'utils/responseHandling';
 
 export const CALL_API = 'Call API';
 

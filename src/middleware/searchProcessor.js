@@ -1,6 +1,6 @@
-import axiosJSONP from 'utils/axios-jsonp';
+import axiosJSONP from 'utils/axiosJSONP';
 // import fetchJSONP from 'utils/fetch';
-import prepareWallPosts from 'utils/response-handling';
+import prepareWallPosts from 'utils/responseHandling';
 import { maxAttempts as maxAttemptsDefault } from 'config/common';
 
 export const SEARCH_CONFIG = 'Search Config';

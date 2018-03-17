@@ -46,6 +46,7 @@
       "consistent": true
     }],
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "react/jsx-max-depth": ["warn", { "max": 2 }],
     "react/jsx-no-literals": "warn",
     "react/jsx-sort-props": "warn",
     "react/no-set-state": "warn",

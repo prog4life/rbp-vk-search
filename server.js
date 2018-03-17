@@ -1,4 +1,4 @@
-const http = require('http');
+// const http = require('http');
 const path = require('path');
 const express = require('express');
 // const remotedev = require('remotedev-server');
@@ -45,6 +45,9 @@ app.get('*', (req, res, next) => {
 
 app.set('port', port);
 
-app.listen(port, () => {
+app.listen(port, (err) => {
+  if (err) {
+    console.error(err);
+  }
   console.log(`Server is listening at http://localhost:${port}`);
 });
