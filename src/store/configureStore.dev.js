@@ -18,7 +18,7 @@ const logger = createLogger({
       'SEARCH_UPDATE',
       'REQUEST_START',
       'REQUEST_SUCCESS',
-      'REQUEST_FAIL'
+      'REQUEST_FAIL',
     ];
     return !hiddenTypes.some(type => type === action.type);
   }
@@ -43,13 +43,13 @@ const configureStore = (preloadedState = {}) => {
     // port setting required to use with local "remotedev-server", OR
     // use remotedev.io/local alternatively
     // set same port in any monitor app (browser/Atom/VS Code extension)
-    port: 8000 // the port local "remotedev-server" is running at
+    port: 8000, // the port local "remotedev-server" is running at
   });
 
   return createStore(
     rootReducer,
     preloadedState,
-    composeEnhancers(applyMiddleware(...middleware))
+    composeEnhancers(applyMiddleware(...middleware)),
   );
 };
 

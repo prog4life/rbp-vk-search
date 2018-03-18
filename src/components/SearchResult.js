@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
+// import moment from 'moment';
 import { ListGroupItem } from 'react-bootstrap';
 
 function SearchResult({ result, number }) {
   const {
-    timestamp, authorId, postId, text, link
+    timestamp, authorId, postId, text, link,
   } = result;
 
   const resultNumber = `[${number}]`;
@@ -13,25 +13,45 @@ function SearchResult({ result, number }) {
   const linkToUserPage = `https://vk.com/id${authorId}`;
   const postIdLabel = `[post id: ${postId}]`;
   const authorIdLabel = `[id${authorId}]`;
+  const postDate = new Date(timestamp * 1000);
+  const dayOfMonth = postDate.getDate();
+  const month = postDate.getMonth() + 1;
+  const year = postDate.getFullYear();
+  const hours = postDate.getHours();
+  const minutes = postDate.getMinutes();
+  // const timestampString = postDate.toLocaleString('en-GB').slice(0, -3);
 
   return (
     <ListGroupItem>
-      <span>{resultNumber}{' '}</span>
-      <span className="post-timestamp">
-        {/* {new Date(timestamp * 1000).toLocaleString()} */}
-        {moment.unix(timestamp).format('D MMM YYYY  H:mm')}
+      <span>
+        {resultNumber}
+        {' '}
       </span>
-      <span>{' '}
+      <span className="post-timestamp">
+        {/* {moment.unix(timestamp).format('D MMM YYYY  H:mm')} */}
+        {`${dayOfMonth}-${month}-${year}`}
+        {/* {timestampString} */}
+      </span>
+      {' '}
+      <span className="post-timestamp">
+        {`${hours}:${minutes}`}
+      </span>
+      <span>
+        {' '}
         {postIdLabel}
       </span>
-      <span>{' '}
+      <span>
+        {' '}
         <a href={linkToUserPage} target="_blank">
           {authorIdLabel}
         </a>
       </span>
       <p>
-        {text}{' '}
-        <a href={link} target="_blank">{linkText}</a>
+        {text}
+        {' '}
+        <a href={link} target="_blank">
+          {linkText}
+        </a>
       </p>
     </ListGroupItem>
   );
@@ -46,6 +66,6 @@ SearchResult.propTypes = {
     authorId: PropTypes.number.isRequired,
     postId: PropTypes.number.isRequired,
     text: PropTypes.string.isRequired,
-    link: PropTypes.string.isRequired
-  }).isRequired
+    link: PropTypes.string.isRequired,
+  }).isRequired,
 };

@@ -1,20 +1,20 @@
 const webpack = require('webpack');
 const path = require('path');
-// const HTMLWebpackPlugin = require('html-webpack-plugin');
+const HTMLWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 // const VisualizerPlugin = require('webpack-visualizer-plugin');
 const DuplPkgCheckrPlugin = require('duplicate-package-checker-webpack-plugin');
 // const CompressionPlugin = require('compression-webpack-plugin');
-// const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const BabelPluginTransformImports = require('babel-plugin-transform-imports');
 
-// rename to "env" ?
-// const nodeEnv = process.env.NODE_ENV || 'development';
-const nodeEnv = process.env.NODE_ENV;
-const isProduction = nodeEnv === 'production';
+// const env = process.env.NODE_ENV;
+const env = process.env.NODE_ENV || 'development';
+const isProduction = env === 'production';
 
-console.log('nodeEnv', nodeEnv);
+console.log('env', env);
 console.log('isProduction', isProduction);
 
 const extractStyles = new ExtractTextPlugin({
@@ -22,64 +22,73 @@ const extractStyles = new ExtractTextPlugin({
   filename: 'styles.css', // TODO: change to func or add 'styles' entry
   allChunks: true,
   // inline loading in development is recommended for HMR and build speed
-  disable: nodeEnv === 'development' // OR !isProduction
+  disable: env === 'development', // OR !isProduction
 });
 
 module.exports = {
   entry: {
-    // polyfills: './src/config/polyfills.js',
+    polyfills: './src/config/polyfills.js',
     bundle: [
-      './src/config/polyfills.js',
+      // './src/config/polyfills.js',
       // 'babel-polyfill',
       // 'normalize.css/normalize.css',
       // './src/styles/index.scss',
-      './src/index.js'
+      './src/index.js',
     ]
   },
   output: {
-    filename: '[name].js',
-    // filename: '[name].[chunkhash].js',
-    // chunkFilename: '[name].bundle.js',
+    filename: isProduction ? 'js/[name].[chunkhash].js' : '[name].[id].js',
+    chunkFilename: isProduction ? 'js/[name].[chunkhash].js' : '[id].[name].js',
     path: path.resolve(__dirname, 'public'),
-    publicPath: '/'
+    publicPath: '/',
   },
   plugins: [
     extractStyles,
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: JSON.stringify(nodeEnv)
-      }
+        NODE_ENV: JSON.stringify(env),
+      },
     }),
-    // new UglifyJSPlugin({ // NOTE: disable in development
-    //   parallel: true, // default === os.cpus().length -1
-    //   sourceMap: true
-    // })
     new CleanWebpackPlugin(
       ['public'], // OR 'build' OR 'dist', removes folder
-      { exclude: ['index.html'] }
+      { exclude: ['index.html'] },
     ),
-    // new HTMLWebpackPlugin({
-    //   title: 'vk-search with reactbootstrap',
-    //   favicon: path.resolve(__dirname, 'src/assets/favicon-32x32.png'),
-    //   inject: false,
-    //   template: path.resolve(__dirname, 'src/assets/template-index.html'),
-    //   chunksSortMode(a, b) {
-    //     const chunks = ['manifest', 'polyfills', 'vendors', 'bundle'];
-    //     return chunks.indexOf(a.names[0]) - chunks.indexOf(b.names[0]);
-    //   },
-    //   appMountId: 'app',
-    //   mobile: true
-    //   // excludeChunks: ['common']
-    //   // filename: 'assets/custom.html'
-    //   // hash: true // usefull for cache busting
-    // }),
+    new HTMLWebpackPlugin({
+      title: 'vk-search with reactbootstrap',
+      favicon: path.resolve(__dirname, 'src/assets/favicon.png'),
+      inject: false,
+      template: path.resolve(__dirname, 'src/assets/template-index.html'),
+      chunksSortMode(a, b) {
+        const order = ['polyfills', 'react-bootstrap', 'vendors', 'bundle'];
+        return order.indexOf(a.names[0]) - order.indexOf(b.names[0]);
+      },
+      appMountId: 'app',
+      mobile: true,
+      // minify: false,
+      // excludeChunks: ['common']
+      // filename: 'assets/custom.html'
+      // hash: true // usefull for cache busting
+    }),
     // new CompressionPlugin({
     //   deleteOriginalAssets: true,
     //   test: /\.js/
     // }),
-    // useful during development for more readable output, if compare with
-    // new webpack.NamedModulesPlugin(), // HashedModuleIdsPlugin
-    // new webpack.HashedModuleIdsPlugin(), // better for production
+    ...isProduction
+      ? [
+        new webpack.HashedModuleIdsPlugin(),
+        new UglifyJSPlugin({
+          parallel: true, // default === os.cpus().length -1
+          sourceMap: true, // cheap-source-map don't work with this plugin
+          uglifyOptions: {
+            ecma: 8,
+            compress: { warnings: false },
+          },
+        }),
+      ]
+      : [
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.NamedModulesPlugin(),
+      ],
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendors',
       chunks: ['bundle'],
@@ -90,7 +99,12 @@ module.exports = {
           return false;
         } // eslint-disable-next-line
         return module.context && module.context.includes('node_modules');
-      }
+      },
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: ['react-bootstrap'],
+      chunks: ['vendors'],
+      minChunks: ({ resource }) => resource && (/react-bootstrap/).test(resource),
     }),
     // new webpack.optimize.CommonsChunkPlugin({
     //   name: 'common',
@@ -98,52 +112,48 @@ module.exports = {
     // }),
     // new webpack.optimize.CommonsChunkPlugin({
     //   name: 'manifest',
-    //   minChunks: Infinity
+    //   // minChunks: Infinity
     // }),
     new BundleAnalyzerPlugin({
       analyzerMode: 'static',
-      openAnalyzer: false
+      openAnalyzer: false,
     }),
     // new VisualizerPlugin(),
     new DuplPkgCheckrPlugin(),
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
   ],
   resolve: {
     alias: {
-      App: path.resolve(__dirname, 'src/containers/App.js'),
       Components: path.resolve(__dirname, 'src/components'),
-      Utilities: path.resolve(__dirname, 'src/utils')
+      Utilities: path.resolve(__dirname, 'src/utils'),
     },
     modules: [
       // path.resolve(__dirname, 'src/components'),
       path.resolve(__dirname, 'src'),
-      'node_modules'
+      'node_modules',
     ],
-    extensions: ['.js', '.json', '.jsx', '*']
+    extensions: ['.js', '.json', '.jsx', '*'],
   },
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
         loader: 'babel-loader',
-        include: [
-          path.resolve(__dirname, 'src')
-        ],
-        exclude: [
-          path.resolve(__dirname, 'node_modules')
-        ],
+        include: [path.resolve(__dirname, 'src')],
+        exclude: [path.resolve(__dirname, 'node_modules')],
         options: {
           plugins: [
+            'react-hot-loader/babel',
             'fast-async',
             'transform-class-properties',
-            [require('babel-plugin-transform-imports'), {
+            [BabelPluginTransformImports, { // TODO: try "transform-imports"
               'react-bootstrap': {
                 transform(importName) {
-                  return `react-bootstrap/lib/${importName.toUpperCase()}`;
+                  return `react-bootstrap/lib/${importName}`;
                 },
-                preventFullImport: true
-              }
-            }]
+                preventFullImport: true,
+              },
+            }],
           ],
           presets: [
             ['env', {
@@ -152,52 +162,59 @@ module.exports = {
               debug: true,
               targets: {
                 // browsers: ['defaults', 'firefox 52', 'not ie <= 11'],
-                browsers: ['last 2 versions']
+                browsers: [
+                  'last 2 versions',
+                  'not ie <= 11',
+                  'not android <= 62',
+                ],
               },
               exclude: [
                 'transform-regenerator',
-                'transform-async-to-generator'
-              ]
+                'transform-async-to-generator',
+              ],
             }],
             'react',
-            'stage-3'
-          ]
-        }
+            'stage-3',
+          ],
+        },
       },
       {
         test: /\.(scss|css)$/,
         include: [
-          path.resolve(__dirname, 'src'),
-          path.resolve(__dirname, 'node_modules')
+          path.resolve(__dirname, 'src/styles'),
+          path.resolve(__dirname, 'src/components'),
+          path.resolve(__dirname, 'node_modules'),
         ],
         use: extractStyles.extract({
           use: [
             {
               loader: 'css-loader',
-              options: { importLoaders: 1, sourceMap: true }
+              options: { importLoaders: 1, sourceMap: true },
             },
             // 'resolve-url-loader',
-            { loader: 'sass-loader', options: { sourceMap: true } }
+            { loader: 'sass-loader', options: { sourceMap: true } },
           ],
-          fallback: 'style-loader'
-        })
+          fallback: 'style-loader',
+        }),
       },
       {
         test: /\.(png|jpe?g|gif|svg|eot|ttf|woff|woff2)$/,
         loader: 'url-loader',
         options: {
-          limit: 10000
-        }
-      }
-    ]
+          limit: 10000,
+        },
+      },
+    ],
   },
   devServer: {
     progress: true,
     contentBase: path.resolve(__dirname, 'public'), // or "dist" or "build"
     compress: true,
     historyApiFallback: true,
-    port: 7031 // 9000, default: 8080
+    hot: true,
+    port: 7031, // 9000, default: 8080
   },
-  devtool: 'source-map'
+  devtool: 'source-map',
+  // devtool: isProduction ? 'source-map' : 'eval-source-map',
   // devtool: isProduction ? 'source-map' : 'cheap-module-eval-source-map'
 };

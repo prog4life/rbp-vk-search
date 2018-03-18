@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
-import moment from 'moment';
+// import moment from 'moment';
 
 import * as actionCreators from 'actions';
 import { tokenRequestURL } from 'config/common';
@@ -58,8 +58,8 @@ class App extends React.Component {
 
     const { actions: { setUserId, saveAccessToken } } = this.props;
 
-    // const tokenExpiresAt = Date.now() + (expiresIn * 1000);
-    const tokenExpiresAt = moment().add(expiresIn, 'seconds').unix();
+    const tokenExpiresAt = Date.now() + (expiresIn * 1000);
+    // const tokenExpiresAt = moment().add(expiresIn, 'seconds').unix();
 
     setUserId(userId);
     saveAccessToken(accessToken, tokenExpiresAt);

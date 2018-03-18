@@ -11,7 +11,7 @@ const SearchControls = ({
   processed,
   total,
   progress,
-  onStopBtnClick
+  onStopBtnClick,
 }) => (
   // TODO: replace Fragment by container div with margin-bottom equal to
   // FormGroup margin-bottom ?

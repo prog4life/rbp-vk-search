@@ -33,8 +33,8 @@
     "compat"
   ],
   "rules": {
-    "comma-dangle": ["error", "never"],
-    "compat/compat": "error",
+    "comma-dangle": "warn",
+    "compat/compat": "warn",
     "import/no-extraneous-dependencies": ["error", {
       "devDependencies": true,
       "optionalDependencies": false,
@@ -45,10 +45,11 @@
       "minProperties": 5,
       "consistent": true
     }],
-    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
-    "react/jsx-max-depth": ["warn", { "max": 2 }],
-    "react/jsx-no-literals": "warn",
-    "react/jsx-sort-props": "warn",
+    "react/require-optimization": 0,
+    "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx"] }],
+    "react/jsx-max-depth": [0, { "max": 2 }],
+    "react/jsx-no-literals": ["warn", { "noStrings": false }],
+    "react/jsx-sort-props": ["warn", { "noSortAlphabetically": true }],
     "react/no-set-state": "warn",
     "jsx-a11y/anchor-is-valid": [ "error", {
       "components": [ "Link" ],
@@ -56,6 +57,15 @@
     }]
   },
   "settings": {
-    "import/resolver": "webpack"
+    "import/resolver": {
+      "webpack": {
+        "config": {
+          "resolve": {
+            "modules": ["./src"],
+            "extensions": [".js", ".jsx"]
+          }
+        }
+      }
+    }
   }
 }

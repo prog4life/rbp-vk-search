@@ -1,4 +1,4 @@
-import moment from 'moment';
+// import moment from 'moment';
 import { apiVersion } from 'config/common';
 import fetchJSONP from 'utils/fetch';
 
@@ -79,8 +79,8 @@ export const parseAccessTokenHash = hash => (dispatch) => {
     let tokenExpiresAt = null;
 
     if (expiresIn) {
-      // const tokenExpiresAt = Date.now() + (expiresIn * 1000);
-      tokenExpiresAt = moment().add(expiresIn, 'seconds').unix();
+      tokenExpiresAt = Date.now() + (expiresIn * 1000);
+      // tokenExpiresAt = moment().add(expiresIn, 'seconds').unix();
     }
     dispatch(saveAccessToken(accessToken, tokenExpiresAt));
 
