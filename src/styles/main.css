@@ -15,17 +15,13 @@
   border: 1px solid rgb(111, 201, 55); */
 }
 
-.navitem {
+.topbar__sign-in {
   margin-right: 15px;
 }
 
 .nav-auth {
   margin-right: 0;
 }
-
-/* .signed-in-dropdown {
-
-} */
 
 .search-form {
   /* margin: 0 auto; */
@@ -39,7 +35,7 @@
 }
 
 .search-controls {
-  margin-top: 0.25em;
+  margin-top: 1.75em;
   margin-bottom: 10px;
 }
 
@@ -71,9 +67,14 @@
   /* min-width: 2em; */
 }
 
-@media (min-width: 768px) {
+@media (max-width: 767px) {
   .search-controls {
-    margin-top: 1.75em;
+    margin-top: 0.25em;
+  }
+
+  /* NOTE: bootstrap classes */
+  .navbar-collapse .dropdown a {
+    text-align: right;
   }
 }
 

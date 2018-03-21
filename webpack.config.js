@@ -22,7 +22,7 @@ const extractStyles = new ExtractTextPlugin({
   filename: 'styles.css', // TODO: change to func or add 'styles' entry
   allChunks: true,
   // inline loading in development is recommended for HMR and build speed
-  disable: env === 'development', // OR !isProduction
+  disable: !isProduction, // OR env === 'development'
 });
 
 module.exports = {
@@ -176,6 +176,10 @@ module.exports = {
             'react',
             'stage-3',
           ],
+          // This is a feature of `babel-loader` for Webpack (not Babel itself).
+          // It enables caching results in ./node_modules/.cache/babel-loader/
+          // directory for faster rebuilds.
+          cacheDirectory: true,
         },
       },
       {

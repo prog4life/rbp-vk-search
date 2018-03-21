@@ -40,7 +40,7 @@
       "optionalDependencies": false,
       "peerDependencies": false
     }],
-    "linebreak-style": ["warn", "unix"],
+    "linebreak-style": ["warn", "windows"],
     "object-curly-newline": ["error", {
       "minProperties": 5,
       "consistent": true

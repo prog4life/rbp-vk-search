@@ -8,7 +8,7 @@ import NotFoundPage from 'components/NotFoundPage';
 import configureStore from 'store/configureStore';
 import { loadState, saveState } from 'utils/localStorage';
 
-setConfig({ logLevel: 'log' }); // ['debug', 'log', 'warn', 'error']
+setConfig({ logLevel: 'log' }); // ['debug', 'log', 'warn', 'error'(default)]
 
 const results = [
   {
