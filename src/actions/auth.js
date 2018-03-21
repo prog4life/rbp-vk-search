@@ -6,27 +6,27 @@ import fetchJSONP from 'utils/fetch';
 export const saveAccessToken = (accessToken, tokenExpiresAt) => ({
   type: 'SAVE_ACCESS_TOKEN',
   accessToken,
-  tokenExpiresAt
+  tokenExpiresAt,
 });
 
 export const setTokenExpiry = expiresAt => ({
   type: 'SET_TOKEN_EXPIRY',
-  expiresAt
+  expiresAt,
 });
 
 // TODO: terminate search on sign out
 export const signOut = () => ({
-  type: 'SIGN_OUT'
+  type: 'SIGN_OUT',
 });
 
 export const setUserId = userId => ({
   type: 'SET_USER_ID',
-  userId
+  userId,
 });
 
 export const setUserName = userName => ({
   type: 'SET_USER_NAME',
-  userName
+  userName,
 });
 
 export const getUserName = (id) => {
@@ -67,7 +67,7 @@ export const parseAccessTokenHash = hash => (dispatch) => {
     expires_in: expiresIn,
     user_id: userId,
     error,
-    error_description: errorDescription
+    error_description: errorDescription,
   } = result;
 
   if (error) {

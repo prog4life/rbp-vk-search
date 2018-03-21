@@ -16,7 +16,7 @@ const PostAuthorId = ({ value, onChange }) => (
 
 PostAuthorId.propTypes = {
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired
+  value: PropTypes.string.isRequired,
 };
 
 export default PostAuthorId;

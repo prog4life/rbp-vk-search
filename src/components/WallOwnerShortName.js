@@ -16,7 +16,7 @@ const WallOwnerShortName = ({ value, onChange }) => (
 
 WallOwnerShortName.propTypes = {
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired
+  value: PropTypes.string.isRequired,
 };
 
 export default WallOwnerShortName;

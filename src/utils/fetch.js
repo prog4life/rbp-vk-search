@@ -28,7 +28,7 @@ const throwIfEmptyOrError = (resData) => {
 // TODO: think over timeout modifying functionality
 const fetchJSONP = (url, updatedTimeout) => (
   fetchJsonp(url, {
-    timeout: updatedTimeout || jsonpTimeout // default - 5000
+    timeout: updatedTimeout || jsonpTimeout, // default - 5000
   })
     .then(getObjectFromJson)
     .then(throwIfEmptyOrError)

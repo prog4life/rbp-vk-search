@@ -57,13 +57,13 @@ FormInputGroup.propTypes = {
   onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
   type: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired
+  value: PropTypes.string.isRequired,
 };
 
 FormInputGroup.defaultProps = {
   // isDisabled: false,
   // isRequired: false,
-  placeholder: ''
+  placeholder: '',
 };
 
 export default FormInputGroup;

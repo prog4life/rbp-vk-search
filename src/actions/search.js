@@ -9,7 +9,7 @@ import {
   waitPending,
   waitTimeout,
   resultsSortOrder as defaultOrder,
-  inputDefaults
+  inputDefaults,
 } from 'config/common';
 import { SEARCH_CONFIG } from 'middleware/searchProcessor';
 
@@ -17,48 +17,48 @@ export const addResults = (results, limit, order = defaultOrder) => ({
   type: 'ADD_RESULTS',
   results,
   limit,
-  order
+  order,
 });
 
 export const requestStart = (offset, attempts = 1) => ({
   type: 'REQUEST_START',
   offset,
   startTime: Date.now(),
-  attempts
+  attempts,
 });
 
 export const requestSuccess = offset => ({
   type: 'REQUEST_SUCCESS',
-  offset
+  offset,
 });
 
 export const requestFail = (offset, attempts = 1) => ({
   type: 'REQUEST_FAIL',
   offset,
-  attempts
+  attempts,
 });
 
 export const updateSearch = (total, processed) => ({
   type: 'SEARCH_UPDATE',
   total,
-  processed
+  processed,
 });
 
 export const wallPostsSearchEnd = () => ({
-  type: 'WALL_POSTS_SEARCH_END'
+  type: 'WALL_POSTS_SEARCH_END',
 });
 
 export const terminateSearch = () => ({
-  type: 'SEARCH_TERMINATE'
+  type: 'SEARCH_TERMINATE',
 });
 
 export const searchTimerTick = () => ({
-  type: 'SEARCH_TIMER_TICK'
+  type: 'SEARCH_TIMER_TICK',
 });
 
 export const setSearchIntervalId = id => ({
   type: 'SET_SEARCH_INTERVAL_ID',
-  intervalId: id
+  intervalId: id,
 });
 
 // NOTE: can retrieve info about author of posts at wall using wall.get with
@@ -101,7 +101,7 @@ export const startWallPostsSearch = (inputData) => {
       offsetModifier, // should be equal to request url "count" param value
       requestInterval,
       waitPending,
-      waitTimeout
+      waitTimeout,
     }
   };
 };

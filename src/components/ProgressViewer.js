@@ -11,11 +11,11 @@ const ProgressViewer = ({ children, className }) => (
 
 ProgressViewer.propTypes = {
   children: PropTypes.node.isRequired,
-  className: PropTypes.string
+  className: PropTypes.string,
 };
 
 ProgressViewer.defaultProps = {
-  className: ''
+  className: '',
 };
 
 // const ProgressViewer = ({ progress, processed, total, itemsName }) => (

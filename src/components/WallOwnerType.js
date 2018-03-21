@@ -24,7 +24,7 @@ const WallOwnerType = ({ value, onChange }) => (
 
 WallOwnerType.propTypes = {
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired
+  value: PropTypes.string.isRequired,
 };
 
 export default WallOwnerType;

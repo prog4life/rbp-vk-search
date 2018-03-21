@@ -21,7 +21,7 @@ export const formatWallPostResults = posts => (
     timestamp: post.date,
     postId: post.id,
     text: post.text,
-    link: `https://vk.com/wall${post.owner_id}_${post.id}`
+    link: `https://vk.com/wall${post.owner_id}_${post.id}`,
   }))
 );
 

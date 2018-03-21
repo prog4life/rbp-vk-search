@@ -79,13 +79,13 @@ SearchControls.propTypes = {
   onStopBtnClick: PropTypes.func.isRequired,
   processed: PropTypes.number.isRequired,
   progress: PropTypes.number.isRequired,
-  total: PropTypes.number
+  total: PropTypes.number,
 };
 
 SearchControls.defaultProps = {
   itemsName: 'items',
   // progress: null,
-  total: null
+  total: null,
 };
 
 export default SearchControls;

@@ -21,7 +21,7 @@ const logger = createLogger({
       'REQUEST_FAIL',
     ];
     return !hiddenTypes.some(type => type === action.type);
-  }
+  },
 });
 
 const watcher = immutabilityWatcher();

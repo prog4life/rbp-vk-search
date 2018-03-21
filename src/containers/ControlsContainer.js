@@ -8,7 +8,7 @@ const mapStateToProps = ({ search }) => ({
   processed: search.processed,
   total: search.total,
   // progress: countSearchProgressInPercents(search)
-  progress: search.progress
+  progress: search.progress,
 });
 
 export default connect(mapStateToProps)(SearchControls);

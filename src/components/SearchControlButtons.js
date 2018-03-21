@@ -36,7 +36,7 @@ const SearchControlButtons = ({ isSearchActive, onStopClick }) => (
 
 SearchControlButtons.propTypes = {
   isSearchActive: PropTypes.bool.isRequired,
-  onStopClick: PropTypes.func.isRequired
+  onStopClick: PropTypes.func.isRequired,
 };
 
 export default SearchControlButtons;

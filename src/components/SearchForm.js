@@ -18,8 +18,8 @@ const propTypes = {
     isActive: PropTypes.bool,
     total: PropTypes.number,
     processed: PropTypes.number,
-    progress: PropTypes.number
-  }).isRequired
+    progress: PropTypes.number,
+  }).isRequired,
 };
 
 class SearchForm extends React.PureComponent {
@@ -35,7 +35,7 @@ class SearchForm extends React.PureComponent {
       wallOwnerShortName: '',
       wallOwnerType: 'group',
       postAuthorId: '',
-      searchResultsLimit: ''
+      searchResultsLimit: '',
     };
   }
   handleSubmit(event) {
@@ -52,7 +52,7 @@ class SearchForm extends React.PureComponent {
       wallOwnerShortName,
       wallOwnerType,
       postAuthorId,
-      searchResultsLimit
+      searchResultsLimit,
     } = event.target.elements;
 
     // TODO: handle case with wrong wallOwnerId here or onChange with
@@ -63,12 +63,12 @@ class SearchForm extends React.PureComponent {
       wallOwnerShortName: wallOwnerShortName.value,
       wallOwnerType: wallOwnerType.value,
       postAuthorId: postAuthorId.value,
-      searchResultsLimit: searchResultsLimit.value
+      searchResultsLimit: searchResultsLimit.value,
     });
   }
   handleInputValueChange(event) {
     this.setState({
-      [event.target.id]: event.target.value
+      [event.target.id]: event.target.value,
     });
   }
   handleStopBtnClick(e) {
@@ -85,7 +85,7 @@ class SearchForm extends React.PureComponent {
       wallOwnerShortName,
       wallOwnerType,
       postAuthorId,
-      searchResultsLimit
+      searchResultsLimit,
     } = this.state;
     // const { search } = this.props;
 

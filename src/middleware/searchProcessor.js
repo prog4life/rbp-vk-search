@@ -7,7 +7,7 @@ export const SEARCH_CONFIG = 'Search Config';
 
 // IDEA
 export const kindsOfData = {
-  wallPosts: 'WALL_POSTS'
+  wallPosts: 'WALL_POSTS',
   // wallComments: 'WALL_COMMENTS'
 };
 
@@ -43,7 +43,7 @@ const searchProcessor = ({ dispatch, getState }) => {
       id: key,
       offset,
       startTime: Date.now(),
-      attempts
+      attempts,
     });
   };
 
@@ -62,7 +62,7 @@ const searchProcessor = ({ dispatch, getState }) => {
     }
     next({
       type: 'REQUEST_SUCCESS',
-      id: key
+      id: key,
     });
     // add searchState for chained further onSearchProgress handler
     return { response, searchState };
@@ -90,7 +90,7 @@ const searchProcessor = ({ dispatch, getState }) => {
         id: key,
         offset,
         startTime: requests[key].startTime,
-        attempts
+        attempts,
       });
       throw Error(`Request with ${offset} offset failed, ${e.message}`);
     }
@@ -126,7 +126,7 @@ const searchProcessor = ({ dispatch, getState }) => {
           type,
           total: nextTotal,
           processed: nextProcessed,
-          progress: nextProgress
+          progress: nextProgress,
         });
       }
       return response;
@@ -138,7 +138,7 @@ const searchProcessor = ({ dispatch, getState }) => {
       next({
         type: addResultsType,
         results: chunk,
-        limit
+        limit,
       });
     }
     return chunk;
@@ -178,7 +178,7 @@ const searchProcessor = ({ dispatch, getState }) => {
       searchStartType,
       addResultsType,
       updateSearchType,
-      searchEndType
+      searchEndType,
     ] = types;
 
     // TODO: import offsetModifier, requestInterval, waitPending and waitTimeout
@@ -193,7 +193,7 @@ const searchProcessor = ({ dispatch, getState }) => {
       requestInterval,
       waitPending,
       waitTimeout,
-      maxAttempts = maxAttemptsDefault
+      maxAttempts = maxAttemptsDefault,
     } = searchConfig;
 
     // TODO: validate authorId, baseAPIReqUrl
@@ -232,7 +232,7 @@ const searchProcessor = ({ dispatch, getState }) => {
           next,
           offset,
           offsetModifier,
-          updateSearchType
+          updateSearchType,
         ))
         // TODO: change to more generic then(handleResponse(searchConfig))
         .then(prepareWallPosts(authorId))
@@ -268,7 +268,7 @@ const searchProcessor = ({ dispatch, getState }) => {
               id,
               offset: req.offset,
               startTime,
-              attempts
+              attempts,
             });
           } else {
             nonOverduePending = req;

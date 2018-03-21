@@ -13,7 +13,7 @@ export default combineReducers({
   tokenExpiresAt: tokenExpiry,
   results,
   search,
-  requests
+  requests,
 });
 
 // TODO: export mainReducer from './mainReducer'; // OR

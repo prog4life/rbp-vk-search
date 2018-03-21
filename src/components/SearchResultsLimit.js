@@ -15,7 +15,7 @@ const SearchResultsLimit = ({ value, onChange }) => (
 
 SearchResultsLimit.propTypes = {
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired
+  value: PropTypes.string.isRequired,
 };
 
 export default SearchResultsLimit;

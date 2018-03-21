@@ -45,7 +45,7 @@ export default function results(state = [], action) {
       return sortItemsByNumField(
         addOnlyUniqueItems(state, action.results, 'postId'),
         'timestamp',
-        action.order
+        action.order,
       ).slice(0, action.limit);
     // to clear results at search start
     // case 'PREPARE_SEARCH':

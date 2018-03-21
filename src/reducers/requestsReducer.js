@@ -5,7 +5,7 @@ const changeExistingRequestState = (state, action, isPending) => (
         ...req,
         // alternatively (if not passed from action): req.attempts + 1
         attempts: action.attempts,
-        isPending
+        isPending,
       };
     }
     return req;
@@ -19,7 +19,7 @@ const addNewRequest = (state, { type, ...rest }, isPending) => (
     // startTime: action.startTime,
     // attempts: action.attempts, // alternatively (if not passing from action): attempts: 1,
     ...rest,
-    isPending
+    isPending,
   }]
 );
 
@@ -34,7 +34,7 @@ export default function requests(state = {}, action) {
           isPending: true,
           // isDone: false,
           offset: action.offset,
-          startTime: action.startTime
+          startTime: action.startTime,
         }
       };
     case 'REQUEST_SUCCESS': {
@@ -50,7 +50,7 @@ export default function requests(state = {}, action) {
           isPending: false,
           // isDone: false,
           offset: action.offset,
-          startTime: action.startTime
+          startTime: action.startTime,
         }
       };
     case 'WALL_POSTS_SEARCH_START':

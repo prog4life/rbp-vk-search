@@ -24,14 +24,14 @@ const propTypes = {
     isActive: PropTypes.bool,
     total: PropTypes.number,
     processed: PropTypes.number,
-    progress: PropTypes.number
+    progress: PropTypes.number,
   }).isRequired,
   signOut: PropTypes.func.isRequired,
   startWallPostsSearch: PropTypes.func.isRequired,
   terminateSearch: PropTypes.func.isRequired,
   // tokenExpiresAt: PropTypes.number.isRequired
   userId: PropTypes.string.isRequired,
-  userName: PropTypes.string.isRequired
+  userName: PropTypes.string.isRequired,
 };
 
 class WallPostsSearch extends React.Component {
@@ -48,7 +48,7 @@ class WallPostsSearch extends React.Component {
       parseAccessTokenHash,
       location,
       match,
-      history
+      history,
     } = this.props;
 
     console.log('match obj ', match);
@@ -106,7 +106,7 @@ class WallPostsSearch extends React.Component {
   }
   render() {
     const {
-      search, results, accessToken, userId, userName
+      search, results, accessToken, userId, userName,
     } = this.props;
 
     return (
@@ -140,7 +140,7 @@ const mapStateToProps = state => ({
   accessToken: state.accessToken,
   tokenExpiresAt: state.tokenExpiresAt,
   results: state.results,
-  search: state.search
+  search: state.search,
 });
 
 const mapDispatchToProps = dispatch => (

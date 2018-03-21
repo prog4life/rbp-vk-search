@@ -31,7 +31,7 @@ const inputDefaults = {
   searchResultsLimitDef: 10,
   ownerIdDef: '75465366',
   ownerDomainDef: '',
-  postAuthorIdDef: 372045306
+  postAuthorIdDef: 372045306,
 };
 
 const tokenRequestURL =
@@ -58,5 +58,5 @@ export {
   maxAttempts,
   resultsSortOrder,
   inputDefaults,
-  tokenRequestURL
+  tokenRequestURL,
 };

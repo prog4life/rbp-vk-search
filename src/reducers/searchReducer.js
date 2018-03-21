@@ -3,7 +3,7 @@ const defaultSearchState = {
   offset: 0,
   processed: 0,
   progress: 0,
-  total: undefined
+  total: undefined,
 };
 
 const search = (state = defaultSearchState, action) => {
@@ -13,17 +13,17 @@ const search = (state = defaultSearchState, action) => {
         isActive: true,
         offset: 0,
         processed: 0,
-        progress: 0
+        progress: 0,
       };
     case 'WALL_POSTS_SEARCH_END':
       return {
         ...state,
-        isActive: false
+        isActive: false,
       };
     case 'SET_OFFSET':
       return {
         ...state,
-        offset: action.offset
+        offset: action.offset,
       };
     // case 'SET_SEARCH_INTERVAL_ID':
     //   return {
@@ -35,14 +35,14 @@ const search = (state = defaultSearchState, action) => {
         ...state,
         total: action.total || state.total, // equal to response.count
         processed: action.processed || state.processed,
-        progress: action.progress
+        progress: action.progress,
       };
     case 'SEARCH_TERMINATE':
       return {
         isActive: false,
         offset: 0,
         processed: 0,
-        progress: 0
+        progress: 0,
       };
     default:
       return state;
