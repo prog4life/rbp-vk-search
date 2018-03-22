@@ -1,6 +1,4 @@
 import axiosJSONP from 'utils/axiosJSONP';
-import fetchJSONP from 'utils/fetchJSONP';
-import jsonpPromise from 'utils/jsonpPromise';
 import prepareWallPosts from 'utils/responseHandling';
 
 export const CALL_API = 'Call API';
@@ -24,46 +22,60 @@ const onRequestStart = (next, offset, attempt) => {
 
 // remove successful request obj from "requests"
 const onRequestSuccess = (next, getState, offset) => (response) => {
-  const { search } = getState();
+  const { search: searchState, requests } = getState();
   const key = `offset_${offset}`;
 
-  if (!search.isActive) {
+  if (!searchState.isActive) {
     throw Error(`Needless response, offset: ${offset}, search is over`);
+  }
+  // if other request with such offset has been succeeded(removed) already
+  if (!requests[key]) {
+    throw Error(`Other request with ${offset} offset has succeeded earlier`);
   }
 
   next({
     type: 'REQUEST_SUCCESS',
     id: key,
   });
-  // TODO: stop passing state further, use selectors here and there
   // add searchState for chained further onSearchProgress handler
-  return response;
+  return { response, searchState };
 };
 
 // add failed request obj with isPending: false to "requests"
 const onRequestFail = (next, getState, offset, attempt) => (e) => {
-  const { search, requests } = getState();
+  const { search: { isActive }, requests } = getState();
   const key = `offset_${offset}`;
 
-  if (!search.isActive) {
+  if (!isActive) {
     throw Error(`Needless failed request ${offset}, search is over already`);
   }
-
-  next({
-    type: 'REQUEST_FAIL',
-    id: key,
-    offset,
-    startTime: requests[key].startTime,
-    attempt,
-  });
-  throw Error(`Request with ${offset} offset failed, ${e.message}`);
+  // if other request with same offset was successful (and therefore was
+  // removed from "requests") - no need to add this one failed
+  if (!requests[key]) {
+    throw Error(`Other request with ${offset} offset have succeeded ` +
+      `earlier, attempt ${attempt} became unnecessary`);
+  }
+  // to check that it's fail of latest attempt, not one that was considered
+  // as failed earlier (due to exceeding of waitTimeout)
+  if (requests[key].attempt === attempt) {
+    next({
+      type: 'REQUEST_FAIL',
+      id: key,
+      offset,
+      startTime: requests[key].startTime,
+      attempt,
+    });
+    throw Error(`Request with ${offset} offset failed, ${e.message}`);
+  }
+  throw Error(`Request with ${offset} offset was sent again ` +
+    `${requests[key].attempt} time, ignoring result of ${attempt} attempt`);
 };
 
-const onSearchProgress = (next, getState, offset, offsetModifier, type) => (
-  (response) => {
-    const { total, processed, progress } = getState().search;
+const onSearchProgress = (next, offset, offsetModifier, type) => (
+  ({ response, searchState }) => {
+    const { total, processed, progress } = searchState;
 
-    console.log('search progress state: ', getState().search);
+    console.log('search progress state: ', searchState);
     // to get updated "total"
     const nextTotal = response && response.count ? response.count : total;
     const itemsLength = response && response.items && response.items.length;
@@ -75,7 +87,6 @@ const onSearchProgress = (next, getState, offset, offsetModifier, type) => (
     }
 
     if (nextTotal !== total || nextProcessed !== processed) {
-      // TODO: remove progress from state, count it by selector
       let nextProgress = progress;
       // count progress in percents
       if (Number.isInteger(nextTotal) && Number.isInteger(nextProcessed)) {
@@ -151,7 +162,7 @@ export default ({ getState, dispatch }) => next => (action) => {
 
   // NOTE: in all next chain must be used offset value that was actual
   // at interval tick moment, i.e. passed to "makeCallToAPI"
-  jsonpPromise(url)
+  axiosJSONP(url)
     .then(
       // TODO: maybe it will be rational to get attempt value from
       //  existing request with same key
@@ -160,12 +171,11 @@ export default ({ getState, dispatch }) => next => (action) => {
     )
     .then(onSearchProgress(
       next,
-      getState,
       offset,
       offsetModifier,
       updateType,
     ))
-    // TODO: change to more generic then(transformResponse(schema))
+    // TODO: change to more generic then(transformResponse(searchConfig))
     .then(prepareWallPosts(authorId))
     .then(savePartOfResults(next, resultsLimit, resType))
     .catch(e => console.error(e));

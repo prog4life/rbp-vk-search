@@ -14,7 +14,7 @@ const state = 55555; // optional
 // vk API request frequency limit is 3 requests per second
 const requestInterval = 350;
 // better to leave default
-const jsonpTimeout = 5000; // default for fetch-jsonp: 5000
+const jsonpTimeout = 1000; // default for fetch-jsonp: 5000
 // make or not request with next offset if current one get no response yet
 const waitPending = false;
 const waitTimeout = 500;

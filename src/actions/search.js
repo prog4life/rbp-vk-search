@@ -1,4 +1,4 @@
-import fetchJSONP from 'utils/fetch';
+import fetchJSONP from 'utils/fetchJSONP';
 import axiosJSONP from 'utils/axiosJSONP';
 import prepareWallPosts from 'utils/responseHandling';
 import {
@@ -20,11 +20,11 @@ export const addResults = (results, limit, order = defaultOrder) => ({
   order,
 });
 
-export const requestStart = (offset, attempts = 1) => ({
+export const requestStart = (offset, attempt = 1) => ({
   type: 'REQUEST_START',
   offset,
   startTime: Date.now(),
-  attempts,
+  attempt,
 });
 
 export const requestSuccess = offset => ({
@@ -32,10 +32,10 @@ export const requestSuccess = offset => ({
   offset,
 });
 
-export const requestFail = (offset, attempts = 1) => ({
+export const requestFail = (offset, attempt = 1) => ({
   type: 'REQUEST_FAIL',
   offset,
-  attempts,
+  attempt,
 });
 
 export const updateSearch = (total, processed) => ({

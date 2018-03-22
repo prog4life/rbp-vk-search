@@ -1,10 +1,11 @@
 import { jsonpTimeout } from 'config/common';
 import axios from 'axios-jsonp-pro';
 
-export default function axiosJSONP(url, customTimeout) {
+export default function axiosJSONP(url, customTimeout = jsonpTimeout) {
   return axios.jsonp(url, {
     // url
-    // timeout: 3000
+    // ...customTimeout ? { timeout: customTimeout } : {},
+    timeout: customTimeout,
   })
     .then((resData) => {
       if (resData.error) {
@@ -13,7 +14,7 @@ export default function axiosJSONP(url, customTimeout) {
         throw Error(`code: ${error_code}, message: ${error_msg}, ` +
           `req params: ${JSON.stringify(request_params, null, 2)}`);
       }
-      console.log('axios response ', resData);
+      console.log('axiosJSONP response ', resData);
       return resData.response;
     });
 }

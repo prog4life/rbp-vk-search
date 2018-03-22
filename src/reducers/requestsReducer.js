@@ -3,8 +3,8 @@ const changeExistingRequestState = (state, action, isPending) => (
     if (req.offset === action.offset) {
       return {
         ...req,
-        // alternatively (if not passed from action): req.attempts + 1
-        attempts: action.attempts,
+        // alternatively (if not passed from action): req.attempt + 1
+        attempt: action.attempt,
         isPending,
       };
     }
@@ -17,7 +17,7 @@ const addNewRequest = (state, { type, ...rest }, isPending) => (
   [...state, {
     // offset: action.offset,
     // startTime: action.startTime,
-    // attempts: action.attempts, // alternatively (if not passing from action): attempts: 1,
+    // attempt: action.attempt, // alternatively (if not passing from action): attempt: 1,
     ...rest,
     isPending,
   }]
@@ -30,7 +30,7 @@ export default function requests(state = {}, action) {
         ...state,
         [action.id]: {
           id: action.id,
-          attempts: action.attempts,
+          attempt: action.attempt,
           isPending: true,
           // isDone: false,
           offset: action.offset,
@@ -46,12 +46,12 @@ export default function requests(state = {}, action) {
         ...state,
         [action.id]: {
           id: action.id,
-          attempts: action.attempts,
+          attempt: action.attempt,
           isPending: false,
           // isDone: false,
           offset: action.offset,
           startTime: action.startTime,
-        }
+        },
       };
     case 'WALL_POSTS_SEARCH_START':
     case 'SEARCH_TERMINATE':
@@ -69,7 +69,7 @@ export default function requests(state = {}, action) {
 //         .concat({
 //           offset: action.offset,
 //           startTime: action.startTime,
-//           attempts: action.attempts,
+//           attempt: action.attempt,
 //           isPending: true,
 //           isDone: false
 //         });
@@ -80,7 +80,7 @@ export default function requests(state = {}, action) {
 //         .concat({
 //           offset: action.offset,
 //           endTime: Date.now(), // TODO: remove or change to action.endTime later?
-//           attempts: action.attempts,
+//           attempt: action.attempt,
 //           isPending: false,
 //           isDone: false
 //         });
