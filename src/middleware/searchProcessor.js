@@ -2,6 +2,7 @@ import axiosJSONP from 'utils/axiosJSONP';
 // import fetchJSONP from 'utils/fetch';
 import prepareWallPosts from 'utils/responseHandling';
 import { maxAttempts as maxAttemptsDefault } from 'config/common';
+import { CALL_API } from 'middleware/callAPI';
 
 export const SEARCH_CONFIG = 'Search Config';
 
@@ -34,115 +35,6 @@ const searchProcessor = ({ dispatch, getState }) => {
   //     isPending: true, // failed request will get "false" value here
   //   }
   // };
-
-  const onRequestStart = (next, offset, attempts) => {
-    const key = `offset_${offset}`;
-
-    next({
-      type: 'REQUEST_START',
-      id: key,
-      offset,
-      startTime: Date.now(),
-      attempts,
-    });
-  };
-
-  // remove successful request obj from "requests"
-  const onRequestSuccess = (next, getState, offset) => (response) => {
-    const { search: searchState, requests } = getState();
-
-    if (!searchState.isActive) {
-      throw Error(`Needless response, offset: ${offset}, search is over`);
-    }
-    const key = `offset_${offset}`;
-
-    // if other request with such offset has been succeeded(removed) already
-    if (!requests[key]) {
-      throw Error(`Other request with ${offset} offset has succeeded earlier`);
-    }
-    next({
-      type: 'REQUEST_SUCCESS',
-      id: key,
-    });
-    // add searchState for chained further onSearchProgress handler
-    return { response, searchState };
-  };
-
-  // add failed request obj with isPending: false to "requests"
-  const onRequestFail = (next, getState, offset, attempts) => (e) => {
-    const { search: { isActive }, requests } = getState();
-
-    if (!isActive) {
-      throw Error(`Needless failed request ${offset}, search is over already`);
-    }
-    const key = `offset_${offset}`;
-    // if other request with same offset was successful (and therefore was
-    // removed from "requests") - no need to add this one failed
-    if (!requests[key]) {
-      throw Error(`Other request with ${offset} offset have succeeded ` +
-        `earlier, attempt ${attempts} became unnecessary`);
-    }
-    // to check that it's fail of latest attempt, not one that was considered
-    // as failed earlier (due to exceeding of waitTimeout)
-    if (requests[key].attempts === attempts) {
-      next({
-        type: 'REQUEST_FAIL',
-        id: key,
-        offset,
-        startTime: requests[key].startTime,
-        attempts,
-      });
-      throw Error(`Request with ${offset} offset failed, ${e.message}`);
-    }
-    throw Error(`Request with ${offset} offset was resended ` +
-      `${requests[key].attempts} time, ignoring result of ${attempts} attempt`);
-  };
-
-  const onSearchProgress = (next, offset, offsetModifier, type) => (
-    ({ response, searchState }) => {
-      const { total, processed, progress } = searchState;
-
-      console.log('search progress state: ', searchState);
-      // to get updated "total"
-      const nextTotal = response && response.count ? response.count : total;
-      const itemsLength = response && response.items && response.items.length;
-
-      let nextProcessed = processed;
-
-      if (itemsLength) {
-        nextProcessed += itemsLength;
-      }
-
-      if (nextTotal !== total || nextProcessed !== processed) {
-        let nextProgress = progress;
-        // count progress in percents
-        if (Number.isInteger(nextTotal) && Number.isInteger(nextProcessed)) {
-          // return Number(((nextProcessed / nextTotal) * 100).toFixed());
-          nextProgress = Math.round(((nextProcessed / nextTotal) * 100));
-        }
-        console.info(`next processed ${nextProcessed}, total ${nextTotal} ` +
-          ` and progress ${nextProgress}`);
-        next({
-          type,
-          total: nextTotal,
-          processed: nextProcessed,
-          progress: nextProgress,
-        });
-      }
-      return response;
-    }
-  );
-
-  const savePartOfResults = (next, limit, addResultsType) => (chunk) => {
-    if (chunk && chunk.length > 0) {
-      next({
-        type: addResultsType,
-        results: chunk,
-        limit,
-      });
-    }
-    return chunk;
-  };
 
   return next => (action) => {
     const { accessToken } = getState();
@@ -204,46 +96,44 @@ const searchProcessor = ({ dispatch, getState }) => {
     // will also clear "requests" in store
     next({ type: searchStartType });
 
-    let checkpoint = performance.now(); // TEMP:
-    let checkpoint2 = performance.now(); // TEMP:
+    // let checkpoint = performance.now(); // TEMP:
+    // let checkpoint2 = performance.now(); // TEMP:
 
     const makeCallToAPI = (offset, attempts = 1) => {
-      const tempCheckpoint2 = checkpoint2;
-      checkpoint2 = performance.now();
-      console.warn(`NEW REQUEST with ${offset} offset, attempt: ` +
-        `${attempts}, interval: ${checkpoint2 - tempCheckpoint2} and shift: ${performance.now() - checkpoint}`);
+      // const tempCheckpoint2 = checkpoint2;
+      // checkpoint2 = performance.now();
+      // console.warn(`NEW REQUEST with ${offset} offset, attempt: ` +
+      //   `${attempts}, interval: ${checkpoint2 - tempCheckpoint2} and shift: ${performance.now() - checkpoint}`);
       // add request obj with isPending: true to "requests"
-      onRequestStart(next, offset, attempts);
+      // onRequestStart(next, offset, attempts);
 
       const currentAPIReqUrl = `${baseAPIReqUrl}` +
         `&access_token=${accessToken}` +
         `&offset=${offset}`;
 
-      // NOTE: in all next chain must be used offset value that was actual
-      // at interval tick moment, i.e. passed to "makeCallToAPI"
-      axiosJSONP(currentAPIReqUrl)
-        .then(
-          // TODO: maybe it will be rational to get attempts value from
-          //  existing request with same key
-          onRequestSuccess(next, getState, offset),
-          onRequestFail(next, getState, offset, attempts)
-        )
-        .then(onSearchProgress(
-          next,
-          offset,
-          offsetModifier,
+      dispatch({
+        types: [
+          'REQUEST_START',
+          'REQUEST_SUCCESS',
+          'REQUEST_FAIL',
+          addResultsType,
           updateSearchType,
-        ))
-        // TODO: change to more generic then(handleResponse(searchConfig))
-        .then(prepareWallPosts(authorId))
-        .then(savePartOfResults(next, searchResultsLimit, addResultsType))
-        .catch(e => console.error(e));
+        ],
+        [CALL_API]: {
+          url: currentAPIReqUrl,
+          offset,
+          attempts,
+          offsetModifier,
+          authorId,
+          resultsLimit: searchResultsLimit,
+        },
+      });
     };
 
     scannerIntervalId = setInterval(() => {
-      const tempCheckpoint = checkpoint;
-      checkpoint = performance.now();
-      console.warn(`NEW interval TICK: ${checkpoint - tempCheckpoint}`);
+      // const tempCheckpoint = checkpoint;
+      // checkpoint = performance.now();
+      // console.warn(`NEW interval TICK: ${checkpoint - tempCheckpoint}`);
 
       const { results, requests, search: { offset, total } } = getState();
       const reqs = Object.values(requests);
@@ -337,6 +227,141 @@ export default searchProcessor;
 //   };
 // }
 
+// ---------------------------------------------------------------------------
+
+// const onRequestStart = (next, offset, attempts) => {
+//   const key = `offset_${offset}`;
+
+//   next({
+//     type: 'REQUEST_START',
+//     id: key,
+//     offset,
+//     startTime: Date.now(),
+//     attempts,
+//   });
+// };
+
+// // remove successful request obj from "requests"
+// const onRequestSuccess = (next, getState, offset) => (response) => {
+//   const { search: searchState, requests } = getState();
+
+//   if (!searchState.isActive) {
+//     throw Error(`Needless response, offset: ${offset}, search is over`);
+//   }
+//   const key = `offset_${offset}`;
+
+//   // if other request with such offset has been succeeded(removed) already
+//   if (!requests[key]) {
+//     throw Error(`Other request with ${offset} offset has succeeded earlier`);
+//   }
+//   next({
+//     type: 'REQUEST_SUCCESS',
+//     id: key,
+//   });
+//   // add searchState for chained further onSearchProgress handler
+//   return { response, searchState };
+// };
+
+// // add failed request obj with isPending: false to "requests"
+// const onRequestFail = (next, getState, offset, attempts) => (e) => {
+//   const { search: { isActive }, requests } = getState();
+
+//   if (!isActive) {
+//     throw Error(`Needless failed request ${offset}, search is over already`);
+//   }
+//   const key = `offset_${offset}`;
+//   // if other request with same offset was successful (and therefore was
+//   // removed from "requests") - no need to add this one failed
+//   if (!requests[key]) {
+//     throw Error(`Other request with ${offset} offset have succeeded ` +
+//       `earlier, attempt ${attempts} became unnecessary`);
+//   }
+//   // to check that it's fail of latest attempt, not one that was considered
+//   // as failed earlier (due to exceeding of waitTimeout)
+//   if (requests[key].attempts === attempts) {
+//     next({
+//       type: 'REQUEST_FAIL',
+//       id: key,
+//       offset,
+//       startTime: requests[key].startTime,
+//       attempts,
+//     });
+//     throw Error(`Request with ${offset} offset failed, ${e.message}`);
+//   }
+//   throw Error(`Request with ${offset} offset was sent again ` +
+//     `${requests[key].attempts} time, ignoring result of ${attempts} attempt`);
+// };
+
+// const onSearchProgress = (next, offset, offsetModifier, type) => (
+//   ({ response, searchState }) => {
+//     const { total, processed, progress } = searchState;
+
+//     console.log('search progress state: ', searchState);
+//     // to get updated "total"
+//     const nextTotal = response && response.count ? response.count : total;
+//     const itemsLength = response && response.items && response.items.length;
+
+//     let nextProcessed = processed;
+
+//     if (itemsLength) {
+//       nextProcessed += itemsLength;
+//     }
+
+//     if (nextTotal !== total || nextProcessed !== processed) {
+//       let nextProgress = progress;
+//       // count progress in percents
+//       if (Number.isInteger(nextTotal) && Number.isInteger(nextProcessed)) {
+//         // return Number(((nextProcessed / nextTotal) * 100).toFixed());
+//         nextProgress = Math.round(((nextProcessed / nextTotal) * 100));
+//       }
+//       console.info(`next processed ${nextProcessed}, total ${nextTotal} ` +
+//         ` and progress ${nextProgress}`);
+//       next({
+//         type,
+//         total: nextTotal,
+//         processed: nextProcessed,
+//         progress: nextProgress,
+//       });
+//     }
+//     return response;
+//   }
+// );
+
+// const savePartOfResults = (next, limit, addResultsType) => (chunk) => {
+//   if (chunk && chunk.length > 0) {
+//     next({
+//       type: addResultsType,
+//       results: chunk,
+//       limit,
+//     });
+//   }
+//   return chunk;
+// };
+
+// ---------------------------------------------------------------------------
+
+// NOTE: in all next chain must be used offset value that was actual
+// at interval tick moment, i.e. passed to "makeCallToAPI"
+// axiosJSONP(currentAPIReqUrl)
+//   .then(
+//     // TODO: maybe it will be rational to get attempts value from
+//     //  existing request with same key
+//     onRequestSuccess(next, getState, offset),
+//     onRequestFail(next, getState, offset, attempts),
+//   )
+//   .then(onSearchProgress(
+//     next,
+//     offset,
+//     offsetModifier,
+//     updateSearchType,
+//   ))
+//   // TODO: change to more generic then(handleResponse(searchConfig))
+//   .then(prepareWallPosts(authorId))
+//   .then(savePartOfResults(next, searchResultsLimit, addResultsType))
+//   .catch(e => console.error(e));
+
+// ---------------------------------------------------------------------------
+
 // const belated = checkBelated(reqs, waitTimeout);
 //
 // if (belated) {
@@ -365,3 +390,5 @@ function checkBelated(reqs, waitTimeout) {
     return false;
   });
 }
+
+// ----------------------------------------------------------------------------

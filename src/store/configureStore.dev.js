@@ -6,6 +6,7 @@ import { createLogger } from 'redux-logger';
 // import { composeWithDevTools } from 'redux-devtools-extension';
 import { composeWithDevTools } from 'remote-redux-devtools';
 import search from 'middleware/searchProcessor';
+import callAPI from 'middleware/callAPI';
 import rootReducer from '../reducers';
 
 // must be the last middleware in chain
@@ -26,7 +27,7 @@ const logger = createLogger({
 
 const watcher = immutabilityWatcher();
 
-const middleware = [watcher, search, thunk, logger];
+const middleware = [watcher, search, callAPI, thunk, logger];
 
 const configureStore = (preloadedState = {}) => {
   /* eslint-disable no-underscore-dangle */
