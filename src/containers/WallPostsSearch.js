@@ -92,7 +92,6 @@ class WallPostsSearch extends React.Component {
     console.log('FORM STATE: ', inputData);
   }
   handleSearchStop() {
-    // NOTE: optionally can get results from props and pass them as arg
     const { terminateSearch } = this.props;
     terminateSearch();
   }
@@ -119,7 +118,6 @@ class WallPostsSearch extends React.Component {
         />
         <SearchForm
           onStartSearch={this.handleSearchStart}
-          onStopSearch={this.handleSearchStop}
           // search={search}
         />
         <ResultsPanel header="This is a panel with search results">

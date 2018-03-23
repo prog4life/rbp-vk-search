@@ -1,14 +1,17 @@
 import { connect } from 'react-redux';
 
+import {
+  getSearchIsActive, getSearchTotal, getSearchProcessed, getSearchProgress,
+} from 'reducers';
+import { terminateSearch } from 'actions';
 import SearchControls from 'components/SearchControls';
-// import countSearchProgressInPercents from 'selectors/selectors';
 
-const mapStateToProps = ({ search }) => ({
-  isSearchActive: search.isActive,
-  processed: search.processed,
-  total: search.total,
+const mapStateToProps = state => ({
+  isSearchActive: getSearchIsActive(state),
+  processed: getSearchProcessed(state),
+  total: getSearchTotal(state),
   // progress: countSearchProgressInPercents(search)
-  progress: search.progress,
+  progress: getSearchProgress(state),
 });
 
-export default connect(mapStateToProps)(SearchControls);
+export default connect(mapStateToProps, { terminateSearch })(SearchControls);

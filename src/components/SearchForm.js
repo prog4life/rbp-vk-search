@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Grid, Row, Col } from 'react-bootstrap';
+import { Grid, Row, Col, Form } from 'react-bootstrap';
 
 import ControlsContainer from 'containers/ControlsContainer';
 import PostAuthorId from './PostAuthorId';
@@ -13,12 +13,8 @@ import SearchResultsLimit from './SearchResultsLimit';
 
 const propTypes = {
   onStartSearch: PropTypes.func.isRequired,
-  onStopSearch: PropTypes.func.isRequired,
   search: PropTypes.shape({
     isActive: PropTypes.bool,
-    total: PropTypes.number,
-    processed: PropTypes.number,
-    progress: PropTypes.number,
   }).isRequired,
 };
 
@@ -28,7 +24,6 @@ class SearchForm extends React.PureComponent {
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleInputValueChange = this.handleInputValueChange.bind(this);
-    this.handleStopBtnClick = this.handleStopBtnClick.bind(this);
 
     this.state = {
       wallOwnerId: '',
@@ -53,7 +48,8 @@ class SearchForm extends React.PureComponent {
       wallOwnerType,
       postAuthorId,
       searchResultsLimit,
-    } = event.target.elements;
+    // } = event.target.elements;
+    } = this.state;
 
     // TODO: handle case with wrong wallOwnerId here or onChange with
     // request to API
@@ -66,18 +62,11 @@ class SearchForm extends React.PureComponent {
       searchResultsLimit: searchResultsLimit.value,
     });
   }
+  // TODO: add debouncing
   handleInputValueChange(event) {
     this.setState({
       [event.target.id]: event.target.value,
     });
-  }
-  handleStopBtnClick(e) {
-    e.preventDefault(); // TODO: to prevent submit, type="button" did not work
-    const { onStopSearch } = this.props;
-    // NOTE: probably this check and "search" destructuring are unnecessary
-    // if (search.isActive) {
-    onStopSearch();
-    // }
   }
   render() {
     const {
@@ -87,11 +76,10 @@ class SearchForm extends React.PureComponent {
       postAuthorId,
       searchResultsLimit,
     } = this.state;
-    // const { search } = this.props;
 
     return (
       <Grid>
-        <form className="search-form" onSubmit={this.handleSubmit}>
+        <Form className="search-form" onSubmit={this.handleSubmit}>
           <Row>
             {/*  TODO: use names instead of id's */}
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
@@ -125,33 +113,15 @@ class SearchForm extends React.PureComponent {
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4} >
-              {/* TODO: Create container for next 2 components ? */}
-              {/* <SearchControlButtons
-                isSearching={search.isActive}
-                onStopClick={this.handleStopBtnClick}
-              />
-              {search.isActive &&
-                <ProgressViewer
-                  now={search.progress}
-                  processedCount={search.processed}
-                  total={search.total}
-                />
-              } */}
-              <ControlsContainer
-                itemsName="posts"
-                onStopBtnClick={this.handleStopBtnClick}
-              />
+              <ControlsContainer itemsName="posts" />
             </Col>
           </Row>
           {/* <Row>
             <Col md={6} lg={4} mdOffset={6} lgOffset={8}>
-              <SearchControlButtons
-                isSearching={search.isActive}
-                onStopClick={this.handleStopBtnClick}
-              />
+              <ControlsContainer itemsName="posts" />
             </Col>
           </Row> */}
-        </form>
+        </Form>
       </Grid>
     );
   }

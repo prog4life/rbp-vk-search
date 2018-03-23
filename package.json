@@ -47,6 +47,7 @@
     "redux-form": "^7.2.3",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
+    "reselect": "^3.0.1",
     "resolve-url-loader": "^2.3.0",
     "sass-loader": "^6.0.7",
     "style-loader": "^0.20.3",

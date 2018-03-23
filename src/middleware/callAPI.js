@@ -61,7 +61,7 @@ const onRequestFail = (next, getState, offset, attempt) => (e) => {
 
 const onSearchProgress = (next, getState, offset, offsetModifier, type) => (
   (response) => {
-    const { total, processed, progress } = getState().search;
+    const { total, processed } = getState().search;
 
     console.log('search progress state: ', getState().search);
     // to get updated "total"
@@ -75,20 +75,12 @@ const onSearchProgress = (next, getState, offset, offsetModifier, type) => (
     }
 
     if (nextTotal !== total || nextProcessed !== processed) {
-      // TODO: remove progress from state, count it by selector
-      let nextProgress = progress;
-      // count progress in percents
-      if (Number.isInteger(nextTotal) && Number.isInteger(nextProcessed)) {
-        // return Number(((nextProcessed / nextTotal) * 100).toFixed());
-        nextProgress = Math.round(((nextProcessed / nextTotal) * 100));
-      }
-      console.info(`next processed ${nextProcessed}, total ${nextTotal} ` +
-        ` and progress ${nextProgress}`);
+      console.info(`next processed ${nextProcessed} and total ${nextTotal}`);
+
       next({
         type,
         total: nextTotal,
         processed: nextProcessed,
-        progress: nextProgress,
       });
     }
     return response;
@@ -151,6 +143,7 @@ export default ({ getState, dispatch }) => next => (action) => {
 
   // NOTE: in all next chain must be used offset value that was actual
   // at interval tick moment, i.e. passed to "makeCallToAPI"
+  // TODO: test cancel method
   jsonpPromise(url)
     .then(
       // TODO: maybe it will be rational to get attempt value from
