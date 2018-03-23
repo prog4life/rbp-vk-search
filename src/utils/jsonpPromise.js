@@ -2,7 +2,7 @@ import jsonp from 'jsonp-promise';
 
 async function jsonpPromise(url) {
   const jsonpObj = jsonp(url, {
-    // timeout: 1000, // 0 to disable (defaults to 15000)
+    timeout: 1000, // 0 to disable (defaults to 15000)
   });
 
   jsonpPromise.cancel = jsonpObj.cancel;

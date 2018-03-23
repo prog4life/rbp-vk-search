@@ -1,6 +1,3 @@
-import axiosJSONP from 'utils/axiosJSONP';
-// import fetchJSONP from 'utils/fetch';
-import prepareWallPosts from 'utils/responseHandling';
 import { maxAttempts as maxAttemptsDefault } from 'config/common';
 import { CALL_API } from 'middleware/callAPI';
 
@@ -46,18 +43,16 @@ const searchProcessor = ({ dispatch, getState }) => {
     if (typeof searchConfig === 'undefined' && type !== 'SEARCH_TERMINATE') {
       return next(action);
     }
-
     if (!types && type !== 'SEARCH_TERMINATE') {
       return next(action);
     }
-
     if (type === 'SEARCH_TERMINATE') {
       clearInterval(scannerIntervalId);
       return next(action);
     }
 
     if (!Array.isArray(types) || types.length !== 4) {
-      throw new Error('Expected an array of seven action types.');
+      throw new Error('Expected an array of four action types.');
     }
     if (typeof searchConfig !== 'object') {
       throw new Error('Expected an object of search config params');
@@ -65,11 +60,14 @@ const searchProcessor = ({ dispatch, getState }) => {
     if (!types.every(t => typeof t === 'string')) {
       throw new Error('Expected action types to be strings');
     }
+    if (!accessToken) {
+      throw new Error('Expected access token to be not empty');
+    }
 
     const [
       searchStartType,
       addResultsType,
-      updateSearchType,
+      updateProgressType, // TODO: make it interval const
       searchEndType,
     ] = types;
 
@@ -110,18 +108,11 @@ const searchProcessor = ({ dispatch, getState }) => {
         `&offset=${offset}`;
 
       dispatch({
-        types: [
-          'REQUEST_START',
-          'REQUEST_SUCCESS',
-          'REQUEST_FAIL',
-          addResultsType,
-          updateSearchType,
-        ],
+        types: [addResultsType, updateProgressType],
         [CALL_API]: {
           url: currentAPIReqUrl,
           offset,
           attempt,
-          offsetModifier,
           authorId,
           resultsLimit: searchResultsLimit,
         },

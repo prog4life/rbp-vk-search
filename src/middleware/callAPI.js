@@ -5,8 +5,8 @@ import prepareWallPosts from 'utils/responseHandling';
 
 export const CALL_API = 'Call API';
 
-export const kindsOfRequest = {
-  wallPosts: 'WALL_POSTS'
+export const schema = {
+  wallPosts: 'WALL_POSTS',
   // wallComments: 'WALL_COMMENTS'
 };
 
@@ -22,75 +22,86 @@ const onRequestStart = (next, offset, attempt) => {
   });
 };
 
+const throwIfSearchIsOver = (isActive, offset) => {
+  if (!isActive) {
+    throw Error(`Needless request (offset: ${offset}), search is over already`);
+  }
+};
+
+// such request obj was removed from store earlier
+const throwIfRequestIsExcess = (request, offset) => {
+  if (!request) {
+    throw Error(`Request with ${offset} offset has been succeeded already`);
+  }
+};
+
 // remove successful request obj from "requests"
 const onRequestSuccess = (next, getState, offset) => (response) => {
-  const { search } = getState();
+  const { search, requests } = getState();
   const key = `offset_${offset}`;
+  console.log(`SUCCESS offset: ${offset}`);
 
-  if (!search.isActive) {
-    throw Error(`Needless response, offset: ${offset}, search is over`);
-  }
+  throwIfSearchIsOver(search.isActive);
+  throwIfRequestIsExcess(requests[key], offset);
 
   next({
     type: 'REQUEST_SUCCESS',
     id: key,
   });
-  // TODO: stop passing state further, use selectors here and there
-  // add searchState for chained further onSearchProgress handler
+
   return response;
 };
 
 // add failed request obj with isPending: false to "requests"
-const onRequestFail = (next, getState, offset, attempt) => (e) => {
+const onRequestFail = (next, getState, offset) => (e) => {
   const { search, requests } = getState();
   const key = `offset_${offset}`;
+  console.log(`FAIL offset: ${offset}`);
 
-  if (!search.isActive) {
-    throw Error(`Needless failed request ${offset}, search is over already`);
-  }
+  // TODO: think over case when belated failed but pending repeated exists
+
+  throwIfSearchIsOver(search.isActive);
+  throwIfRequestIsExcess(requests[key], offset);
 
   next({
     type: 'REQUEST_FAIL',
     id: key,
     offset,
     startTime: requests[key].startTime,
-    attempt,
+    attempt: requests[key].attempt,
   });
+
   throw Error(`Request with ${offset} offset failed, ${e.message}`);
 };
 
-const onSearchProgress = (next, getState, offset, offsetModifier, type) => (
-  (response) => {
-    const { total, processed } = getState().search;
+const onSearchProgress = ({ next, getState, type }) => (response) => {
+  const { total, processed } = getState().search;
+  // to get updated "total"
+  const nextTotal = response && response.count ? response.count : total;
+  const itemsLength = response && response.items && response.items.length;
 
-    console.log('search progress state: ', getState().search);
-    // to get updated "total"
-    const nextTotal = response && response.count ? response.count : total;
-    const itemsLength = response && response.items && response.items.length;
+  let nextProcessed = processed;
 
-    let nextProcessed = processed;
-
-    if (itemsLength) {
-      nextProcessed += itemsLength;
-    }
-
-    if (nextTotal !== total || nextProcessed !== processed) {
-      console.info(`next processed ${nextProcessed} and total ${nextTotal}`);
-
-      next({
-        type,
-        total: nextTotal,
-        processed: nextProcessed,
-      });
-    }
-    return response;
+  if (itemsLength) {
+    nextProcessed += itemsLength;
   }
-);
 
-const savePartOfResults = (next, limit, addResultsType) => (chunk) => {
+  if (nextTotal !== total || nextProcessed !== processed) {
+    console.info(`next processed ${nextProcessed} and total ${nextTotal}`);
+
+    next({
+      type,
+      total: nextTotal,
+      processed: nextProcessed,
+    });
+  }
+  return response;
+};
+
+const savePartOfResults = (next, limit, type) => (chunk) => {
   if (chunk && chunk.length > 0) {
     next({
-      type: addResultsType,
+      type,
       results: chunk,
       limit,
     });
@@ -99,67 +110,59 @@ const savePartOfResults = (next, limit, addResultsType) => (chunk) => {
 };
 
 export default ({ getState, dispatch }) => next => (action) => {
-  const callAPIParams = action[CALL_API];
-  // const { kindOfRequest } = action;
+  const callParams = action[CALL_API];
   const { types } = action;
 
-  if (typeof callAPIParams === 'undefined') {
+  if (typeof callParams === 'undefined') {
     return next(action);
   }
 
-  // const { types, endpoint } = callAPIParams;
   const {
-    url, offset, attempt, offsetModifier, authorId, resultsLimit,
-  } = callAPIParams;
+    url, offset, attempt, authorId, resultsLimit,
+  } = callParams;
 
-  if (Array.isArray(types) && types.length !== 5) {
-    throw new Error('Expected an array of five action types');
+  if (Array.isArray(types) && types.length !== 2) {
+    throw new Error('Expected an array of two action types');
   }
-  // if (!kindOfRequest) {
-  //   throw new Error('Specify one of the exported kinds of requests');
-  // }
   if (!types.every(t => typeof t === 'string')) {
     throw new Error('Expected action types to be strings');
   }
   if (typeof url !== 'string') {
     throw new Error('Specify a string request URL');
   }
-  if (!Number.isInteger(offset)) {
-    throw new Error('Expected offset to be integer');
+  if (!Number.isInteger(offset) || !Number.isInteger(attempt)) {
+    throw new Error('Expected offset and attempt to be integers');
   }
-  if (!Number.isInteger(attempt)) {
-    throw new Error('Expected attempt to be integer');
+  if (!Number.isInteger(authorId)) {
+    throw new Error('Expected authorId to be integers');
   }
-  // let { endpoint } = callAPIParams
-  // if (typeof endpoint === 'function') {                                       !!!
-  //   endpoint = endpoint(store.getState())
-  // }
 
-  // const API_ROOT = 'https://api.github.com/';
-
-  const [requestType, successType, failureType, resType, updateType] = types;
+  const [addResultsType, updateProgressType] = types;
   // add request obj with isPending: true to "requests"
   onRequestStart(next, offset, attempt);
 
-  // NOTE: in all next chain must be used offset value that was actual
-  // at interval tick moment, i.e. passed to "makeCallToAPI"
-  // TODO: test cancel method
+  // TODO: is it necessary ?
+  // const actionWith = (data) => {
+  //   const finalAction = {
+  //     ...action,
+  //     ...data,
+  //   };
+  //   delete finalAction[CALL_API];
+  //   return finalAction;
+  // };
+
   jsonpPromise(url)
     .then(
-      // TODO: maybe it will be rational to get attempt value from
-      //  existing request with same key
       onRequestSuccess(next, getState, offset),
-      onRequestFail(next, getState, offset, attempt),
+      onRequestFail(next, getState, offset),
     )
-    .then(onSearchProgress(
+    .then(onSearchProgress({
       next,
       getState,
-      offset,
-      offsetModifier,
-      updateType,
-    ))
+      type: updateProgressType,
+    }))
     // TODO: change to more generic then(transformResponse(schema))
     .then(prepareWallPosts(authorId))
-    .then(savePartOfResults(next, resultsLimit, resType))
+    .then(savePartOfResults(next, resultsLimit, addResultsType))
     .catch(e => console.error(e));
 };
