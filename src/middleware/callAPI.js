@@ -41,7 +41,7 @@ const onRequestSuccess = (next, getState, offset) => (response) => {
   const key = `offset_${offset}`;
   console.log(`SUCCESS offset: ${offset}`);
 
-  throwIfSearchIsOver(search.isActive);
+  throwIfSearchIsOver(search.isActive, offset);
   throwIfRequestIsExcess(requests[key], offset);
 
   next({
@@ -60,7 +60,7 @@ const onRequestFail = (next, getState, offset) => (e) => {
 
   // TODO: think over case when belated failed but pending repeated exists
 
-  throwIfSearchIsOver(search.isActive);
+  throwIfSearchIsOver(search.isActive, offset);
   throwIfRequestIsExcess(requests[key], offset);
 
   next({
@@ -98,15 +98,16 @@ const onSearchProgress = ({ next, getState, type }) => (response) => {
   return response;
 };
 
-const savePartOfResults = (next, limit, type) => (chunk) => {
-  if (chunk && chunk.length > 0) {
+const savePartOfResults = (next, limit, type) => (results) => {
+  // if (chunk && chunk.length > 0) {
+  if (typeof results === 'object' && Object.keys(results).length > 0) {
     next({
       type,
-      results: chunk,
+      results,
       limit,
     });
   }
-  return chunk;
+  return results;
 };
 
 export default ({ getState, dispatch }) => next => (action) => {
@@ -151,7 +152,7 @@ export default ({ getState, dispatch }) => next => (action) => {
   //   return finalAction;
   // };
 
-  jsonpPromise(url)
+  return jsonpPromise(url)
     .then(
       onRequestSuccess(next, getState, offset),
       onRequestFail(next, getState, offset),

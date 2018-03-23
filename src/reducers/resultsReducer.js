@@ -1,3 +1,8 @@
+import {
+  ADD_RESULTS,
+  WALL_POSTS_SEARCH_START,
+} from 'constants/actionTypes.js';
+
 // const sortByTimestamp = (posts, order) => (
 //   posts.sort((a, b) => (
 //     order === 'asc'
@@ -41,16 +46,16 @@ const addOnlyUniqueItems = (state, items, compareBy) => (
 // TODO: refactor to storing results as hashmap-like object
 export default function results(state = [], action) {
   switch (action.type) {
-    case 'ADD_RESULTS':
-      return sortItemsByNumField(
-        addOnlyUniqueItems(state, action.results, 'postId'),
-        'timestamp',
-        action.order,
-      ).slice(0, action.limit);
+    // case ADD_RESULTS:
+    //   return sortItemsByNumField(
+    //     addOnlyUniqueItems(state, action.results, 'postId'),
+    //     'timestamp',
+    //     action.order,
+    //   ).slice(0, action.limit);
     // to clear results at search start
     // case 'PREPARE_SEARCH':
     //   return [];
-    case 'WALL_POSTS_SEARCH_START':
+    case WALL_POSTS_SEARCH_START:
       return [];
     default:
       return state;

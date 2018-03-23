@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 
 import * as actionCreators from 'actions';
+import { getSortedPosts } from 'reducers';
 import { tokenRequestURL } from 'config/common';
 import TopBar from 'components/TopBar';
 import SearchForm from 'components/SearchForm';
@@ -105,7 +106,7 @@ class WallPostsSearch extends React.Component {
   }
   render() {
     const {
-      search, results, accessToken, userId, userName,
+      search, posts, accessToken, userId, userName,
     } = this.props;
 
     return (
@@ -122,7 +123,7 @@ class WallPostsSearch extends React.Component {
         />
         <ResultsPanel header="This is a panel with search results">
           <ResultsFilter filterText="Here will be filter text" />
-          <ResultsList results={results} />
+          <ResultsList results={posts} />
           {/* <ResultsListContainer /> */}
         </ResultsPanel>
       </div>
@@ -138,6 +139,7 @@ const mapStateToProps = state => ({
   accessToken: state.accessToken,
   tokenExpiresAt: state.tokenExpiresAt,
   results: state.results,
+  posts: getSortedPosts(state),
   search: state.search,
 });
 

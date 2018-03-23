@@ -13,9 +13,9 @@ import SearchResultsLimit from './SearchResultsLimit';
 
 const propTypes = {
   onStartSearch: PropTypes.func.isRequired,
-  search: PropTypes.shape({
-    isActive: PropTypes.bool,
-  }).isRequired,
+  // search: PropTypes.shape({
+  //   isActive: PropTypes.bool,
+  // }).isRequired,
 };
 
 class SearchForm extends React.PureComponent {
@@ -63,6 +63,7 @@ class SearchForm extends React.PureComponent {
     });
   }
   // TODO: add debouncing
+  // TODO: block fields when search is active
   handleInputValueChange(event) {
     this.setState({
       [event.target.id]: event.target.value,

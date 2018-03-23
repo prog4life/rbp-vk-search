@@ -14,7 +14,7 @@ export function extractPostsById(response, authorId) {
   throw Error('Posts from response is not array');
 }
 
-export const formatWallPostResults = posts => (
+export const formatWallPosts = posts => (
   posts && posts.map(post => ({
     // TODO: resolve, must be signer_id in some cases; rename to postAuthor
     authorId: post.signer_id || post.from_id,
@@ -25,9 +25,18 @@ export const formatWallPostResults = posts => (
   }))
 );
 
-const prepareWallPosts = authorId => response => (
-  formatWallPostResults(extractPostsById(response, authorId))
-);
+export const transformToPostsById = (posts) => {
+  const postsById = {};
+  posts.forEach((one) => {
+    postsById[one.postId] = one;
+  });
+  return postsById;
+};
+
+const prepareWallPosts = authorId => (response) => {
+  const formatted = formatWallPosts(extractPostsById(response, authorId));
+  return transformToPostsById(formatted);
+};
 
 export default prepareWallPosts;
 
