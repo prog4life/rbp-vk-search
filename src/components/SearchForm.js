@@ -42,25 +42,26 @@ class SearchForm extends React.PureComponent {
     //   return;
     // }
 
-    const {
-      wallOwnerId,
-      wallOwnerShortName,
-      wallOwnerType,
-      postAuthorId,
-      searchResultsLimit,
+    // const {
+    //   wallOwnerId,
+    //   wallOwnerShortName,
+    //   wallOwnerType,
+    //   postAuthorId,
+    //   searchResultsLimit,
     // } = event.target.elements;
-    } = this.state;
+    // } = this.state;
 
     // TODO: handle case with wrong wallOwnerId here or onChange with
     // request to API
 
-    onStartSearch({
-      wallOwnerId: wallOwnerId.value,
-      wallOwnerShortName: wallOwnerShortName.value,
-      wallOwnerType: wallOwnerType.value,
-      postAuthorId: postAuthorId.value,
-      searchResultsLimit: searchResultsLimit.value,
-    });
+    // onStartSearch({
+    //   wallOwnerId: wallOwnerId.value,
+    //   wallOwnerShortName: wallOwnerShortName.value,
+    //   wallOwnerType: wallOwnerType.value,
+    //   postAuthorId: postAuthorId.value,
+    //   searchResultsLimit: searchResultsLimit.value,
+    // });
+    onStartSearch(this.state);
   }
   // TODO: add debouncing
   // TODO: block fields when search is active

@@ -10,8 +10,8 @@ import { loadState, saveState } from 'utils/localStorage';
 
 setConfig({ logLevel: 'log' }); // ['debug', 'log', 'warn', 'error'(default)]
 
-const results = [
-  {
+const posts = {
+  54525: {
     timestamp: 1582357458,
     authorId: 413870329,
     postId: 54525,
@@ -19,7 +19,7 @@ const results = [
     'только постоянного, за материальную поддержку',
     link: 'https://vk.com/club75465366?w=wall-75465366_37844%2Fall',
   },
-  {
+  13585: {
     timestamp: 1323574580,
     authorId: 247772351,
     postId: 13585,
@@ -27,7 +27,7 @@ const results = [
     'полненькая но не сильно, общительная. Пишите в л/с',
     link: 'https://vk.com/club75465366?w=wall-75465366_37824%2Fall',
   },
-];
+};
 
 const persistedState = loadState('vk-search-state') || {};
 
@@ -35,7 +35,7 @@ const persistedState = loadState('vk-search-state') || {};
 // and make this component presentational, not container
 const store = configureStore({
   ...persistedState,
-  results,
+  posts,
 });
 
 // TODO: wrap in throttle or debounce

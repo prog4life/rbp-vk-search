@@ -47,11 +47,21 @@ const configureStore = (preloadedState = {}) => {
     port: 8000, // the port local "remotedev-server" is running at
   });
 
-  return createStore(
+  const store = createStore(
     rootReducer,
     preloadedState,
     composeEnhancers(applyMiddleware(...middleware)),
   );
+
+  if (module.hot) {
+    // Enable Webpack hot module replacement for reducers
+    module.hot.accept('../reducers', () => {
+      const nextRootReducer = require('../reducers/index');
+      store.replaceReducer(nextRootReducer);
+    });
+  }
+
+  return store;
 };
 
 export default configureStore;

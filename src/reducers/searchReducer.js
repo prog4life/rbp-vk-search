@@ -3,7 +3,7 @@ const defaultSearchState = {
   offset: 0,
   processed: 0,
   // progress: 0,
-  total: undefined,
+  // total: undefined,
 };
 
 const search = (state = defaultSearchState, action) => {

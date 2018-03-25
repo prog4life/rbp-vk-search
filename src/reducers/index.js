@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 import { createSelector } from 'reselect';
+import sortBy from 'lodash.sortby';
 import { sortItemsByNumField } from 'utils/sorting';
 // import * as reducers from './auth';
 import { accessToken, tokenExpiry, userId, userName } from './authReducers';
@@ -36,10 +37,14 @@ export const getSearchProgress = createSelector(
   },
 );
 
+const getPostsById = state => state.posts;
+
 export const getSortedPosts = (state) => {
   // add getLimit
-  const allPosts = fromPosts.getPosts(state.posts);
-  return sortItemsByNumField(allPosts, 'timestamp');
+  // const allPosts = fromPosts.getPosts(state.posts);
+  // return sortItemsByNumField(allPosts, 'timestamp');
+  const postsById = getPostsById(state);
+  return sortBy(postsById, ['timestamp']).reverse();
 };
 
 // TODO: export mainReducer from './mainReducer'; // OR
