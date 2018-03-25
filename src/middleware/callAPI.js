@@ -39,7 +39,7 @@ const throwIfRequestIsExcess = (request, offset) => {
 const onRequestSuccess = (next, getState, offset) => (response) => {
   const { search, requests } = getState();
   const key = `offset_${offset}`;
-  console.log(`SUCCESS offset: ${offset}`);
+  // console.log(`SUCCESS offset: ${offset}`);
 
   throwIfSearchIsOver(search.isActive, offset);
   throwIfRequestIsExcess(requests[key], offset);
@@ -56,7 +56,7 @@ const onRequestSuccess = (next, getState, offset) => (response) => {
 const onRequestFail = (next, getState, offset) => (e) => {
   const { search, requests } = getState();
   const key = `offset_${offset}`;
-  console.log(`FAIL offset: ${offset}`);
+  // console.log(`FAIL offset: ${offset}`);
 
   // TODO: think over case when belated failed but pending repeated exists
 
@@ -87,7 +87,7 @@ const onSearchProgress = ({ next, getState, type }) => (response) => {
   }
 
   if (nextTotal !== total || nextProcessed !== processed) {
-    console.info(`next processed ${nextProcessed} and total ${nextTotal}`);
+    // console.info(`next processed ${nextProcessed} and total ${nextTotal}`);
 
     next({
       type,

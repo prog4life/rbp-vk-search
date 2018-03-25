@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Grid, Row, Col, Form } from 'react-bootstrap';
+import { Grid, Row, Col } from 'react-bootstrap';
 
 import ControlsContainer from 'containers/ControlsContainer';
-import PostAuthorId from './PostAuthorId';
-import WallOwnerId from './WallOwnerId';
-import WallOwnerShortName from './WallOwnerShortName';
-import WallOwnerType from './WallOwnerType';
-import SearchResultsLimit from './SearchResultsLimit';
+import PostAuthorIdField from './PostAuthorIdField';
+import WallOwnerIdField from './WallOwnerIdField';
+import OwnerShortNameField from './OwnerShortNameField';
+import WallOwnerTypeSelect from './WallOwnerTypeSelect';
+import SearchResultsLimitField from './SearchResultsLimitField';
 // import SearchControlButtons from './SearchControlButtons';
 // import ProgressViewer from './ProgressViewer';
 
@@ -18,7 +18,7 @@ const propTypes = {
   // }).isRequired,
 };
 
-class SearchForm extends React.PureComponent {
+class SearchForm extends React.Component { // TODO: use PureComponent ?
   constructor(props) {
     super(props);
 
@@ -26,6 +26,9 @@ class SearchForm extends React.PureComponent {
     this.handleInputValueChange = this.handleInputValueChange.bind(this);
 
     this.state = {
+      shouldValidate: false,
+      isShortNameChecked: false,
+      // isValidationOk: undefined,
       wallOwnerId: '',
       wallOwnerShortName: '',
       wallOwnerType: 'group',
@@ -33,14 +36,26 @@ class SearchForm extends React.PureComponent {
       searchResultsLimit: '',
     };
   }
+  validate = (isValid) => {
+    if (!isValid) {
+      this.setState({ isValidationOk: false });
+    }
+  }
   handleSubmit(event) {
     event.preventDefault();
     // const { search, onStartSearch } = this.props;
     const { onStartSearch } = this.props;
+    // const { wallOwnerId, wallOwnerShortName } = this.state;
 
     // if (search.isActive) {
     //   return;
     // }
+
+    this.setState({
+      shouldValidate: true,
+    });
+
+    if (this.state.isValidationOk) {}
 
     // const {
     //   wallOwnerId,
@@ -66,14 +81,23 @@ class SearchForm extends React.PureComponent {
   // TODO: add debouncing
   // TODO: block fields when search is active
   handleInputValueChange(event) {
+    if (event.target.type === 'radio') {
+      this.setState({
+        isShortNameChecked: event.target.value === 'shortName',
+      });
+      return;
+    }
     this.setState({
-      [event.target.id]: event.target.value,
+      [event.target.name]: event.target.value.trim(),
     });
   }
   render() {
     const {
+      shouldValidate,
+      isShortNameChecked,
       wallOwnerId,
       wallOwnerShortName,
+      // wallOwner,
       wallOwnerType,
       postAuthorId,
       searchResultsLimit,
@@ -81,36 +105,44 @@ class SearchForm extends React.PureComponent {
 
     return (
       <Grid>
-        <Form className="search-form" onSubmit={this.handleSubmit}>
+        <form className="search-form" onSubmit={this.handleSubmit}>
           <Row>
-            {/*  TODO: use names instead of id's */}
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
-              <WallOwnerId
+              <WallOwnerIdField
+                disabled={isShortNameChecked}
+                // isOwnerSpecified={isOwnerSpecified}
                 onChange={this.handleInputValueChange}
+                shouldValidate={shouldValidate}
                 value={wallOwnerId}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
-              <WallOwnerShortName
+              <OwnerShortNameField
+                disabled={!isShortNameChecked}
+                // isOwnerSpecified={isOwnerSpecified}
                 onChange={this.handleInputValueChange}
+                shouldValidate={shouldValidate}
                 value={wallOwnerShortName}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
-              <WallOwnerType
+              <WallOwnerTypeSelect
                 onChange={this.handleInputValueChange}
                 value={wallOwnerType}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
-              <PostAuthorId
+              <PostAuthorIdField
+                // disabled={isSearchActive}
                 onChange={this.handleInputValueChange}
+                shouldValidate={shouldValidate}
                 value={postAuthorId}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
-              <SearchResultsLimit
+              <SearchResultsLimitField
                 onChange={this.handleInputValueChange}
+                shouldValidate={shouldValidate}
                 value={searchResultsLimit}
               />
             </Col>
@@ -123,7 +155,7 @@ class SearchForm extends React.PureComponent {
               <ControlsContainer itemsName="posts" />
             </Col>
           </Row> */}
-        </Form>
+        </form>
       </Grid>
     );
   }

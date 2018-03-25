@@ -16,10 +16,10 @@ const logger = createLogger({
   predicate: (getState, action) => {
     const hiddenTypes = [
       'SET_OFFSET',
-      'SEARCH_UPDATE',
-      'REQUEST_START',
-      'REQUEST_SUCCESS',
-      'REQUEST_FAIL',
+      // 'SEARCH_UPDATE',
+      // 'REQUEST_START',
+      // 'REQUEST_SUCCESS',
+      // 'REQUEST_FAIL',
     ];
     return !hiddenTypes.some(type => type === action.type);
   },
@@ -56,7 +56,7 @@ const configureStore = (preloadedState = {}) => {
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers
     module.hot.accept('../reducers', () => {
-      const nextRootReducer = require('../reducers/index');
+      const nextRootReducer = require('../reducers');
       store.replaceReducer(nextRootReducer);
     });
   }

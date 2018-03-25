@@ -2,8 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 
-const WallOwnerType = ({ value, onChange }) => (
-  <FormGroup controlId="wallOwnerType">
+const WallOwnerTypeSelect = ({ value, onChange }) => (
+  <FormGroup
+    controlId="wall-owner-type"
+    name="wallOwnerType"
+  >
     <ControlLabel>
       {'Wall is owned by'}
     </ControlLabel>
@@ -22,9 +25,9 @@ const WallOwnerType = ({ value, onChange }) => (
   </FormGroup>
 );
 
-WallOwnerType.propTypes = {
+WallOwnerTypeSelect.propTypes = {
   onChange: PropTypes.func.isRequired,
   value: PropTypes.string.isRequired,
 };
 
-export default WallOwnerType;
+export default WallOwnerTypeSelect;
