@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import MaskedFormControl from 'react-bootstrap-maskedinput';
 // TODO: test InputGroupAddon
-import { FormControl, InputGroup } from 'react-bootstrap';
+import { InputGroup } from 'react-bootstrap';
 import FormInputGroup from 'components/FormInputGroup';
 
 function getValidationState(value, disabled, fail) {
@@ -34,13 +34,16 @@ const WallOwnerIdField = ({ value, onChange, disabled, fail }) => (
         />
       </InputGroup.Addon>
       <MaskedFormControl
-        // fefefokokokokokkkokokokokokokfeo - 32 chars in screen name
         disabled={disabled}
         mask="1111111111"
+        formatCharacters={{
+          // i: { validate(char) { return char === 'i'; } },
+          // d: { validate(char) { return char === 'd'; } },
+        }}
         placeholderChar=" "
         name="wallOwnerId" // TODO: here or for radio input ?
         onChange={onChange}
-        placeholder="id of user or group without 'id' part"
+        placeholder="id123456789"
         type="text"
         value={value}
       />

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 
-const WallOwnerTypeSelect = ({ value, onChange }) => (
+const WallOwnerTypeSelect = ({ value, onChange, disabled }) => (
   <FormGroup
     controlId="wall-owner-type"
     name="wallOwnerType"
@@ -13,6 +13,7 @@ const WallOwnerTypeSelect = ({ value, onChange }) => (
     <FormControl
       componentClass="select"
       onChange={onChange}
+      disabled={disabled}
       value={value}
     >
       <option value="user">

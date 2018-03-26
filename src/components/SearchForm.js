@@ -12,6 +12,7 @@ import SearchResultsLimitField from './SearchResultsLimitField';
 // import ProgressViewer from './ProgressViewer';
 
 const propTypes = {
+  isSearchActive: PropTypes.bool.isRequired,
   onStartSearch: PropTypes.func.isRequired,
   // search: PropTypes.shape({
   //   isActive: PropTypes.bool,
@@ -42,13 +43,12 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
   }
   handleSubmit(event) {
     event.preventDefault();
-    // const { search, onStartSearch } = this.props;
-    const { onStartSearch } = this.props;
+    const { isSearchActive, onStartSearch } = this.props;
     // const { wallOwnerId, wallOwnerShortName } = this.state;
 
-    // if (search.isActive) {
-    //   return;
-    // }
+    if (isSearchActive) {
+      return;
+    }
 
     this.isFormValid = true;
     // this.notValidFields = [];
@@ -99,6 +99,7 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
   }
   render() {
     const {
+      isSearchActive,
       shouldValidate,
       isShortNameChecked,
       wallOwnerId,
@@ -114,7 +115,7 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
           <Row>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
               <WallOwnerIdField
-                disabled={isShortNameChecked}
+                disabled={isSearchActive || isShortNameChecked}
                 onChange={this.handleInputValueChange}
                 fail={shouldValidate && this.failValidation}
                 value={wallOwnerId}
@@ -122,7 +123,7 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
               <OwnerShortNameField
-                disabled={!isShortNameChecked}
+                disabled={isSearchActive || !isShortNameChecked}
                 onChange={this.handleInputValueChange}
                 fail={shouldValidate && this.failValidation}
                 value={wallOwnerShortName}
@@ -130,13 +131,14 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
               <WallOwnerTypeSelect
+                disabled={isSearchActive}
                 onChange={this.handleInputValueChange}
                 value={wallOwnerType}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
               <PostAuthorIdField
-                // disabled={isSearchActive}
+                disabled={isSearchActive}
                 onChange={this.handleInputValueChange}
                 fail={shouldValidate && this.failValidation}
                 value={postAuthorId}
@@ -144,6 +146,7 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
               <SearchResultsLimitField
+                disabled={isSearchActive}
                 onChange={this.handleInputValueChange}
                 fail={shouldValidate && this.failValidation}
                 value={searchResultsLimit}

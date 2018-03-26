@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import MaskedFormControl from 'react-bootstrap-maskedinput';
 // TODO: test InputGroupAddon
 import { FormControl, InputGroup } from 'react-bootstrap';
 import FormInputGroup from 'components/FormInputGroup';
@@ -8,7 +9,7 @@ function getValidationState(value, disabled, fail) {
   if (disabled || !fail) {
     return undefined;
   }
-  if (value.length < 1) {
+  if (value.length < 1 || value.length > 32) { // numbers, letters and _
     fail();
     return 'error';
   }
@@ -31,9 +32,17 @@ const OwnerShortNameField = ({ value, onChange, disabled, fail }) => (
           value="shortName"
         />
       </InputGroup.Addon>
-      <FormControl
-        // componentClass={<MaskedInput />}
+      <MaskedFormControl
+        // componentClass={<MaskedInput />} // react-bootstrap prop
         disabled={disabled}
+        mask={'w'.repeat(32)}
+        formatCharacters={{
+          w: {
+            validate(char) { return /\w/.test(char); }, // \w === [A-Za-z0-9_]
+            // transform(char) { return char.toUpperCase(); },
+          },
+        }}
+        placeholderChar=" "
         name="wallOwnerShortName" // TODO: here or for radio input ?
         onChange={onChange}
         placeholder="short textual id of user or group"

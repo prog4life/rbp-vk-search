@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import FormInputGroup from 'components/FormInputGroup';
 
-const SearchResultsLimitField = ({ value, onChange }) => (
+const SearchResultsLimitField = ({ value, onChange, disabled }) => (
   <FormInputGroup
     id="search-results-limit"
     name="searchResultsLimit"
@@ -10,6 +10,7 @@ const SearchResultsLimitField = ({ value, onChange }) => (
     onChange={onChange}
     placeholder="number of results"
     type="text"
+    disabled={disabled}
     value={value}
   />
 );

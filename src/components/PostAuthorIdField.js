@@ -21,6 +21,7 @@ const PostAuthorIdField = ({ value, onChange, disabled, fail }) => (
     onChange={onChange}
     placeholder="id of post author"
     type="text"
+    disabled={disabled}
     validationState={getValidationState(value, disabled, fail)}
     value={value}
   />

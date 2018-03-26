@@ -70,7 +70,7 @@ class WallPostsSearch extends React.Component {
     // TODO: remove this temp redirect later and sign in at search start
     setTimeout(() => {
       // localStorage.setItem('url', tokenRequestURL);
-      // window.location.replace(tokenRequestURL); // req to external vk api url
+      // window.location.assign(tokenRequestURL); // req to external vk api url
     }, 3000);
 
     // if (!accessToken) {
