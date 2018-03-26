@@ -1,31 +1,48 @@
 // import moment from 'moment';
-import { apiVersion } from 'config/common';
+import { getAuthData } from 'reducers';
+import { apiVersion, tokenRequestURL } from 'config/common';
 import fetchJSONP from 'utils/fetchJSONP';
 
+import {
+  SAVE_AUTH_DATA,
+  SET_USER_NAME,
+  SIGN_OUT,
+  NO_TOKEN,
+  TOKEN_EXPIRED,
+  REDIRECT_FOR_TOKEN,
+} from 'constants/actionTypes';
+
 // TODO: split into 2 distinct actions ?
-export const saveAccessToken = (accessToken, tokenExpiresAt) => ({
-  type: 'SAVE_ACCESS_TOKEN',
+// export const saveAccessToken = (accessToken, tokenExpiresAt) => ({
+//   type: 'SAVE_ACCESS_TOKEN',
+//   accessToken,
+//   tokenExpiresAt,
+// });
+
+// export const setTokenExpiry = expiresAt => ({
+//   type: 'SET_TOKEN_EXPIRY',
+//   expiresAt,
+// });
+
+// export const setUserId = userId => ({
+//   type: 'SET_USER_ID',
+//   userId,
+// });
+
+export const saveAuthData = (accessToken, tokenExpiresAt, userId) => ({
+  type: SAVE_AUTH_DATA,
   accessToken,
   tokenExpiresAt,
-});
-
-export const setTokenExpiry = expiresAt => ({
-  type: 'SET_TOKEN_EXPIRY',
-  expiresAt,
+  userId,
 });
 
 // TODO: terminate search on sign out
 export const signOut = () => ({
-  type: 'SIGN_OUT',
-});
-
-export const setUserId = userId => ({
-  type: 'SET_USER_ID',
-  userId,
+  type: SIGN_OUT,
 });
 
 export const setUserName = userName => ({
-  type: 'SET_USER_NAME',
+  type: SET_USER_NAME,
   userName,
 });
 
@@ -40,6 +57,29 @@ export const getUserName = (id) => {
   }).catch(e => console.warn(e));
 };
 
+export const checkAccessToken = () => (dispatch, getState) => {
+  const { accessToken, tokenExpiresAt } = getAuthData(getState());
+
+  if (!accessToken) {
+    dispatch({ type: NO_TOKEN });
+    return false;
+  }
+  if (tokenExpiresAt < Date.now() - (6 * Math.pow(10, 5))) { // try **
+    dispatch({ type: TOKEN_EXPIRED });
+    return false;
+  }
+  return accessToken;
+};
+
+export const redirectForToken = () => {
+  window.location.assign(tokenRequestURL);
+
+  return {
+    type: REDIRECT_FOR_TOKEN,
+  };
+};
+
+// TODO: rename to extractAuthData, save errors to store
 export const parseAccessTokenHash = hash => (dispatch) => {
   if (!hash) {
     return false;
@@ -65,7 +105,7 @@ export const parseAccessTokenHash = hash => (dispatch) => {
   const {
     access_token: accessToken,
     expires_in: expiresIn,
-    user_id: userId,
+    user_id: userId = '',
     error,
     error_description: errorDescription,
   } = result;
@@ -82,12 +122,14 @@ export const parseAccessTokenHash = hash => (dispatch) => {
       tokenExpiresAt = Date.now() + (expiresIn * 1000);
       // tokenExpiresAt = moment().add(expiresIn, 'seconds').unix();
     }
-    dispatch(saveAccessToken(accessToken, tokenExpiresAt));
+    // dispatch(saveAccessToken(accessToken, tokenExpiresAt)); // TODO: delete
 
     if (userId) {
-      dispatch(setUserId(userId));
+      // dispatch(setUserId(userId)); // TODO: delete
       getUserName(userId).then(userName => dispatch(setUserName(userName)));
     }
+    dispatch(saveAuthData(accessToken, tokenExpiresAt, userId));
+
     return result;
   }
   return false;

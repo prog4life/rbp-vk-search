@@ -3,22 +3,25 @@ import { createSelector } from 'reselect';
 import sortBy from 'lodash.sortby';
 import { sortItemsByNumField } from 'utils/sorting';
 // import * as reducers from './auth';
-import { accessToken, tokenExpiry, userId, userName } from './authReducers';
+import auth from './authReducer';
 import search, * as fromSearch from './searchReducer';
 import results from './resultsReducer';
 import posts, * as fromPosts from './postsReducer';
 import requests from './requestsReducer';
 
 export default combineReducers({
-  userId,
-  accessToken,
-  userName,
-  tokenExpiresAt: tokenExpiry,
+  // userId,
+  // accessToken,
+  // userName,
+  // tokenExpiresAt: tokenExpiry,
+  auth,
   results,
   posts,
   search,
   requests,
 });
+
+export const getAuthData = state => state.auth;
 
 export const getSearchIsActive = state => fromSearch.getIsActive(state.search);
 export const getSearchTotal = state => fromSearch.getTotal(state.search);

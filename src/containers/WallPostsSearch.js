@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 
 import * as actionCreators from 'actions';
 import { getSortedPosts } from 'reducers';
-import { tokenRequestURL } from 'config/common';
 import TopBar from 'components/TopBar';
 import SearchForm from 'components/SearchForm';
 import ResultsPanel from 'components/ResultsPanel';
@@ -13,27 +12,6 @@ import ResultsFilter from 'components/ResultsFilter';
 import ResultsList from 'components/ResultsList';
 
 import ResultsListContainer from 'containers/ResultsListContainer';
-
-const propTypes = {
-  accessToken: PropTypes.string.isRequired,
-  history: PropTypes.instanceOf(Object).isRequired,
-  location: PropTypes.instanceOf(Object).isRequired,
-  match: PropTypes.instanceOf(Object).isRequired,
-  parseAccessTokenHash: PropTypes.func.isRequired,
-  results: PropTypes.arrayOf(PropTypes.object).isRequired,
-  search: PropTypes.shape({
-    isActive: PropTypes.bool,
-    total: PropTypes.number,
-    processed: PropTypes.number,
-    progress: PropTypes.number,
-  }).isRequired,
-  signOut: PropTypes.func.isRequired,
-  startWallPostsSearch: PropTypes.func.isRequired,
-  terminateSearch: PropTypes.func.isRequired,
-  // tokenExpiresAt: PropTypes.number.isRequired
-  userId: PropTypes.string.isRequired,
-  userName: PropTypes.string.isRequired,
-};
 
 class WallPostsSearch extends React.Component {
   constructor(props) {
@@ -47,6 +25,7 @@ class WallPostsSearch extends React.Component {
     const {
       accessToken,
       parseAccessTokenHash,
+      // redirectForToken,
       location,
       match,
       history,
@@ -70,7 +49,7 @@ class WallPostsSearch extends React.Component {
     // TODO: remove this temp redirect later and sign in at search start
     setTimeout(() => {
       // localStorage.setItem('url', tokenRequestURL);
-      // window.location.assign(tokenRequestURL); // req to external vk api url
+      // redirectForToken(); // redirects to external vk api url
     }, 3000);
 
     // if (!accessToken) {
@@ -87,13 +66,21 @@ class WallPostsSearch extends React.Component {
     this.handleSearchStop();
   }
   handleSearchStart = (inputData) => {
-    const { startWallPostsSearch } = this.props;
-    startWallPostsSearch(inputData);
-    // TEMP:
-    console.log('FORM STATE: ', inputData);
+    const {
+      startWallPostsSearch, checkAccessToken, redirectForToken,
+    } = this.props;
+
+    if (checkAccessToken()) {
+      console.log('FORM STATE: ', inputData); // TEMP
+      startWallPostsSearch(inputData);
+      return;
+    }
+    // TODO: save input values to localStorage; show redirection notification
+    redirectForToken();
   }
   handleSearchStop() {
     const { terminateSearch } = this.props;
+    // TODO: check if search is active
     terminateSearch();
   }
   handleNavSelect(eventKey, e) {
@@ -131,13 +118,12 @@ class WallPostsSearch extends React.Component {
   }
 }
 
-WallPostsSearch.propTypes = propTypes;
 
 const mapStateToProps = state => ({
-  userId: state.userId,
-  userName: state.userName,
-  accessToken: state.accessToken,
-  tokenExpiresAt: state.tokenExpiresAt,
+  userId: state.auth.userId,
+  userName: state.auth.userName,
+  accessToken: state.auth.accessToken,
+  tokenExpiresAt: state.auth.tokenExpiresAt,
   results: state.results,
   posts: getSortedPosts(state),
   search: state.search,
@@ -146,5 +132,26 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => (
   bindActionCreators(actionCreators, dispatch)
 );
+
+WallPostsSearch.propTypes = {
+  accessToken: PropTypes.string.isRequired,
+  history: PropTypes.instanceOf(Object).isRequired,
+  location: PropTypes.instanceOf(Object).isRequired,
+  match: PropTypes.instanceOf(Object).isRequired,
+  parseAccessTokenHash: PropTypes.func.isRequired,
+  results: PropTypes.arrayOf(PropTypes.object).isRequired,
+  search: PropTypes.shape({
+    isActive: PropTypes.bool,
+    total: PropTypes.number,
+    processed: PropTypes.number,
+    progress: PropTypes.number,
+  }).isRequired,
+  signOut: PropTypes.func.isRequired,
+  startWallPostsSearch: PropTypes.func.isRequired,
+  terminateSearch: PropTypes.func.isRequired,
+  // tokenExpiresAt: PropTypes.number.isRequired
+  userId: PropTypes.string.isRequired,
+  userName: PropTypes.string.isRequired,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(WallPostsSearch);
