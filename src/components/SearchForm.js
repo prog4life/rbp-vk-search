@@ -28,7 +28,6 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
     this.state = {
       shouldValidate: false,
       isShortNameChecked: false,
-      // isValidationOk: undefined,
       wallOwnerId: '',
       wallOwnerShortName: '',
       wallOwnerType: 'group',
@@ -36,10 +35,10 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
       searchResultsLimit: '',
     };
   }
-  validate = (isValid) => {
-    if (!isValid) {
-      this.setState({ isValidationOk: false });
-    }
+  // componentDidUpdate(prevProps, prevState) {
+  // }
+  failValidation = () => {
+    this.isFormValid = false;
   }
   handleSubmit(event) {
     event.preventDefault();
@@ -51,11 +50,18 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
     //   return;
     // }
 
+    this.isFormValid = true;
+    // this.notValidFields = [];
+
     this.setState({
       shouldValidate: true,
+    }, () => {
+      // NOTE: will be executed once component is re-rendered
+      // if (this.notValidFields && !this.notValidFields.length) {
+      if (this.isFormValid) {
+        onStartSearch(this.state);
+      }
     });
-
-    if (this.state.isValidationOk) {}
 
     // const {
     //   wallOwnerId,
@@ -76,7 +82,7 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
     //   postAuthorId: postAuthorId.value,
     //   searchResultsLimit: searchResultsLimit.value,
     // });
-    onStartSearch(this.state);
+    // onStartSearch(this.state);
   }
   // TODO: add debouncing
   // TODO: block fields when search is active
@@ -97,7 +103,6 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
       isShortNameChecked,
       wallOwnerId,
       wallOwnerShortName,
-      // wallOwner,
       wallOwnerType,
       postAuthorId,
       searchResultsLimit,
@@ -110,18 +115,16 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
               <WallOwnerIdField
                 disabled={isShortNameChecked}
-                // isOwnerSpecified={isOwnerSpecified}
                 onChange={this.handleInputValueChange}
-                shouldValidate={shouldValidate}
+                fail={shouldValidate && this.failValidation}
                 value={wallOwnerId}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
               <OwnerShortNameField
                 disabled={!isShortNameChecked}
-                // isOwnerSpecified={isOwnerSpecified}
                 onChange={this.handleInputValueChange}
-                shouldValidate={shouldValidate}
+                fail={shouldValidate && this.failValidation}
                 value={wallOwnerShortName}
               />
             </Col>
@@ -135,14 +138,14 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
               <PostAuthorIdField
                 // disabled={isSearchActive}
                 onChange={this.handleInputValueChange}
-                shouldValidate={shouldValidate}
+                fail={shouldValidate && this.failValidation}
                 value={postAuthorId}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
               <SearchResultsLimitField
                 onChange={this.handleInputValueChange}
-                shouldValidate={shouldValidate}
+                fail={shouldValidate && this.failValidation}
                 value={searchResultsLimit}
               />
             </Col>

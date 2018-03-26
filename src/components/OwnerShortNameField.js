@@ -4,21 +4,22 @@ import PropTypes from 'prop-types';
 import { FormControl, InputGroup } from 'react-bootstrap';
 import FormInputGroup from 'components/FormInputGroup';
 
-function getValidationState(value, disabled, shouldValidate) {
-  if (disabled || !shouldValidate) {
+function getValidationState(value, disabled, fail) {
+  if (disabled || !fail) {
     return undefined;
   }
-  if (value.trim().length < 1) {
+  if (value.length < 1) {
+    fail();
     return 'error';
   }
   return undefined;
 }
 
-const OwnerShortNameField = ({ value, onChange, disabled, shouldValidate }) => (
+const OwnerShortNameField = ({ value, onChange, disabled, fail }) => (
   <FormInputGroup
     id="wall-owner-short-name"
     label="Short name of wall owner (instead of id)"
-    validationState={getValidationState(value, disabled, shouldValidate)}
+    validationState={getValidationState(value, disabled, fail)}
   >
     <InputGroup>
       <InputGroup.Addon>
@@ -31,6 +32,7 @@ const OwnerShortNameField = ({ value, onChange, disabled, shouldValidate }) => (
         />
       </InputGroup.Addon>
       <FormControl
+        // componentClass={<MaskedInput />}
         disabled={disabled}
         name="wallOwnerShortName" // TODO: here or for radio input ?
         onChange={onChange}

@@ -1,25 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import MaskedFormControl from 'react-bootstrap-maskedinput';
 // TODO: test InputGroupAddon
 import { FormControl, InputGroup } from 'react-bootstrap';
 import FormInputGroup from 'components/FormInputGroup';
 
-function getValidationState(value, disabled, shouldValidate) {
-  if (disabled || !shouldValidate) {
+function getValidationState(value, disabled, fail) {
+  if (disabled || !fail) {
     return undefined;
   }
-  if (value.trim().length < 1) {
+  if (value.length < 1) {
+    fail();
     return 'error';
   }
   return undefined;
 }
 
-const WallOwnerIdField = ({ value, onChange, disabled, shouldValidate }) => (
+const WallOwnerIdField = ({ value, onChange, disabled, fail }) => (
   <FormInputGroup
     id="wall-owner-id"
     label="Wall owner id"
     // required // TODO: this or short name must be entered, look below
-    validationState={getValidationState(value, disabled, shouldValidate)}
+    validationState={getValidationState(value, disabled, fail)}
   >
     <InputGroup>
       <InputGroup.Addon>
@@ -31,11 +33,14 @@ const WallOwnerIdField = ({ value, onChange, disabled, shouldValidate }) => (
           value="usualId"
         />
       </InputGroup.Addon>
-      <FormControl
+      <MaskedFormControl
+        // fefefokokokokokkkokokokokokokfeo - 32 chars in screen name
         disabled={disabled}
+        mask="1111111111"
+        placeholderChar=" "
         name="wallOwnerId" // TODO: here or for radio input ?
         onChange={onChange}
-        placeholder="id of user or group"
+        placeholder="id of user or group without 'id' part"
         type="text"
         value={value}
       />

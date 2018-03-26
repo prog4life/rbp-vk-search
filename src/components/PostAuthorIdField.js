@@ -2,17 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import FormInputGroup from 'components/FormInputGroup';
 
-function getValidationState(value, disabled, shouldValidate) {
-  if (disabled || !shouldValidate) {
+function getValidationState(value, disabled, fail) {
+  if (disabled || !fail) {
     return undefined;
   }
-  if (value.trim().length < 1) {
+  if (value.length < 1) {
+    fail();
     return 'error';
   }
   return undefined;
 }
 
-const PostAuthorIdField = ({ value, onChange, disabled, shouldValidate }) => (
+const PostAuthorIdField = ({ value, onChange, disabled, fail }) => (
   <FormInputGroup
     id="post-author-id"
     name="postAuthorId"
@@ -20,7 +21,7 @@ const PostAuthorIdField = ({ value, onChange, disabled, shouldValidate }) => (
     onChange={onChange}
     placeholder="id of post author"
     type="text"
-    validationState={getValidationState(value, disabled, shouldValidate)}
+    validationState={getValidationState(value, disabled, fail)}
     value={value}
   />
 );
