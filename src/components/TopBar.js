@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { Navbar } from 'react-bootstrap';
+import { Navbar, Nav, NavItem  } from 'react-bootstrap';
 // TODO: try
 // import {
 //   Navbar, NavbarText, NavbarLink, NavbarHeader, NavbarBrand, NavbarCollapse,
 // } from 'react-bootstrap';
-import { tokenRequestURL } from 'config/common';
 
 import NavAuth from 'components/NavAuth';
 
@@ -18,14 +17,18 @@ const propTypes = {
 };
 
 const TopBar = ({ userId, userName, isLoggedIn, onNavSelect }) => {
-  const singleSignIn = (
-    <Navbar.Text className="topbar__sign-in" pullRight>
+  const signInNav = (
+    <Nav pullRight>
       {/* TODO: invoke action with request instead href;
-      prevent repeated requests; add loading indicator */}
-      <Navbar.Link href={tokenRequestURL}>
+        // prevent repeated requests; add loading indicator or modal */}
+      <NavItem
+        className="topbar__sign-in"
+        eventKey={2}
+        href="#"
+      >
         {'Sign in'}
-      </Navbar.Link>
-    </Navbar.Text>
+      </NavItem>
+    </Nav>
   );
 
   return (
@@ -41,7 +44,7 @@ const TopBar = ({ userId, userName, isLoggedIn, onNavSelect }) => {
       <Navbar.Collapse>
         {isLoggedIn
           ? <NavAuth userId={userId} userName={userName} />
-          : singleSignIn
+          : signInNav
         }
       </Navbar.Collapse>
     </Navbar>

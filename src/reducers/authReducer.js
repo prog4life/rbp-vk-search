@@ -1,14 +1,16 @@
 import {
   SAVE_AUTH_DATA,
   SET_USER_NAME,
+  REDIRECT_TO_AUTH,
   SIGN_OUT,
 } from 'constants/actionTypes';
 
 const defaultState = {
   accessToken: '',
-  // tokenExpiresAt: null,
+  tokenExpiresAt: null,
   userId: '',
   userName: '',
+  isRedirecting: false,
 };
 
 const authReducer = (state = defaultState, action) => {
@@ -25,12 +27,18 @@ const authReducer = (state = defaultState, action) => {
         ...state,
         userName: action.userName,
       };
-    case SIGN_OUT:
+    case REDIRECT_TO_AUTH:
+      return {
+        ...state,
+        isRedirecting: action.isRedirecting,
+      };
+    case SIGN_OUT: // change to defaultState?
       return {
         accessToken: '',
-        tokenExpiresAt: undefined,
+        tokenExpiresAt: null,
         userId: '',
         userName: '',
+        isRedirecting: false,
       };
     default:
       return state;
@@ -39,46 +47,46 @@ const authReducer = (state = defaultState, action) => {
 
 export default authReducer;
 
-export function accessToken(state = '', action) {
-  switch (action.type) {
-    case 'SAVE_ACCESS_TOKEN':
-      return action.accessToken;
-    case 'SIGN_OUT':
-      return '';
-    default:
-      return state;
-  }
-}
+// export function accessToken(state = '', action) {
+//   switch (action.type) {
+//     case 'SAVE_ACCESS_TOKEN':
+//       return action.accessToken;
+//     case 'SIGN_OUT':
+//       return '';
+//     default:
+//       return state;
+//   }
+// }
 
-export function tokenExpiry(state = null, action) {
-  switch (action.type) {
-    case 'SAVE_ACCESS_TOKEN':
-      return action.tokenExpiresAt;
-    case 'SIGN_OUT':
-      return null;
-    default:
-      return state;
-  }
-}
+// export function tokenExpiry(state = null, action) {
+//   switch (action.type) {
+//     case 'SAVE_ACCESS_TOKEN':
+//       return action.tokenExpiresAt;
+//     case 'SIGN_OUT':
+//       return null;
+//     default:
+//       return state;
+//   }
+// }
 
-export function userId(state = '', action) {
-  switch (action.type) {
-    case 'SET_USER_ID':
-      return action.userId;
-    case 'SIGN_OUT':
-      return '';
-    default:
-      return state;
-  }
-}
+// export function userId(state = '', action) {
+//   switch (action.type) {
+//     case 'SET_USER_ID':
+//       return action.userId;
+//     case 'SIGN_OUT':
+//       return '';
+//     default:
+//       return state;
+//   }
+// }
 
-export function userName(state = '', action) {
-  switch (action.type) {
-    case 'SET_USER_NAME':
-      return action.userName;
-    case 'SIGN_OUT':
-      return '';
-    default:
-      return state;
-  }
-}
+// export function userName(state = '', action) {
+//   switch (action.type) {
+//     case 'SET_USER_NAME':
+//       return action.userName;
+//     case 'SIGN_OUT':
+//       return '';
+//     default:
+//       return state;
+//   }
+// }

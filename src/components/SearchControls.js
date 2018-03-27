@@ -37,7 +37,10 @@ class SearchControls extends Component {
         <ButtonToolbar className="search-controls__search-buttons">
           {isSearchActive
             ?
-              <Button type="button" onClick={this.handleStopClick}>
+              <Button
+                onClick={this.handleStopClick}
+                type="button"
+              >
                 {'Stop Search'}
               </Button>
             :

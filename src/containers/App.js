@@ -2,13 +2,14 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { hot, setConfig } from 'react-hot-loader';
+import _debounce from 'lodash.debounce';
 // import Home from 'containers/Home';
 import WallPostsSearch from 'containers/WallPostsSearch';
 import NotFoundPage from 'components/NotFoundPage';
 import configureStore from 'store/configureStore';
 import { loadState, saveState } from 'utils/localStorage';
 
-setConfig({ logLevel: 'log' }); // ['debug', 'log', 'warn', 'error'(default)]
+setConfig({ logLevel: 'error' }); // ['debug', 'log', 'warn', 'error'(default)]
 
 const posts = {
   54525: {
@@ -34,21 +35,31 @@ const persistedState = loadState('vk-search-state') || {};
 // TODO: replace store creation to index.js and pass it as prop into here
 // and make this component presentational, not container
 const store = configureStore({
-  ...persistedState,
+  auth: {
+    ...persistedState,
+    isRedirecting: false,
+  },
   posts,
 });
 
 // TODO: wrap in throttle or debounce
-// store.subscribe(() => console.log('Updated state ', store.getState()));
-store.subscribe(() => {
-  const { userId, accessToken, tokenExpiresAt } = store.getState();
+store.subscribe(() => console.log('State update ', (new Date()).toLocaleTimeString()));
+
+const saveStateDebounced = _debounce(() => {
+  const {
+    auth: { userId, accessToken, tokenExpiresAt, userName },
+  } = store.getState();
   const stateSliceToStore = {
     userId,
     accessToken,
     tokenExpiresAt,
+    userName,
   };
+  console.log('save state debounced ', (new Date()).toLocaleTimeString());
   saveState(stateSliceToStore, 'vk-search-state');
-});
+}, 5000);
+
+store.subscribe(saveStateDebounced);
 
 const App = () => (
   <Provider store={store}>

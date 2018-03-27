@@ -9,7 +9,7 @@ import {
   SIGN_OUT,
   NO_TOKEN,
   TOKEN_EXPIRED,
-  REDIRECT_FOR_TOKEN,
+  REDIRECT_TO_AUTH,
 } from 'constants/actionTypes';
 
 // TODO: split into 2 distinct actions ?
@@ -71,11 +71,12 @@ export const checkAccessToken = () => (dispatch, getState) => {
   return accessToken;
 };
 
-export const redirectForToken = () => {
+export const redirectToAuth = () => {
   window.location.assign(tokenRequestURL);
 
   return {
-    type: REDIRECT_FOR_TOKEN,
+    type: REDIRECT_TO_AUTH,
+    isRedirecting: true,
   };
 };
 

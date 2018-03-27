@@ -8,15 +8,10 @@ import WallOwnerIdField from './WallOwnerIdField';
 import OwnerShortNameField from './OwnerShortNameField';
 import WallOwnerTypeSelect from './WallOwnerTypeSelect';
 import SearchResultsLimitField from './SearchResultsLimitField';
-// import SearchControlButtons from './SearchControlButtons';
-// import ProgressViewer from './ProgressViewer';
 
 const propTypes = {
   isSearchActive: PropTypes.bool.isRequired,
   onStartSearch: PropTypes.func.isRequired,
-  // search: PropTypes.shape({
-  //   isActive: PropTypes.bool,
-  // }).isRequired,
 };
 
 class SearchForm extends React.Component { // TODO: use PureComponent ?
@@ -54,20 +49,17 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
   handleSubmit(event) {
     event.preventDefault();
     const { isSearchActive, onStartSearch } = this.props;
-    // const { wallOwnerId, wallOwnerShortName } = this.state;
 
     if (isSearchActive) {
       return;
     }
 
     this.isFormValid = true;
-    // this.notValidFields = [];
 
     this.setState({
       shouldValidate: true,
     }, () => {
       // NOTE: will be executed once component is re-rendered
-      // if (this.notValidFields && !this.notValidFields.length) {
       if (this.isFormValid) {
         onStartSearch(this.state);
       }
@@ -92,10 +84,8 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
     //   postAuthorId: postAuthorId.value,
     //   searchResultsLimit: searchResultsLimit.value,
     // });
-    // onStartSearch(this.state);
   }
-  // TODO: add debouncing
-  // TODO: block fields when search is active
+  // TODO: add throttling
   handleInputValueChange(event) {
     if (event.target.type === 'radio') {
       this.setState({
@@ -166,11 +156,6 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
               <ControlsContainer itemsName="posts" />
             </Col>
           </Row>
-          {/* <Row>
-            <Col md={6} lg={4} mdOffset={6} lgOffset={8}>
-              <ControlsContainer itemsName="posts" />
-            </Col>
-          </Row> */}
         </form>
       </Grid>
     );

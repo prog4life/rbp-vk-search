@@ -10,6 +10,7 @@ import SearchForm from 'components/SearchForm';
 import ResultsPanel from 'components/ResultsPanel';
 import ResultsFilter from 'components/ResultsFilter';
 import ResultsList from 'components/ResultsList';
+import RedirectToAuthModal from 'components/RedirectToAuthModal';
 
 import ResultsListContainer from 'containers/ResultsListContainer';
 
@@ -25,7 +26,7 @@ class WallPostsSearch extends React.Component {
     const {
       parseAccessTokenHash,
       checkAccessToken,
-      // redirectForToken,
+      // redirectToAuth,
       location,
       match,
       history,
@@ -49,8 +50,10 @@ class WallPostsSearch extends React.Component {
 
     // TODO: remove this temp redirect later and sign in at search start
     setTimeout(() => {
-      // localStorage.setItem('url', tokenRequestURL);
-      // redirectForToken(); // redirects to external vk api url
+      // NOTE: store in localStorage path of page from wich token was requested
+      // and return to it after parsing of auth data from hash
+      // localStorage.setItem('url', current route path);
+      // redirectToAuth(); // redirects to external vk api url
     }, 3000);
 
     // if (!accessToken) {
@@ -68,7 +71,7 @@ class WallPostsSearch extends React.Component {
   }
   handleSearchStart = (inputData) => {
     const {
-      startWallPostsSearch, checkAccessToken, redirectForToken,
+      startWallPostsSearch, checkAccessToken, redirectToAuth,
     } = this.props;
 
     if (checkAccessToken()) {
@@ -77,7 +80,7 @@ class WallPostsSearch extends React.Component {
       return;
     }
     // TODO: save input values to localStorage; show redirection notification
-    redirectForToken();
+    redirectToAuth();
   }
   handleSearchStop() {
     const { isSearchActive, terminateSearch } = this.props;
@@ -87,16 +90,22 @@ class WallPostsSearch extends React.Component {
     }
   }
   handleNavSelect(eventKey, e) {
-    const { signOut } = this.props;
+    console.log('Select: ', eventKey);
+
     if (eventKey === 1.2) {
+      const { signOut } = this.props;
       signOut();
       this.handleSearchStop();
+      return;
     }
-    console.log('Select: ', eventKey);
+    if (eventKey === 2) {
+      const { redirectToAuth } = this.props;
+      redirectToAuth();
+    }
   }
   render() {
     const {
-      isSearchActive, posts, accessToken, userId, userName,
+      isSearchActive, isRedirecting, posts, accessToken, userId, userName,
     } = this.props;
 
     return (
@@ -112,6 +121,7 @@ class WallPostsSearch extends React.Component {
           onStartSearch={this.handleSearchStart}
           // search={search}
         />
+        {isRedirecting && <RedirectToAuthModal />}
         <ResultsPanel header="This is a panel with search results">
           <ResultsFilter filterText="Here will be filter text" />
           <ResultsList results={posts} />
@@ -127,6 +137,7 @@ const mapStateToProps = state => ({
   userName: state.auth.userName,
   accessToken: state.auth.accessToken,
   tokenExpiresAt: state.auth.tokenExpiresAt,
+  isRedirecting: state.auth.isRedirecting,
   // results: state.results,
   posts: getSortedPosts(state),
   // search: state.search,
@@ -140,6 +151,7 @@ const mapDispatchToProps = dispatch => (
 WallPostsSearch.propTypes = {
   accessToken: PropTypes.string.isRequired,
   history: PropTypes.instanceOf(Object).isRequired,
+  isRedirecting: PropTypes.bool.isRequired,
   isSearchActive: PropTypes.bool.isRequired,
   location: PropTypes.instanceOf(Object).isRequired,
   match: PropTypes.instanceOf(Object).isRequired,

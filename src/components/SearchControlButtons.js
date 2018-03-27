@@ -20,7 +20,10 @@ const SearchControlButtons = ({ isSearchActive, onStopClick }) => (
   <ButtonToolbar className="search-buttons">
     {isSearchActive
       ?
-        <Button onClick={onStopClick} type="button">
+        <Button
+          onClick={onStopClick}
+          type="button"
+        >
           {'Stop Search'}
         </Button>
       :

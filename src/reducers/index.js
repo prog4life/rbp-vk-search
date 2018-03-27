@@ -10,10 +10,6 @@ import posts, * as fromPosts from './postsReducer';
 import requests from './requestsReducer';
 
 export default combineReducers({
-  // userId,
-  // accessToken,
-  // userName,
-  // tokenExpiresAt: tokenExpiry,
   auth,
   results,
   posts,

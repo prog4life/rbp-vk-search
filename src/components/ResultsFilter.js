@@ -2,10 +2,10 @@ import React from 'react';
 
 function ResultsFilter({ filterText }) {
   return (
-    <p>
+    <div>
       <span>Here will be search results filter with search query:</span>
       {filterText}
-    </p>
+    </div>
   );
 }
 
