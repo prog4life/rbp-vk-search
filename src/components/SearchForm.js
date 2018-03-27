@@ -36,6 +36,16 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
       searchResultsLimit: '',
     };
   }
+  componentWillReceiveProps(nextProps) {
+    const { isSearchActive: currentIsActive } = this.props;
+    const nextIsActive = nextProps.isSearchActive;
+
+    if (currentIsActive !== nextIsActive && nextIsActive === false) {
+      this.setState({
+        shouldValidate: false,
+      });
+    }
+  }
   // componentDidUpdate(prevProps, prevState) {
   // }
   failValidation = () => {
@@ -98,8 +108,8 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
     });
   }
   render() {
+    const { isSearchActive } = this.props;
     const {
-      isSearchActive,
       shouldValidate,
       isShortNameChecked,
       wallOwnerId,

@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 
 import * as actionCreators from 'actions';
-import { getSortedPosts } from 'reducers';
+import { getSortedPosts, getSearchIsActive } from 'reducers';
 import TopBar from 'components/TopBar';
 import SearchForm from 'components/SearchForm';
 import ResultsPanel from 'components/ResultsPanel';
@@ -23,8 +23,8 @@ class WallPostsSearch extends React.Component {
   }
   componentDidMount() {
     const {
-      accessToken,
       parseAccessTokenHash,
+      checkAccessToken,
       // redirectForToken,
       location,
       match,
@@ -40,8 +40,9 @@ class WallPostsSearch extends React.Component {
     }
     // history.replace(match.url); // looks like redundant
 
+    const accessToken = checkAccessToken();
+
     if (accessToken) {
-      // TODO: check if accessToken expired
       console.info('accessToken is already present: ', accessToken);
       return;
     }
@@ -79,9 +80,11 @@ class WallPostsSearch extends React.Component {
     redirectForToken();
   }
   handleSearchStop() {
-    const { terminateSearch } = this.props;
+    const { isSearchActive, terminateSearch } = this.props;
     // TODO: check if search is active
-    terminateSearch();
+    if (isSearchActive) {
+      terminateSearch();
+    }
   }
   handleNavSelect(eventKey, e) {
     const { signOut } = this.props;
@@ -93,7 +96,7 @@ class WallPostsSearch extends React.Component {
   }
   render() {
     const {
-      search, posts, accessToken, userId, userName,
+      isSearchActive, posts, accessToken, userId, userName,
     } = this.props;
 
     return (
@@ -105,6 +108,7 @@ class WallPostsSearch extends React.Component {
           userName={userName}
         />
         <SearchForm
+          isSearchActive={isSearchActive}
           onStartSearch={this.handleSearchStart}
           // search={search}
         />
@@ -118,15 +122,15 @@ class WallPostsSearch extends React.Component {
   }
 }
 
-
 const mapStateToProps = state => ({
   userId: state.auth.userId,
   userName: state.auth.userName,
   accessToken: state.auth.accessToken,
   tokenExpiresAt: state.auth.tokenExpiresAt,
-  results: state.results,
+  // results: state.results,
   posts: getSortedPosts(state),
-  search: state.search,
+  // search: state.search,
+  isSearchActive: getSearchIsActive(state),
 });
 
 const mapDispatchToProps = dispatch => (
@@ -136,16 +140,17 @@ const mapDispatchToProps = dispatch => (
 WallPostsSearch.propTypes = {
   accessToken: PropTypes.string.isRequired,
   history: PropTypes.instanceOf(Object).isRequired,
+  isSearchActive: PropTypes.bool.isRequired,
   location: PropTypes.instanceOf(Object).isRequired,
   match: PropTypes.instanceOf(Object).isRequired,
   parseAccessTokenHash: PropTypes.func.isRequired,
-  results: PropTypes.arrayOf(PropTypes.object).isRequired,
-  search: PropTypes.shape({
-    isActive: PropTypes.bool,
-    total: PropTypes.number,
-    processed: PropTypes.number,
-    progress: PropTypes.number,
-  }).isRequired,
+  // results: PropTypes.arrayOf(PropTypes.object).isRequired,
+  // search: PropTypes.shape({
+  //   isActive: PropTypes.bool,
+  //   total: PropTypes.number,
+  //   processed: PropTypes.number,
+  //   progress: PropTypes.number,
+  // }).isRequired,
   signOut: PropTypes.func.isRequired,
   startWallPostsSearch: PropTypes.func.isRequired,
   terminateSearch: PropTypes.func.isRequired,
