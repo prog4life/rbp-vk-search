@@ -76,7 +76,6 @@ export const redirectToAuth = () => {
 
   return {
     type: REDIRECT_TO_AUTH,
-    isRedirecting: true,
   };
 };
 

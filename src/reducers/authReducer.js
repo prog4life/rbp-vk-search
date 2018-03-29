@@ -30,7 +30,7 @@ const authReducer = (state = defaultState, action) => {
     case REDIRECT_TO_AUTH:
       return {
         ...state,
-        isRedirecting: action.isRedirecting,
+        isRedirecting: true,
       };
     case SIGN_OUT: // change to defaultState?
       return {

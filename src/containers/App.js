@@ -35,29 +35,23 @@ const persistedState = loadState('vk-search-state') || {};
 // TODO: replace store creation to index.js and pass it as prop into here
 // and make this component presentational, not container
 const store = configureStore({
-  auth: {
-    ...persistedState,
-    isRedirecting: false,
-  },
+  ...persistedState,
   posts,
 });
 
-// TODO: wrap in throttle or debounce
 store.subscribe(() => console.log('State update ', (new Date()).toLocaleTimeString()));
 
+// TODO: wrap in throttle or debounce
 const saveStateDebounced = _debounce(() => {
-  const {
-    auth: { userId, accessToken, tokenExpiresAt, userName },
-  } = store.getState();
-  const stateSliceToStore = {
-    userId,
-    accessToken,
-    tokenExpiresAt,
-    userName,
+  const { auth } = store.getState();
+  const stateToStore = {
+    auth: { ...auth, isRedirecting: false },
   };
+
   console.log('save state debounced ', (new Date()).toLocaleTimeString());
-  saveState(stateSliceToStore, 'vk-search-state');
-}, 5000);
+
+  saveState(stateToStore, 'vk-search-state');
+}, 5000, { leading: true, trailing: true });
 
 store.subscribe(saveStateDebounced);
 

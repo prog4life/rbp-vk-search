@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  ModalDialog,
+  Modal,
   ModalHeader,
   ModalTitle,
   ModalBody,
@@ -8,26 +8,37 @@ import {
   Button,
 } from 'react-bootstrap';
 
-const RedirectToAuthModal = props => (
-  <div className="redirect-to-auth-modal">
-    {/* <Modal show={this.state.isOpened} onHide={this.handleClose}> */}
-    <ModalDialog>
-      <ModalHeader>
-        <ModalTitle>
-          {'Redirection for authentication'}
-        </ModalTitle>
-      </ModalHeader>
-      <ModalBody>
-        {'You are redirected to vk.com login page'}
-      </ModalBody>
-      <ModalFooter>
-        <Button onClick={(e) => {}}>
-          {'Close'}
-        </Button>
-      </ModalFooter>
-    </ModalDialog>
-    {/* </Modal> */}
-  </div>
-);
+class RedirectToAuthModal extends React.Component {
+  state = {
+    isOpened: true,
+  }
+  handleOkClick = () => {
+    this.setState({ isOpened: false });
+  }
+  render() {
+    const { isOpened } = this.state;
+
+    return (
+      <div className="redirect-to-auth-modal">
+        {/* <Modal show={isOpened} onHide={this.handleClose}> */}
+        <Modal show={isOpened}>
+          <ModalHeader>
+            <ModalTitle>
+              {'Redirection for authentication'}
+            </ModalTitle>
+          </ModalHeader>
+          <ModalBody>
+            {'You are redirected to vk.com login page'}
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={this.handleOkClick}>
+              {'OK'}
+            </Button>
+          </ModalFooter>
+        </Modal>
+      </div>
+    );
+  }
+}
 
 export default RedirectToAuthModal;

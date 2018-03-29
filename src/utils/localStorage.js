@@ -16,8 +16,8 @@ export const loadState = (storageKey) => {
 };
 
 export const saveState = (state, key) => {
-  if (typeof key !== 'string') {
-    console.error('Expected key for storing state to be string');
+  if (typeof key !== 'string' || !key.length) {
+    console.error('Expected key for storing state to be not empty string');
     return false;
   }
   try {
