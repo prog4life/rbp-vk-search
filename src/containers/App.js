@@ -51,7 +51,7 @@ const saveStateDebounced = _debounce(() => {
   console.log('save state debounced ', (new Date()).toLocaleTimeString());
 
   saveState(stateToStore, 'vk-search-state');
-}, 5000, { leading: true, trailing: true });
+}, 500, { leading: true, trailing: true });
 
 store.subscribe(saveStateDebounced);
 

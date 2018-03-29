@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
   Modal,
   ModalHeader,
@@ -8,18 +9,29 @@ import {
   Button,
 } from 'react-bootstrap';
 
+const propTypes = {
+  onRedirectClick: PropTypes.func.isRequired,
+};
+
 class RedirectToAuthModal extends React.Component {
   state = {
     isOpened: true,
   }
-  handleOkClick = () => {
+  handleRedirectClick = () => {
+    const { onRedirectClick } = this.props;
+
+    this.setState({ isOpened: false });
+
+    onRedirectClick();
+  }
+  handleLaterClick = () => {
     this.setState({ isOpened: false });
   }
   render() {
     const { isOpened } = this.state;
 
     return (
-      <div className="redirect-to-auth-modal">
+      <div className="redirect-confirm-modal">
         {/* <Modal show={isOpened} onHide={this.handleClose}> */}
         <Modal show={isOpened}>
           <ModalHeader>
@@ -28,11 +40,15 @@ class RedirectToAuthModal extends React.Component {
             </ModalTitle>
           </ModalHeader>
           <ModalBody>
-            {'You will be redirected to vk.com login page or signed in. Please wait'}
+            {`You must be logged in with vk.com to search.
+              Redirect to login page now?`}
           </ModalBody>
           <ModalFooter>
-            <Button onClick={this.handleOkClick}>
-              {'OK'}
+            <Button onClick={this.handleRedirectClick}>
+              {'Redirect'}
+            </Button>
+            <Button onClick={this.handleLaterClick}>
+              {'Later'}
             </Button>
           </ModalFooter>
         </Modal>
@@ -40,5 +56,7 @@ class RedirectToAuthModal extends React.Component {
     );
   }
 }
+
+RedirectToAuthModal.propTypes = propTypes;
 
 export default RedirectToAuthModal;

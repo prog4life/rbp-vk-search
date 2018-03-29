@@ -40,7 +40,7 @@ class SearchControls extends Component {
             ?
               <div>
                 <Spinner
-                  size={120}
+                  size={20}
                   spinnerColor={"#333"}
                   spinnerWidth={2}
                   visible
