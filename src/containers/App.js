@@ -55,6 +55,8 @@ const saveStateDebounced = _debounce(() => {
 
 store.subscribe(saveStateDebounced);
 
+// TODO: That said, you definitely should not be creating a Redux store inside
+// of a render() method. Create it outside your component tree entirely
 const App = () => (
   <Provider store={store}>
     <Router>

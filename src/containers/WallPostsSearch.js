@@ -10,6 +10,7 @@ import SearchForm from 'components/SearchForm';
 import ResultsPanel from 'components/ResultsPanel';
 import ResultsFilter from 'components/ResultsFilter';
 import ResultsList from 'components/ResultsList';
+import RedirectConfirmModal from 'components/RedirectConfirmModal';
 import RedirectToAuthModal from 'components/RedirectToAuthModal';
 
 import ResultsListContainer from 'containers/ResultsListContainer';
@@ -26,7 +27,7 @@ class WallPostsSearch extends React.Component {
     const {
       parseAccessTokenHash,
       checkAccessToken,
-      // redirectToAuth,
+      redirectToAuth,
       location,
       match,
       history,
@@ -50,6 +51,7 @@ class WallPostsSearch extends React.Component {
 
     // TODO: remove this temp redirect later and sign in at search start
     setTimeout(() => {
+      <RedirectConfirmModal onRedirectClick={redirectToAuth} />
       // NOTE: store in localStorage path of page from wich token was requested
       // and return to it after parsing of auth data from hash
       // localStorage.setItem('url', current route path);
