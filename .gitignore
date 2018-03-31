@@ -16,5 +16,6 @@ dist/
 
 # misc
 .DS_Store
+yarn-error.log
 npm-debug.log
 **/.idea/

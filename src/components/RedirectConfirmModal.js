@@ -13,7 +13,7 @@ const propTypes = {
   onRedirectClick: PropTypes.func.isRequired,
 };
 
-class RedirectToAuthModal extends React.Component {
+class RedirectConfirmModal extends React.Component {
   state = {
     isOpened: true,
   }
@@ -57,6 +57,6 @@ class RedirectToAuthModal extends React.Component {
   }
 }
 
-RedirectToAuthModal.propTypes = propTypes;
+RedirectConfirmModal.propTypes = propTypes;
 
-export default RedirectToAuthModal;
+export default RedirectConfirmModal;

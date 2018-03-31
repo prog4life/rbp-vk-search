@@ -122,7 +122,7 @@ export default ({ getState, dispatch }) => next => (action) => {
     url, offset, attempt, authorId, resultsLimit,
   } = callParams;
 
-  if (Array.isArray(types) && types.length !== 2) {
+  if (!Array.isArray(types) || types.length !== 2) {
     throw new Error('Expected an array of two action types');
   }
   if (!types.every(t => typeof t === 'string')) {
@@ -135,7 +135,7 @@ export default ({ getState, dispatch }) => next => (action) => {
     throw new Error('Expected offset and attempt to be integers');
   }
   if (!Number.isInteger(authorId)) {
-    throw new Error('Expected authorId to be integers');
+    throw new Error('Expected authorId to be integer');
   }
 
   const [addResultsType, updateProgressType] = types;

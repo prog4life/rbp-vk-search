@@ -49,7 +49,7 @@ export const wallPostsSearchEnd = () => ({
 });
 
 export const terminateSearch = () => ({
-  type: 'SEARCH_TERMINATE',
+  type: 'TERMINATE_SEARCH',
 });
 
 export const searchTimerTick = () => ({

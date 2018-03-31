@@ -23,7 +23,7 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
 
     this.state = {
       shouldValidate: false,
-      isShortNameChecked: false,
+      isShortNameUsed: false,
       wallOwnerId: '',
       wallOwnerShortName: '',
       wallOwnerType: 'group',
@@ -35,6 +35,7 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
     const { isSearchActive: currentIsActive } = this.props;
     const nextIsActive = nextProps.isSearchActive;
 
+    // when search was stopped or finished validation should be disabled
     if (currentIsActive !== nextIsActive && nextIsActive === false) {
       this.setState({
         shouldValidate: false,
@@ -89,7 +90,7 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
   handleInputValueChange(event) {
     if (event.target.type === 'radio') {
       this.setState({
-        isShortNameChecked: event.target.value === 'shortName',
+        isShortNameUsed: event.target.value === 'shortName',
       });
       return;
     }
@@ -101,7 +102,7 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
     const { isSearchActive } = this.props;
     const {
       shouldValidate,
-      isShortNameChecked,
+      isShortNameUsed,
       wallOwnerId,
       wallOwnerShortName,
       wallOwnerType,
@@ -115,7 +116,7 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
           <Row>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
               <WallOwnerIdField
-                disabled={isSearchActive || isShortNameChecked}
+                disabled={isSearchActive || isShortNameUsed}
                 onChange={this.handleInputValueChange}
                 fail={shouldValidate && this.failValidation}
                 value={wallOwnerId}
@@ -123,7 +124,7 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
               <OwnerShortNameField
-                disabled={isSearchActive || !isShortNameChecked}
+                disabled={isSearchActive || !isShortNameUsed}
                 onChange={this.handleInputValueChange}
                 fail={shouldValidate && this.failValidation}
                 value={wallOwnerShortName}

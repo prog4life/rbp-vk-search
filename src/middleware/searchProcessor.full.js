@@ -43,15 +43,15 @@ const searchProcessor = ({ dispatch, getState }) => {
     const { type, types } = action;
     const searchConfig = action[SEARCH_CONFIG];
 
-    if (typeof searchConfig === 'undefined' && type !== 'SEARCH_TERMINATE') {
+    if (typeof searchConfig === 'undefined' && type !== 'TERMINATE_SEARCH') {
       return next(action);
     }
 
-    if (!types && type !== 'SEARCH_TERMINATE') {
+    if (!types && type !== 'TERMINATE_SEARCH') {
       return next(action);
     }
 
-    if (type === 'SEARCH_TERMINATE') {
+    if (type === 'TERMINATE_SEARCH') {
       clearInterval(scannerIntervalId);
       return next(action);
     }

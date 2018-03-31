@@ -54,7 +54,7 @@ export default function requests(state = {}, action) {
         },
       };
     case 'WALL_POSTS_SEARCH_START':
-    case 'SEARCH_TERMINATE':
+    case 'TERMINATE_SEARCH':
       return {};
     default:
       return state;
@@ -85,7 +85,7 @@ export default function requests(state = {}, action) {
 //           isDone: false
 //         });
 //     case 'WALL_POSTS_SEARCH_START':
-//     case 'SEARCH_TERMINATE':
+//     case 'TERMINATE_SEARCH':
 //       return [];
 //     default:
 //       return state;

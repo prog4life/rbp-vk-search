@@ -15,7 +15,7 @@ export const kindsOfData = {
 // const checkAndRepeatFailed = () => {}
 
 const searchProcessor = ({ dispatch, getState }) => {
-  let scannerIntervalId;
+  let searchIntervalId;
   // const search = {
   //   isActive: false,
   //   offset: 0
@@ -40,14 +40,14 @@ const searchProcessor = ({ dispatch, getState }) => {
     const { type, types } = action;
     const searchConfig = action[SEARCH_CONFIG];
 
-    if (typeof searchConfig === 'undefined' && type !== 'SEARCH_TERMINATE') {
+    if (typeof searchConfig === 'undefined' && type !== 'TERMINATE_SEARCH') {
       return next(action);
     }
-    if (!types && type !== 'SEARCH_TERMINATE') {
+    if (!types && type !== 'TERMINATE_SEARCH') {
       return next(action);
     }
-    if (type === 'SEARCH_TERMINATE') {
-      clearInterval(scannerIntervalId);
+    if (type === 'TERMINATE_SEARCH') {
+      clearInterval(searchIntervalId);
       return next(action);
     }
 
@@ -55,7 +55,7 @@ const searchProcessor = ({ dispatch, getState }) => {
       throw new Error('Expected an array of four action types.');
     }
     if (typeof searchConfig !== 'object') {
-      throw new Error('Expected an object of search config params');
+      throw new Error('Expected an object with search config params');
     }
     if (!types.every(t => typeof t === 'string')) {
       throw new Error('Expected action types to be strings');
@@ -87,7 +87,7 @@ const searchProcessor = ({ dispatch, getState }) => {
     // TODO: validate authorId, baseAPIReqUrl
 
     // doublecheck
-    clearInterval(scannerIntervalId);
+    clearInterval(searchIntervalId);
     // to notify reducers about search start
     // will also clear "requests" in store
     next({ type: searchStartType });
@@ -95,6 +95,7 @@ const searchProcessor = ({ dispatch, getState }) => {
     // let checkpoint = performance.now(); // TEMP:
     // let checkpoint2 = performance.now(); // TEMP:
 
+    // TODO: replace to top level
     const makeCallToAPI = (offset, attempt = 1) => {
       // const tempCheckpoint2 = checkpoint2;
       // checkpoint2 = performance.now();
@@ -119,7 +120,7 @@ const searchProcessor = ({ dispatch, getState }) => {
       });
     };
 
-    scannerIntervalId = setInterval(() => {
+    searchIntervalId = setInterval(() => {
       // const tempCheckpoint = checkpoint;
       // checkpoint = performance.now();
       // console.warn(`NEW interval TICK: ${checkpoint - tempCheckpoint}`);
@@ -177,7 +178,7 @@ const searchProcessor = ({ dispatch, getState }) => {
 
       // TODO: replace by if (reqs.length - completelyFailed.length === 0)
       if (reqs.length === 0) {
-        clearInterval(scannerIntervalId);
+        clearInterval(searchIntervalId);
         next({ type: searchEndType });
       }
     }, requestInterval);

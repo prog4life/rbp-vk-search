@@ -37,7 +37,7 @@ const search = (state = defaultSearchState, action) => {
         processed: action.processed || state.processed,
         // progress: action.progress,
       };
-    case 'SEARCH_TERMINATE':
+    case 'TERMINATE_SEARCH':
       return {
         isActive: false,
         offset: 0,
@@ -82,7 +82,7 @@ export const getIsActive = state => state.isActive;
 //         total: action.total || state.total,
 //         processed: action.processed || state.processed
 //       };
-//     case 'SEARCH_TERMINATE':
+//     case 'TERMINATE_SEARCH':
 //       // TODO: clean up search state values
 //       return {
 //         isActive: false,
