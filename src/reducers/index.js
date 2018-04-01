@@ -19,6 +19,19 @@ export default combineReducers({
 
 export const getAuthData = state => state.auth;
 
+export const getAccessToken = createSelector(
+  getAuthData,
+  ({ accessToken, tokenExpiresAt }) => {
+    if (!accessToken) {
+      return '';
+    }
+    if (tokenExpiresAt < Date.now() - (6 * Math.pow(10, 5))) { // try **
+      return '';
+    }
+    return accessToken;
+  },
+);
+
 export const getSearchIsActive = state => fromSearch.getIsActive(state.search);
 export const getSearchTotal = state => fromSearch.getTotal(state.search);
 export const getSearchProcessed = state => fromSearch.getProcessed(state.search);

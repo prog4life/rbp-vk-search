@@ -4,13 +4,13 @@ import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 
 import * as actionCreators from 'actions';
-import { getSortedPosts, getSearchIsActive } from 'reducers';
+import { getSortedPosts, getSearchIsActive, getAccessToken } from 'reducers';
 import TopBar from 'components/TopBar';
 import SearchForm from 'components/SearchForm';
 import ResultsPanel from 'components/ResultsPanel';
 import ResultsFilter from 'components/ResultsFilter';
 import ResultsList from 'components/ResultsList';
-import RedirectConfirmModal from 'components/RedirectConfirmModal';
+import RedirectOfferModal from 'components/RedirectOfferModal';
 import RedirectToAuthModal from 'components/RedirectToAuthModal';
 
 import ResultsListContainer from 'containers/ResultsListContainer';
@@ -26,8 +26,8 @@ class WallPostsSearch extends React.Component {
   componentDidMount() {
     const {
       parseAccessTokenHash,
-      checkAccessToken,
-      redirectToAuth,
+      offerAuthRedirect,
+      accessToken,
       location,
       match,
       history,
@@ -42,16 +42,15 @@ class WallPostsSearch extends React.Component {
     }
     // history.replace(match.url); // looks like redundant
 
-    const accessToken = checkAccessToken();
-
-    if (accessToken) {
-      console.info('accessToken is already present: ', accessToken);
+    if (!accessToken) {
+      offerAuthRedirect();
       return;
     }
 
+    console.info('accessToken is already present: ', accessToken);
+
     // TODO: remove this temp redirect later and sign in at search start
     setTimeout(() => {
-      <RedirectConfirmModal onRedirectClick={redirectToAuth} />
       // NOTE: store in localStorage path of page from wich token was requested
       // and return to it after parsing of auth data from hash
       // localStorage.setItem('url', current route path);
@@ -107,7 +106,14 @@ class WallPostsSearch extends React.Component {
   }
   render() {
     const {
-      isSearchActive, isRedirecting, posts, accessToken, userId, userName,
+      isSearchActive,
+      isRedirecting,
+      shouldOfferAuth,
+      posts,
+      redirectToAuth,
+      accessToken,
+      userId,
+      userName,
     } = this.props;
 
     return (
@@ -118,12 +124,19 @@ class WallPostsSearch extends React.Component {
           userId={userId}
           userName={userName}
         />
+        {isRedirecting && <RedirectToAuthModal />}
+        {/* TODO: replace by in-store modal displaying variable */}
+        {shouldOfferAuth &&
+          <RedirectOfferModal
+            delay={3000}
+            onRedirectClick={redirectToAuth}
+          />
+        }
         <SearchForm
           isSearchActive={isSearchActive}
           onStartSearch={this.handleSearchStart}
           // search={search}
         />
-        {isRedirecting && <RedirectToAuthModal />}
         <ResultsPanel header="This is a panel with search results">
           <ResultsFilter filterText="Here will be filter text" />
           <ResultsList results={posts} />
@@ -137,9 +150,10 @@ class WallPostsSearch extends React.Component {
 const mapStateToProps = state => ({
   userId: state.auth.userId,
   userName: state.auth.userName,
-  accessToken: state.auth.accessToken,
+  accessToken: getAccessToken(state),
   tokenExpiresAt: state.auth.tokenExpiresAt,
   isRedirecting: state.auth.isRedirecting,
+  shouldOfferAuth: state.auth.shouldOfferAuth,
   // results: state.results,
   posts: getSortedPosts(state),
   // search: state.search,
@@ -158,6 +172,7 @@ WallPostsSearch.propTypes = {
   location: PropTypes.instanceOf(Object).isRequired,
   match: PropTypes.instanceOf(Object).isRequired,
   parseAccessTokenHash: PropTypes.func.isRequired,
+  posts: PropTypes.arrayOf(PropTypes.object).isRequired,
   // results: PropTypes.arrayOf(PropTypes.object).isRequired,
   // search: PropTypes.shape({
   //   isActive: PropTypes.bool,

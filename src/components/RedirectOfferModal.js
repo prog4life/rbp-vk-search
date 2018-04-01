@@ -10,12 +10,20 @@ import {
 } from 'react-bootstrap';
 
 const propTypes = {
+  delay: PropTypes.number.isRequired,
   onRedirectClick: PropTypes.func.isRequired,
 };
 
-class RedirectConfirmModal extends React.Component {
+class RedirectOfferModal extends React.Component {
   state = {
-    isOpened: true,
+    isOpened: !this.props.delay,
+  }
+  componentDidMount() {
+    const { delay } = this.props;
+
+    if (delay) {
+      setTimeout(() => this.setState({ isOpened: true }), delay);
+    }
   }
   handleRedirectClick = () => {
     const { onRedirectClick } = this.props;
@@ -31,7 +39,7 @@ class RedirectConfirmModal extends React.Component {
     const { isOpened } = this.state;
 
     return (
-      <div className="redirect-confirm-modal">
+      <div className="redirect-offer-modal">
         {/* <Modal show={isOpened} onHide={this.handleClose}> */}
         <Modal show={isOpened}>
           <ModalHeader>
@@ -57,6 +65,6 @@ class RedirectConfirmModal extends React.Component {
   }
 }
 
-RedirectConfirmModal.propTypes = propTypes;
+RedirectOfferModal.propTypes = propTypes;
 
-export default RedirectConfirmModal;
+export default RedirectOfferModal;

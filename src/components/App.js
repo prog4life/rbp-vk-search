@@ -27,7 +27,7 @@ const App = ({ store }) => (
 );
 
 App.propTypes = {
-  store: PropTypes.objectOf(PropTypes.object).isRequired,
+  store: PropTypes.oneOfType([PropTypes.object, PropTypes.func]).isRequired,
 };
 
 // export default hot(module)(App);

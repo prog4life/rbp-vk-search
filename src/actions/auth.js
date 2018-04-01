@@ -10,6 +10,7 @@ import {
   NO_TOKEN,
   TOKEN_EXPIRED,
   REDIRECT_TO_AUTH,
+  OFFER_AUTH_REDIRECT,
 } from 'constants/actionTypes';
 
 // TODO: split into 2 distinct actions ?
@@ -57,6 +58,7 @@ export const getUserName = (id) => {
   }).catch(e => console.warn(e));
 };
 
+// TODO: remove
 export const checkAccessToken = () => (dispatch, getState) => {
   const { accessToken, tokenExpiresAt } = getAuthData(getState());
 
@@ -78,6 +80,10 @@ export const redirectToAuth = () => {
     type: REDIRECT_TO_AUTH,
   };
 };
+
+export const offerAuthRedirect = () => ({
+  type: OFFER_AUTH_REDIRECT,
+});
 
 // TODO: rename to extractAuthData, save errors to store
 export const parseAccessTokenHash = hash => (dispatch) => {

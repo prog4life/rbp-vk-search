@@ -2,6 +2,7 @@ import {
   SAVE_AUTH_DATA,
   SET_USER_NAME,
   REDIRECT_TO_AUTH,
+  OFFER_AUTH_REDIRECT,
   SIGN_OUT,
 } from 'constants/actionTypes';
 
@@ -11,6 +12,7 @@ const defaultState = {
   userId: '',
   userName: '',
   isRedirecting: false,
+  shouldOfferAuth: false,
 };
 
 const authReducer = (state = defaultState, action) => {
@@ -31,6 +33,12 @@ const authReducer = (state = defaultState, action) => {
       return {
         ...state,
         isRedirecting: true,
+        shouldOfferAuth: false,
+      };
+    case OFFER_AUTH_REDIRECT:
+      return {
+        ...state,
+        shouldOfferAuth: true,
       };
     case SIGN_OUT: // change to defaultState?
       return {
@@ -39,6 +47,7 @@ const authReducer = (state = defaultState, action) => {
         userId: '',
         userName: '',
         isRedirecting: false,
+        shouldOfferAuth: false,
       };
     default:
       return state;

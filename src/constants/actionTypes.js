@@ -9,3 +9,4 @@ export const SIGN_OUT = 'SIGN_OUT';
 export const NO_TOKEN = 'NO_TOKEN';
 export const TOKEN_EXPIRED = 'TOKEN_EXPIRED';
 export const REDIRECT_TO_AUTH = 'REDIRECT_TO_AUTH';
+export const OFFER_AUTH_REDIRECT = 'OFFER_AUTH_REDIRECT';
