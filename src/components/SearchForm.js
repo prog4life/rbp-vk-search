@@ -61,6 +61,8 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
       shouldValidate: true,
     }, () => {
       // NOTE: will be executed once component is re-rendered
+      // setState callbacks (second argument) now fire immediately after
+      // componentDidMount / componentDidUpdate instead of after all components have rendered
       if (this.isFormValid) {
         onStartSearch(this.state);
       }

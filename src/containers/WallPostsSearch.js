@@ -10,6 +10,8 @@ import SearchForm from 'components/SearchForm';
 import ResultsPanel from 'components/ResultsPanel';
 import ResultsFilter from 'components/ResultsFilter';
 import ResultsList from 'components/ResultsList';
+import Delayed from 'components/Delayed';
+import ErrorBoundary from 'components/ErrorBoundary';
 import RedirectOfferModal from 'components/RedirectOfferModal';
 import RedirectToAuthModal from 'components/RedirectToAuthModal';
 
@@ -127,10 +129,14 @@ class WallPostsSearch extends React.Component {
         {isRedirecting && <RedirectToAuthModal />}
         {/* TODO: replace by in-store modal displaying variable */}
         {shouldOfferAuth &&
-          <RedirectOfferModal
-            delay={3000}
-            onRedirectClick={redirectToAuth}
-          />
+          <ErrorBoundary>
+            <Delayed
+              component={
+                <RedirectOfferModal onRedirectClick={redirectToAuth} />
+              }
+              delay={3000}
+            />
+          </ErrorBoundary>
         }
         <SearchForm
           isSearchActive={isSearchActive}

@@ -154,7 +154,7 @@ module.exports = {
                 preventFullImport: true,
               },
             }],
-          ],
+          ].concat(isProduction ? [] : ['transform-react-jsx-source']),
           presets: [
             ['env', {
               modules: false,

@@ -9,21 +9,12 @@ import {
   Button,
 } from 'react-bootstrap';
 
-const propTypes = {
-  delay: PropTypes.number.isRequired,
-  onRedirectClick: PropTypes.func.isRequired,
-};
-
 class RedirectOfferModal extends React.Component {
-  state = {
-    isOpened: !this.props.delay,
+  static propTypes = {
+    onRedirectClick: PropTypes.func.isRequired,
   }
-  componentDidMount() {
-    const { delay } = this.props;
-
-    if (delay) {
-      setTimeout(() => this.setState({ isOpened: true }), delay);
-    }
+  state = {
+    isOpened: true,
   }
   handleRedirectClick = () => {
     const { onRedirectClick } = this.props;
@@ -64,7 +55,5 @@ class RedirectOfferModal extends React.Component {
     );
   }
 }
-
-RedirectOfferModal.propTypes = propTypes;
 
 export default RedirectOfferModal;
