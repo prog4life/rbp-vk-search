@@ -130,12 +130,9 @@ class WallPostsSearch extends React.Component {
         {/* TODO: replace by in-store modal displaying variable */}
         {shouldOfferAuth &&
           <ErrorBoundary>
-            <Delayed
-              component={
-                <RedirectOfferModal onRedirectClick={redirectToAuth} />
-              }
-              delay={3000}
-            />
+            <Delayed delay={3000}>
+              <RedirectOfferModal onRedirectClick={redirectToAuth} />
+            </Delayed>
           </ErrorBoundary>
         }
         <SearchForm

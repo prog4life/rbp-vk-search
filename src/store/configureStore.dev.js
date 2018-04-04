@@ -30,17 +30,8 @@ const watcher = immutabilityWatcher();
 const middleware = [watcher, search, callAPI, thunk, logger];
 
 const configureStore = (preloadedState = {}) => {
-  /* eslint-disable no-underscore-dangle */
-  /* to use with Chrome Extension without 'redux-devtools-extension' package: */
-  // const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ||
-  //   compose;
-  /* eslint-enable */
-
-  // devTools options object is optional, without it replace "composeEnhancers"
-  // call with "composeWithDevTools"
   const composeEnhancers = composeWithDevTools({
-    realtime: true, // if process.env.NODE_ENV not set as 'development'
-    // host: '127.0.0.1', // default
+    // realtime: true,
     // port setting required to use with local "remotedev-server", OR
     // use remotedev.io/local alternatively
     // set same port in any monitor app (browser/Atom/VS Code extension)

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 class Delayed extends React.Component {
   static propTypes = {
-    component: PropTypes.element.isRequired,
+    children: PropTypes.node.isRequired,
     delay: PropTypes.number.isRequired,
   }
   constructor(props) {
@@ -25,10 +25,10 @@ class Delayed extends React.Component {
     clearTimeout(this.timeout);
   }
   render() {
-    const { component } = this.props;
+    const { children } = this.props;
     const { isVisible } = this.state;
 
-    return isVisible ? component : null;
+    return isVisible ? children : null;
   }
 }
 
