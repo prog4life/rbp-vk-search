@@ -4,11 +4,14 @@ const HTMLWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-// const VisualizerPlugin = require('webpack-visualizer-plugin');
 const DuplPkgCheckrPlugin = require('duplicate-package-checker-webpack-plugin');
-// const CompressionPlugin = require('compression-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const BabelPluginTransformImports = require('babel-plugin-transform-imports');
+// const CompressionPlugin = require('compression-webpack-plugin');
+// const VisualizerPlugin = require('webpack-visualizer-plugin');
+const autoprefixer = require('autoprefixer');
+const scssSyntax = require('postcss-scss');
+// const cssnano = require('cssnano');
 
 // const env = process.env.NODE_ENV;
 const env = process.env.NODE_ENV || 'development';
@@ -128,8 +131,8 @@ module.exports = {
       Utilities: path.resolve(__dirname, 'src/utils'),
     },
     modules: [
+      // path.resolve(__dirname, 'src'),
       // path.resolve(__dirname, 'src/components'),
-      path.resolve(__dirname, 'src'),
       'node_modules',
     ],
     extensions: ['.js', '.json', '.jsx', '*'],
