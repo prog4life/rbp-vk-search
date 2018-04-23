@@ -9,8 +9,8 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const BabelPluginTransformImports = require('babel-plugin-transform-imports');
 // const CompressionPlugin = require('compression-webpack-plugin');
 // const VisualizerPlugin = require('webpack-visualizer-plugin');
-const autoprefixer = require('autoprefixer');
-const scssSyntax = require('postcss-scss');
+// const autoprefixer = require('autoprefixer');
+// const scssSyntax = require('postcss-scss');
 // const cssnano = require('cssnano');
 
 // const env = process.env.NODE_ENV;
@@ -127,11 +127,14 @@ module.exports = {
   ],
   resolve: {
     alias: {
-      Components: path.resolve(__dirname, 'src/components'),
-      Utilities: path.resolve(__dirname, 'src/utils'),
+      // components: path.resolve(__dirname, 'src/components'),
+      // containers: path.resolve(__dirname, 'src/containers'),
+      // utils: path.resolve(__dirname, 'src/utils'),
+      // store: path.resolve(__dirname, 'src/store'),
+      // styles: path.resolve(__dirname, 'src/styles'),
     },
     modules: [
-      // path.resolve(__dirname, 'src'),
+      path.resolve(__dirname, 'src'),
       // path.resolve(__dirname, 'src/components'),
       'node_modules',
     ],
