@@ -9,6 +9,7 @@ import results from './resultsReducer';
 import posts, * as fromPosts from './postsReducer';
 import requests from './requestsReducer';
 
+// root reducer
 export default combineReducers({
   auth,
   results,

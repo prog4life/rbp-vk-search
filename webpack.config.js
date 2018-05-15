@@ -4,6 +4,7 @@ const HTMLWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const DuplPkgCheckrPlugin = require('duplicate-package-checker-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const BabelPluginTransformImports = require('babel-plugin-transform-imports');
@@ -37,7 +38,7 @@ module.exports = {
       // 'normalize.css/normalize.css',
       // './src/styles/index.scss',
       './src/index.js',
-    ]
+    ],
   },
   output: {
     filename: isProduction ? 'js/[name].[chunkhash].js' : '[name].[id].js',
@@ -72,6 +73,8 @@ module.exports = {
       // filename: 'assets/custom.html'
       // hash: true // usefull for cache busting
     }),
+    new OptimizeCssAssetsPlugin({}),
+    // TODO: add "optimize css assets plugin"
     // new CompressionPlugin({
     //   deleteOriginalAssets: true,
     //   test: /\.js/
