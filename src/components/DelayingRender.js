@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-class Delayed extends React.Component {
+class DelayingRender extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     delay: PropTypes.number.isRequired,
@@ -32,4 +32,4 @@ class Delayed extends React.Component {
   }
 }
 
-export default Delayed;
+export default DelayingRender;
