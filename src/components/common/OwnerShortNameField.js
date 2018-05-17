@@ -3,30 +3,32 @@ import PropTypes from 'prop-types';
 import MaskedFormControl from 'react-bootstrap-maskedinput';
 // TODO: test InputGroupAddon
 import { FormControl, InputGroup } from 'react-bootstrap';
-import FormInputGroup from 'components/FormInputGroup';
+import FormInputGroup from './FormInputGroup';
 
-function getValidationState(value, disabled, fail) {
-  if (disabled || !fail) {
+function getValidationState(value, disabled, validate) {
+  if (disabled || !validate) {
     return undefined;
   }
   if (value.length < 1 || value.length > 32) { // numbers, letters and _
-    fail();
+    validate('wallOwnerShortName', 'error');
     return 'error';
   }
   return undefined;
 }
 
-const OwnerShortNameField = ({ value, onChange, disabled, fail }) => (
+const OwnerShortNameField = ({
+  input: { value, onChange }, disabled, onIdTypeSwitch,
+}) => (
   <FormInputGroup
     id="wall-owner-short-name"
     label="Short name of wall owner (instead of id)"
-    validationState={getValidationState(value, disabled, fail)}
+    validationState={null}
   >
     <InputGroup>
       <InputGroup.Addon>
         <input
           checked={!disabled}
-          onChange={onChange}
+          onChange={onIdTypeSwitch}
           type="radio"
           name="wallOwnerIdType"
           value="shortName"
@@ -53,6 +55,19 @@ const OwnerShortNameField = ({ value, onChange, disabled, fail }) => (
   </FormInputGroup>
 );
 
+OwnerShortNameField.propTypes = {
+  disabled: PropTypes.bool.isRequired,
+  input: PropTypes.shape({
+    onChange: PropTypes.func.isRequired,
+    value: PropTypes.string.isRequired,
+  }).isRequired,
+  onIdTypeSwitch: PropTypes.func.isRequired,
+};
+
+OwnerShortNameField.defaultProps = {
+  isOwnerSpecified: true,
+};
+
 // const prev = (
 //   <FormInputGroup
 //     id="wall-owner-short-name"
@@ -65,16 +80,5 @@ const OwnerShortNameField = ({ value, onChange, disabled, fail }) => (
 //     value={value}
 //   />
 // );
-
-OwnerShortNameField.propTypes = {
-  isOwnerSpecified: PropTypes.bool,
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
-};
-
-OwnerShortNameField.defaultProps = {
-  isOwnerSpecified: true,
-};
-
 
 export default OwnerShortNameField;

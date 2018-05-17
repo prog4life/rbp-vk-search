@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 
-const WallOwnerTypeSelect = ({ value, onChange, disabled }) => (
+const WallOwnerTypeSelect = ({ input: { value, onChange }, disabled }) => (
   <FormGroup
     controlId="wall-owner-type"
     name="wallOwnerType"
@@ -27,8 +27,10 @@ const WallOwnerTypeSelect = ({ value, onChange, disabled }) => (
 );
 
 WallOwnerTypeSelect.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
+  input: PropTypes.shape({
+    onChange: PropTypes.func.isRequired,
+    value: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default WallOwnerTypeSelect;

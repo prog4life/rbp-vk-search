@@ -3,31 +3,33 @@ import PropTypes from 'prop-types';
 import MaskedFormControl from 'react-bootstrap-maskedinput';
 // TODO: test InputGroupAddon
 import { InputGroup } from 'react-bootstrap';
-import FormInputGroup from 'components/FormInputGroup';
+import FormInputGroup from './FormInputGroup';
 
-function getValidationState(value, disabled, fail) {
-  if (disabled || !fail) {
+function getValidationState(value, disabled, validate) {
+  if (disabled || !validate) {
     return undefined;
   }
   if (value.length < 1) {
-    fail();
+    validate('wallOwnerId', 'error');
     return 'error';
   }
   return undefined;
 }
 
-const WallOwnerIdField = ({ value, onChange, disabled, fail }) => (
+const WallOwnerIdField = ({
+  input: { value, onChange }, disabled, onIdTypeSwitch
+}) => (
   <FormInputGroup
     id="wall-owner-id"
     label="Wall owner id"
     // required // TODO: this or short name must be entered, look below
-    validationState={getValidationState(value, disabled, fail)}
+    validationState={null}
   >
     <InputGroup>
       <InputGroup.Addon>
         <input
           checked={!disabled}
-          onChange={onChange}
+          onChange={onIdTypeSwitch}
           type="radio"
           name="wallOwnerIdType"
           value="usualId"
@@ -43,13 +45,26 @@ const WallOwnerIdField = ({ value, onChange, disabled, fail }) => (
         placeholderChar=" "
         name="wallOwnerId" // TODO: here or for radio input ?
         onChange={onChange}
-        placeholder="id123456789"
+        placeholder="123456789"
         type="text"
         value={value}
       />
     </InputGroup>
   </FormInputGroup>
 );
+
+WallOwnerIdField.propTypes = {
+  disabled: PropTypes.bool.isRequired,
+  input: PropTypes.shape({
+    onChange: PropTypes.func.isRequired,
+    value: PropTypes.string.isRequired,
+  }).isRequired,
+  onIdTypeSwitch: PropTypes.func.isRequired,
+};
+
+WallOwnerIdField.defaultProps = {
+  isOwnerSpecified: true,
+};
 
 // const prevContents = (
 //   <FormInputGroup
@@ -88,16 +103,6 @@ const WallOwnerIdField = ({ value, onChange, disabled, fail }) => (
 //   </FormGroup>
 // );
 
-WallOwnerIdField.propTypes = {
-  isOwnerSpecified: PropTypes.bool,
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
-};
-
-WallOwnerIdField.defaultProps = {
-  isOwnerSpecified: true,
-};
-
 export default WallOwnerIdField;
 
 // One of solution to switch between entering of usual id or short textual id
@@ -110,4 +115,3 @@ export default WallOwnerIdField;
 //     <FormControl type="text" />
 //   </InputGroup>
 // </FormGroup>
-

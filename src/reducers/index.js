@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 import { createSelector } from 'reselect';
+import { reducer as formReducer } from 'redux-form'
 import sortBy from 'lodash.sortby';
 import { sortItemsByNumField } from 'utils/sorting';
 // import * as reducers from './auth';
@@ -16,6 +17,7 @@ export default combineReducers({
   posts,
   search,
   requests,
+  form: formReducer,
 });
 
 export const getAuthData = state => state.auth;

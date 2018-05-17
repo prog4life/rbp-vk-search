@@ -10,8 +10,8 @@ import SearchForm from 'components/SearchForm';
 import ResultsPanel from 'components/ResultsPanel';
 import ResultsFilter from 'components/ResultsFilter';
 import ResultsList from 'components/ResultsList';
-import DelayingRender from 'components/DelayingRender';
-import ErrorBoundary from 'components/ErrorBoundary';
+import DelayingRender from 'components/common/DelayingRender';
+import ErrorBoundary from 'components/common/ErrorBoundary';
 import RedirectToAuthModal from 'components/RedirectToAuthModal';
 
 import ResultsListContainer from 'containers/ResultsListContainer';

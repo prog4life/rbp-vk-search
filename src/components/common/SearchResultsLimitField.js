@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import FormInputGroup from 'components/FormInputGroup';
+import FormInputGroup from './FormInputGroup';
 
-const SearchResultsLimitField = ({ value, onChange, disabled }) => (
+const SearchResultsLimitField = ({ input: { value, onChange }, disabled }) => (
   <FormInputGroup
     id="search-results-limit"
     name="searchResultsLimit"
@@ -16,8 +16,10 @@ const SearchResultsLimitField = ({ value, onChange, disabled }) => (
 );
 
 SearchResultsLimitField.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
+  input: PropTypes.shape({
+    onChange: PropTypes.func.isRequired,
+    value: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default SearchResultsLimitField;

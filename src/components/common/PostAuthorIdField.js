@@ -1,35 +1,37 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import FormInputGroup from 'components/FormInputGroup';
+import FormInputGroup from './FormInputGroup';
 
-function getValidationState(value, disabled, fail) {
-  if (disabled || !fail) {
+function getValidationState(value, disabled, validate) {
+  if (disabled || !validate) {
     return undefined;
   }
   if (value.length < 1) {
-    fail();
+    validate('postAuthorId', 'error');
     return 'error';
   }
   return undefined;
 }
 
-const PostAuthorIdField = ({ value, onChange, disabled, fail }) => (
+const PostAuthorIdField = ({ input: { value, onChange }, disabled }) => (
   <FormInputGroup
     id="post-author-id"
     name="postAuthorId"
     label="ID of author of posts you want to find"
     onChange={onChange}
-    placeholder="id of post author"
+    placeholder="123456789"
     type="text"
     disabled={disabled}
-    validationState={getValidationState(value, disabled, fail)}
+    validationState={null}
     value={value}
   />
 );
 
 PostAuthorIdField.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
+  input: PropTypes.shape({
+    onChange: PropTypes.func.isRequired,
+    value: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default PostAuthorIdField;
