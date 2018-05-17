@@ -12,7 +12,7 @@ const defaultState = {
   userId: '',
   userName: '',
   isRedirecting: false,
-  shouldOfferAuth: false,
+  hasAuthOffer: false,
 };
 
 const authReducer = (state = defaultState, action) => {
@@ -33,12 +33,12 @@ const authReducer = (state = defaultState, action) => {
       return {
         ...state,
         isRedirecting: true,
-        shouldOfferAuth: false,
+        hasAuthOffer: false,
       };
     case OFFER_AUTH_REDIRECT:
       return {
         ...state,
-        shouldOfferAuth: true,
+        hasAuthOffer: true,
       };
     case SIGN_OUT: // change to defaultState?
       return {
@@ -47,7 +47,7 @@ const authReducer = (state = defaultState, action) => {
         userId: '',
         userName: '',
         isRedirecting: false,
-        shouldOfferAuth: false,
+        hasAuthOffer: false,
       };
     default:
       return state;

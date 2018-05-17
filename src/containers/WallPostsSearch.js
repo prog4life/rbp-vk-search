@@ -13,7 +13,6 @@ import ResultsList from 'components/ResultsList';
 import DelayingRender from 'components/DelayingRender';
 import ErrorBoundary from 'components/ErrorBoundary';
 import RedirectToAuthModal from 'components/RedirectToAuthModal';
-// import RedirectToAuthModal2 from 'components/RedirectToAuthModal2';
 
 import ResultsListContainer from 'containers/ResultsListContainer';
 
@@ -27,7 +26,7 @@ class WallPostsSearch extends React.Component {
   }
   componentDidMount() {
     const {
-      parseAccessTokenHash,
+      extractAuthData,
       offerAuthRedirect,
       accessToken,
       location,
@@ -38,36 +37,22 @@ class WallPostsSearch extends React.Component {
     console.log('match obj ', match);
     console.log('location obj ', location);
 
-    if (parseAccessTokenHash(location.hash.substr(1))) {
-      history.replace(match.url);
+    if (extractAuthData(location.hash.substr(1))) {
+      // or set url as match.url
+      window.history.replaceState(null, document.title, location.pathname);
       return;
     }
-    // history.replace(match.url); // looks like redundant
+    // window.history.replaceState(null, document.title, location.pathname); //  ???
 
     if (!accessToken) {
       offerAuthRedirect();
       return;
     }
-
     console.info('accessToken is already present: ', accessToken);
-
-    // TODO: remove this temp redirect later and sign in at search start
-    setTimeout(() => {
-      // NOTE: store in localStorage path of page from wich token was requested
-      // and return to it after parsing of auth data from hash
-      // localStorage.setItem('url', current route path);
-      // redirectToAuth(); // redirects to external vk api url
-    }, 3000);
-
-    // if (!accessToken) {
-    //   setTimeout(() => {
-    //     const result = window.confirm('You must be logged in your vk account' +
-    //       ' to perform search. Do you want to log in now?');
-    //     if (result) {
-    //       window.location.replace(tokenRequestURL);
-    //     }
-    //   }, 3000);
-    // }
+    // TODO: sign in at search start
+    // NOTE: store in localStorage path of page from wich token was requested
+    // and return to it after parsing of auth data from hash
+    // localStorage.setItem('url', current route path);
   }
   componentWillUnmount() {
     this.handleSearchStop();
@@ -110,7 +95,7 @@ class WallPostsSearch extends React.Component {
     const {
       isSearchActive,
       isRedirecting,
-      shouldOfferAuth,
+      hasAuthOffer,
       posts,
       redirectToAuth,
       accessToken,
@@ -126,7 +111,7 @@ class WallPostsSearch extends React.Component {
           userId={userId}
           userName={userName}
         />
-        {(shouldOfferAuth || isRedirecting) &&
+        {(hasAuthOffer || isRedirecting) &&
           <ErrorBoundary>
             <DelayingRender delay={3000}>
               <RedirectToAuthModal
@@ -157,7 +142,7 @@ const mapStateToProps = state => ({
   accessToken: getAccessToken(state),
   tokenExpiresAt: state.auth.tokenExpiresAt,
   isRedirecting: state.auth.isRedirecting,
-  shouldOfferAuth: state.auth.shouldOfferAuth,
+  hasAuthOffer: state.auth.hasAuthOffer,
   // results: state.results,
   posts: getSortedPosts(state),
   // search: state.search,
@@ -170,12 +155,14 @@ const mapDispatchToProps = dispatch => (
 
 WallPostsSearch.propTypes = {
   accessToken: PropTypes.string.isRequired,
+  extractAuthData: PropTypes.func.isRequired,
+  hasAuthOffer: PropTypes.bool.isRequired,
   history: PropTypes.instanceOf(Object).isRequired,
   isRedirecting: PropTypes.bool.isRequired,
   isSearchActive: PropTypes.bool.isRequired,
   location: PropTypes.instanceOf(Object).isRequired,
   match: PropTypes.instanceOf(Object).isRequired,
-  parseAccessTokenHash: PropTypes.func.isRequired,
+  offerAuthRedirect: PropTypes.func.isRequired,
   posts: PropTypes.arrayOf(PropTypes.object).isRequired,
   // results: PropTypes.arrayOf(PropTypes.object).isRequired,
   // search: PropTypes.shape({

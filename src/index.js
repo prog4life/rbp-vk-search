@@ -48,7 +48,7 @@ store.subscribe(() => console.log('State update ', (new Date()).toLocaleTimeStri
 const saveStateDebounced = _debounce(() => {
   const { auth } = store.getState();
   const stateToStore = {
-    auth: { ...auth, isRedirecting: false, shouldOfferAuth: false },
+    auth: { ...auth, isRedirecting: false, hasAuthOffer: false },
   };
 
   console.log('save state debounced ', (new Date()).toLocaleTimeString());

@@ -45,7 +45,7 @@ class RedirectToAuthModal extends React.Component {
           </ModalHeader>
           <ModalBody>
             {isRedirecting
-              ? 'Wait please. You will sign in very soon'
+              ? 'Wait please. You will sign in soon'
               : `You must be logged in with vk.com to search.
                 Redirect to sign in page now?`
             }

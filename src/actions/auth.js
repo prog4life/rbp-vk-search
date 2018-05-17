@@ -1,7 +1,8 @@
 // import moment from 'moment';
-import { getAuthData } from 'reducers';
-import { apiVersion, tokenRequestURL } from 'config/common';
-import fetchJSONP from 'utils/fetchJSONP';
+import { getAuthData, getAccessToken } from 'reducers';
+import {
+  requestUserName, redirectToTokenRequestUrl, parseAccessTokenHash,
+} from 'utils/api';
 
 import {
   SAVE_AUTH_DATA,
@@ -12,6 +13,9 @@ import {
   REDIRECT_TO_AUTH,
   OFFER_AUTH_REDIRECT,
 } from 'constants/actionTypes';
+
+const EXTRACT_TOKEN_ERROR = 'EXTRACT_TOKEN_ERROR';
+const FETCH_USER_NAME_FAIL = 'FETCH_USER_NAME_FAIL';
 
 // TODO: split into 2 distinct actions ?
 // export const saveAccessToken = (accessToken, tokenExpiresAt) => ({
@@ -30,7 +34,7 @@ import {
 //   userId,
 // });
 
-export const saveAuthData = (accessToken, tokenExpiresAt, userId) => ({
+export const saveAuthData = (accessToken, tokenExpiresAt, userId = '') => ({
   type: SAVE_AUTH_DATA,
   accessToken,
   tokenExpiresAt,
@@ -38,8 +42,12 @@ export const saveAuthData = (accessToken, tokenExpiresAt, userId) => ({
 });
 
 // TODO: terminate search on sign out
-export const signOut = () => ({
-  type: SIGN_OUT,
+export const signOut = () => ({ type: SIGN_OUT });
+
+export const extractTokenError = (error = null, description) => ({
+  type: EXTRACT_TOKEN_ERROR,
+  error,
+  description: description || 'Failed to retrieve auth data or error details',
 });
 
 export const setUserName = userName => ({
@@ -47,18 +55,18 @@ export const setUserName = userName => ({
   userName,
 });
 
-export const getUserName = (id) => {
-  const url = `https://api.vk.com/method/users.get?` +
-    `user_ids=${id}&v=${apiVersion}`;
+export const fetchUserNameFail = () => ({ type: FETCH_USER_NAME_FAIL });
 
-  return fetchJSONP(url, 5000).then((response) => {
-    const [{ first_name: firstName, last_name: lastName }] = response;
-
-    return `${firstName} ${lastName}`;
-  }).catch(e => console.warn(e));
+export const fetchUserName = (userId, token) => (dispatch, getState) => {
+  const accessToken = token || getAccessToken(getState());
+  // TODO: replace by selector
+  requestUserName(userId, accessToken).then(
+    userName => dispatch(setUserName(userName)),
+    () => dispatch(fetchUserNameFail()),
+  );
 };
 
-// TODO: remove
+// TODO: remove, use selector instead?
 export const checkAccessToken = () => (dispatch, getState) => {
   const { accessToken, tokenExpiresAt } = getAuthData(getState());
 
@@ -74,69 +82,27 @@ export const checkAccessToken = () => (dispatch, getState) => {
 };
 
 export const redirectToAuth = () => {
-  window.location.assign(tokenRequestURL);
-
-  return {
-    type: REDIRECT_TO_AUTH,
-  };
+  redirectToTokenRequestUrl();
+  return { type: REDIRECT_TO_AUTH };
 };
 
-export const offerAuthRedirect = () => ({
-  type: OFFER_AUTH_REDIRECT,
-});
+export const offerAuthRedirect = () => ({ type: OFFER_AUTH_REDIRECT });
 
-// TODO: rename to extractAuthData, save errors to store
-export const parseAccessTokenHash = hash => (dispatch) => {
-  if (!hash) {
-    return false;
-  }
-  if (typeof hash !== 'string') {
-    console.error('Hash must be string');
-    return false;
-  }
-  // TODO: consider using decodeURIComponent
-  const hashChunks = hash.split('&');
-  const result = {};
-
-  hashChunks.forEach((chunk) => {
-    const [key, value = ''] = chunk.split('=');
-
-    // TODO: consider saving empty string value
-    if (!key || value.length < 1) {
-      return;
-    }
-    result[key] = value;
-  });
-
-  const {
-    access_token: accessToken,
-    expires_in: expiresIn,
-    user_id: userId = '',
-    error,
-    error_description: errorDescription,
-  } = result;
+export const extractAuthData = hash => (dispatch) => {
+  const parsedHash = parseAccessTokenHash(hash);
+  const { accessToken, tokenExpiresAt, userId, error } = parsedHash;
 
   if (error) {
-    console.error(`Hash has error: ${error}, description: ${errorDescription}`);
+    dispatch(extractTokenError(error, parsedHash.errorDescription));
+  }
+  if (!accessToken) {
     return false;
   }
+  dispatch(saveAuthData(accessToken, tokenExpiresAt, userId));
 
-  if (accessToken) {
-    let tokenExpiresAt = null;
-
-    if (expiresIn) {
-      tokenExpiresAt = Date.now() + (expiresIn * 1000);
-      // tokenExpiresAt = moment().add(expiresIn, 'seconds').unix();
-    }
-    // dispatch(saveAccessToken(accessToken, tokenExpiresAt)); // TODO: delete
-
-    if (userId) {
-      // dispatch(setUserId(userId)); // TODO: delete
-      getUserName(userId).then(userName => dispatch(setUserName(userName)));
-    }
-    dispatch(saveAuthData(accessToken, tokenExpiresAt, userId));
-
-    return result;
+  // TODO: consider to use out of here
+  if (userId) {
+    dispatch(fetchUserName(userId, accessToken));
   }
-  return false;
+  return parsedHash;
 };
