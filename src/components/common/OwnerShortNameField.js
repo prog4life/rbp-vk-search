@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// TODO: test InputGroupAddon
-import { InputGroup } from 'react-bootstrap';
+import { InputGroup, FormControl } from 'react-bootstrap';
 import FormInputGroup from './FormInputGroup';
 
-function getValidationState(value, disabled, validate) {
-  if (disabled || !validate) {
+function getValidationState(value, isDisabled, validate) {
+  if (isDisabled || !validate) {
     return undefined;
   }
   if (value.length < 1 || value.length > 32) { // numbers, letters and _
@@ -16,56 +15,42 @@ function getValidationState(value, disabled, validate) {
 }
 
 const OwnerShortNameField = ({
-  input: { value, onChange }, disabled, onIdTypeSwitch,
+  input: { value, onChange }, isDisabled, onIdTypeSwitch,
 }) => (
   <FormInputGroup
     id="wall-owner-short-name"
-    name="wallOwnerShortName"
-    label="Short name of wall owner (instead of id)"
-    onChange={onChange}
-    placeholder="short textual id of user or group"
-    type="text"
+    label="Short name of wall owner"
     validationState={null}
-    value={value}
   >
     <InputGroup>
       <InputGroup.Addon>
         <input
-          checked={!disabled}
+          checked={!isDisabled}
           onChange={onIdTypeSwitch}
           type="radio"
           name="wallOwnerIdType"
           value="shortName"
         />
       </InputGroup.Addon>
+      <FormControl
+        name="wallOwnerShortName"
+        onChange={onChange}
+        placeholder="short textual id (instead of numeric id)"
+        disabled={isDisabled}
+        type="text"
+        value={value}
+      />
     </InputGroup>
   </FormInputGroup>
 );
 
 OwnerShortNameField.propTypes = {
-  disabled: PropTypes.bool.isRequired,
   input: PropTypes.shape({
     onChange: PropTypes.func.isRequired,
     value: PropTypes.string.isRequired,
   }).isRequired,
+  isDisabled: PropTypes.bool.isRequired,
   onIdTypeSwitch: PropTypes.func.isRequired,
 };
-
-OwnerShortNameField.defaultProps = {
-  isOwnerSpecified: true,
-};
-
-// const prev = (
-//   <FormInputGroup
-//     id="wall-owner-short-name"
-//     name="wallOwnerShortName"
-//     label="Short name of wall owner (instead of id)"
-//     onChange={onChange}
-//     placeholder="wall owner textual id"
-//     type="text"
-//     validationState={getValidationState(isOwnerSpecified)}
-//     value={value}
-//   />
-// );
 
 export default OwnerShortNameField;

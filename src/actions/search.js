@@ -91,17 +91,19 @@ export const startWallPostsSearch = (inputData) => {
       // 'REQUEST_FAIL',
       'ADD_RESULTS',
       'SEARCH_UPDATE',
-      'WALL_POSTS_SEARCH_END'
+      'WALL_POSTS_SEARCH_END',
     ],
+    // TODO:
+    // getEndpoint() or getToken() instead of endpoint
     [SEARCH_CONFIG]: {
       authorId: postAuthorId,
       baseAPIReqUrl,
       searchResultsLimit,
       offsetModifier, // should be equal to request url "count" param value
       requestInterval,
-      waitPending,
+      waitPending, // TODO: remove completely this feature
       waitTimeout,
-    }
+    },
   };
 };
 

@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// TODO: test InputGroupAddon
-import { InputGroup } from 'react-bootstrap';
+import { InputGroup, FormControl } from 'react-bootstrap';
 import FormInputGroup from './FormInputGroup';
 
-function getValidationState(value, disabled, validate) {
-  if (disabled || !validate) {
+function getValidationState(value, isDisabled, validate) {
+  if (isDisabled || !validate) {
     return undefined;
   }
   if (value.length < 1) {
@@ -16,60 +15,46 @@ function getValidationState(value, disabled, validate) {
 }
 
 const WallOwnerIdField = ({
-  input: { value, onChange }, disabled, isRequired, onIdTypeSwitch
+  input: { value, onChange }, isDisabled, onIdTypeSwitch,
 }) => (
   <FormInputGroup
     id="wall-owner-id"
-    name="wallOwnerId"
     label="Wall owner id"
-    onChange={onChange}
-    placeholder="123456789"
-    // required // TODO: this or short name must be entered, look below
-    type="text"
     validationState={null}
-    value={value}
   >
     <InputGroup>
       <InputGroup.Addon>
         <input
-          checked={!disabled}
+          checked={!isDisabled}
           onChange={onIdTypeSwitch}
           type="radio"
           name="wallOwnerIdType"
           value="usualId"
         />
       </InputGroup.Addon>
+      <FormControl
+        name="wallOwnerId"
+        onChange={onChange}
+        placeholder="123456789"
+        // required // TODO: this or short name must be entered, look below
+        disabled={isDisabled}
+        type="text"
+        value={value}
+      />
     </InputGroup>
   </FormInputGroup>
 );
 
 WallOwnerIdField.propTypes = {
-  disabled: PropTypes.bool.isRequired,
   input: PropTypes.shape({
     onChange: PropTypes.func.isRequired,
     value: PropTypes.string.isRequired,
   }).isRequired,
+  isDisabled: PropTypes.bool.isRequired,
   onIdTypeSwitch: PropTypes.func.isRequired,
 };
 
-WallOwnerIdField.defaultProps = {
-  isOwnerSpecified: true,
-};
-
-// const prevContents = (
-//   <FormInputGroup
-//     id="wall-owner-id"
-//     name="wallOwnerId"
-//     label="Wall owner id"
-//     onChange={onChange}
-//     placeholder="id of user or group"
-//     // required // TODO: this or short name must be entered, look below
-//     type="text"
-//     validationState={getValidationState(isOwnerSpecified)}
-//     value={value}
-//   />
-// );
-
+// TODO: consider usage of usual FormGroup
 // const alt = (
 //   <FormGroup
 //     controlId="wall-owner-id"

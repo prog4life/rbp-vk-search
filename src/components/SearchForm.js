@@ -27,14 +27,7 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
     this.state = {
       isSubmitted: false,
       isShortNameUsed: false,
-      // validation: {},
-      // wallOwnerId: '',
-      // wallOwnerShortName: '',
-      // wallOwnerType: 'group',
-      // postAuthorId: '',
-      // searchResultsLimit: '',
     };
-    this.validation = {};
     this.renderCount = 0;
   }
   componentWillReceiveProps(nextProps) {
@@ -53,34 +46,12 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
     const { isSubmitted, isShortNameUsed, ...rest } = this.state;
     const { onStartSearch } = this.props;
 
-    console.log('cDU BEFORE CHECK, render #', this.renderCount);
+    console.log('cDU, render #', this.renderCount);
 
-    if (isSubmitted && this.checkValidation(this.validation)) {
-      console.log('cDU CHECK PASSED, render #', this.renderCount);
-      onStartSearch(rest);
-    }
-  }
-  setValidation = (name, result) => {
-    //   this.isFormValid = false;
-    this.validation[name] = result;
-    console.log(`VALIDATION for "${name}" was set as "${result}", render #${this.renderCount}`);
-    // this.setState(prevState => ({
-    //   validation: { ...prevState.validation, [name]: result },
-    // }));
-  }
-  resetValidation() {
-    this.validation = {
-      wallOwnerId: 'success',
-      wallOwnerShortName: 'success',
-      postAuthorId: 'success',
-    };
-  }
-  checkValidation = (validation) => {
-    const fields = Object.keys(validation);
-
-    return fields.length === 3 && fields.every(field => (
-      validation[field] && validation[field] !== 'error'
-    ));
+    // if (isSubmitted) {
+    //   console.log('cDU CHECK PASSED, render #', this.renderCount);
+    //   onStartSearch(rest);
+    // }
   }
   handleSubmit(values) {
     // event.preventDefault();
@@ -90,22 +61,19 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
       return;
     }
 
-    console.log('SUBMITTED: ', values);
+    console.log('SUBMITTED values: ', values);
     // NOTE: will be executed once component is re-rendered
     // setState callbacks (second argument) now fire immediately after
     // componentDidMount / componentDidUpdate instead of after all components have rendered
+    onStartSearch(values);
   }
-  // TODO: add throttling
+  // TODO: looks like throttling is no more needed
   handleInputValueChange(event) {
     if (event.target.type === 'radio') {
       this.setState({
         isShortNameUsed: event.target.value === 'shortName',
       });
-      // return;
     }
-    // this.setState({
-    //   [event.target.name]: event.target.value.trim(),
-    // });
   }
   render() {
     const { isSearchActive, handleSubmit } = this.props;
@@ -115,15 +83,19 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
 
     return (
       <Grid>
-        <form className="search-form" onSubmit={handleSubmit(this.handleSubmit)}>
+        <form
+          className="search-form"
+          onSubmit={handleSubmit(this.handleSubmit)}
+        >
           <Row>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
-              {/* TODO: isRequired={!isShortNameUsed} */}
+              {/* TODO: check id or shortname is used for validation by
+                isDisabled prop */}
               <Field
                 name="wallOwnerId"
                 component={WallOwnerIdField}
                 onIdTypeSwitch={this.handleInputValueChange}
-                disabled={isSearchActive || isShortNameUsed}
+                isDisabled={isSearchActive || isShortNameUsed}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
@@ -131,28 +103,28 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
                 name="wallOwnerShortName"
                 component={OwnerShortNameField}
                 onIdTypeSwitch={this.handleInputValueChange}
-                disabled={isSearchActive || !isShortNameUsed}
+                isDisabled={isSearchActive || !isShortNameUsed}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
               <Field
                 name="wallOwnerType"
                 component={WallOwnerTypeSelect}
-                disabled={isSearchActive}
+                isDisabled={isSearchActive}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
               <Field
                 name="postAuthorId"
                 component={PostAuthorIdField}
-                disabled={isSearchActive}
+                isDisabled={isSearchActive}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
               <Field
                 name="searchResultsLimit"
                 component={SearchResultsLimitField}
-                disabled={isSearchActive}
+                isDisabled={isSearchActive}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4} >
@@ -172,5 +144,5 @@ export default reduxForm({
   initialValues: {
     wallOwnerType: 'group',
   },
-  // onSubmit: SearchForm.handleSubmit,
+  // onSubmit: component.handleSubmit,
 })(SearchForm);

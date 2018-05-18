@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
+import { FormGroup, FormControl, ControlLabel, HelpBlock } from 'react-bootstrap';
 
 const FormInputGroup = ({
   id, label, help, validationState, children, ...restProps
@@ -13,26 +13,28 @@ const FormInputGroup = ({
       {label}
     </ControlLabel>
     {children || <FormControl {...restProps} />}
-    {/* {help && <HelpBlock>{help}</HelpBlock>} */}
+    {help &&
+      <HelpBlock>
+        {help}
+      </HelpBlock>
+    }
   </FormGroup>
 );
 
 FormInputGroup.propTypes = {
+  children: PropTypes.node,
+  help: PropTypes.string,
   id: PropTypes.string.isRequired,
-  // isDisabled: PropTypes.bool,
   // isRequired: PropTypes.bool,
   label: PropTypes.string.isRequired,
-  // help: PropTypes.any,
-  // onChange: PropTypes.func.isRequired,
-  placeholder: PropTypes.string,
-  // type: PropTypes.string.isRequired,
-  // value: PropTypes.string.isRequired,
+  validationState: PropTypes.string,
 };
 
 FormInputGroup.defaultProps = {
-  // isDisabled: false,
+  children: null,
+  help: null,
   // isRequired: false,
-  placeholder: '',
+  validationState: null,
 };
 
 export default FormInputGroup;
