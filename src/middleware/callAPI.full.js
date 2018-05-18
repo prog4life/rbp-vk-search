@@ -1,4 +1,4 @@
-import axiosJSONP from 'utils/axiosJSONP';
+import fetchJSONP from 'utils/fetchJSONP';
 import prepareWallPosts from 'utils/responseHandling';
 
 export const CALL_API = 'Call API';
@@ -162,7 +162,7 @@ export default ({ getState, dispatch }) => next => (action) => {
 
   // NOTE: in all next chain must be used offset value that was actual
   // at interval tick moment, i.e. passed to "makeCallToAPI"
-  axiosJSONP(url)
+  fetchJSONP(url)
     .then(
       // TODO: maybe it will be rational to get attempt value from
       //  existing request with same key

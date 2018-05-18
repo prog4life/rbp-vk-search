@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import { createSelector } from 'reselect';
-import { reducer as formReducer } from 'redux-form'
+import { reducer as formReducer } from 'redux-form';
 import sortBy from 'lodash.sortby';
 import { sortItemsByNumField } from 'utils/sorting';
 // import * as reducers from './auth';
@@ -9,6 +9,9 @@ import search, * as fromSearch from './searchReducer';
 import results from './resultsReducer';
 import posts, * as fromPosts from './postsReducer';
 import requests from './requestsReducer';
+
+// import reducer from 'redux-form/es/reducer';
+// const formReducer = reducer;
 
 // root reducer
 export default combineReducers({

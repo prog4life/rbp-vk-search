@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { ProgressBar, ButtonToolbar, Button } from 'react-bootstrap';
-import Spinner from 'react-spinner-material';
 
 // import SearchControlButtons from 'components/SearchControlButtons';
 import ProgressViewer from 'components/ProgressViewer';
@@ -38,20 +37,12 @@ class SearchControls extends Component {
         <ButtonToolbar className="search-controls__search-buttons">
           {isSearchActive
             ?
-              <div>
-                <Spinner
-                  size={20}
-                  spinnerColor={"#333"}
-                  spinnerWidth={2}
-                  visible
-                />
-                <Button
-                  onClick={this.handleStopClick}
-                  type="button"
-                >
-                  {'Stop Search'}
-                </Button>
-              </div>
+              <Button
+                onClick={this.handleStopClick}
+                type="button"
+              >
+                {'Stop Search'}
+              </Button>
             :
               <Button // TODO: change to onClick instead of submit
                 bsStyle="info"

@@ -162,6 +162,12 @@ module.exports = {
                 },
                 preventFullImport: true,
               },
+              'redux-form': {
+                transform(importName) {
+                  return `redux-form/es/${importName}`;
+                },
+                preventFullImport: true,
+              },
             }],
           ].concat(isProduction ? [] : ['transform-react-jsx-source']),
           presets: [

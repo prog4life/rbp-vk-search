@@ -1,5 +1,4 @@
 import fetchJSONP from 'utils/fetchJSONP';
-import axiosJSONP from 'utils/axiosJSONP';
 import prepareWallPosts from 'utils/responseHandling';
 import {
   apiVersion,
@@ -144,7 +143,7 @@ export const startWallPostsSearch = (inputData) => {
 //       waitTimeout
 //     },
 //     // callAPI: fetchJSONP,
-//     callAPI: axiosJSONP,
+//     callAPI: fetchJSONP,
 //     handleResponse: prepareWallPosts(postAuthorId),
 //     addResults,
 //     requestStart,

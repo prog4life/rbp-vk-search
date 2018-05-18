@@ -1,4 +1,3 @@
-import axiosJSONP from 'utils/axiosJSONP';
 import fetchJSONP from 'utils/fetchJSONP';
 import jsonpPromise from 'utils/jsonpPromise';
 import prepareWallPosts from 'utils/responseHandling';

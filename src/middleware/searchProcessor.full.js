@@ -1,4 +1,4 @@
-import axiosJSONP from 'utils/axiosJSONP';
+import fetchJSONP from 'utils/fetchJSONP';
 // import fetchJSONP from 'utils/fetch';
 import prepareWallPosts from 'utils/responseHandling';
 import { maxAttempts as maxAttemptsDefault } from 'config/common';
@@ -342,7 +342,7 @@ export default searchProcessor;
 
 // NOTE: in all next chain must be used offset value that was actual
 // at interval tick moment, i.e. passed to "makeCallToAPI"
-// axiosJSONP(currentAPIReqUrl)
+// fetchJSONP(currentAPIReqUrl)
 //   .then(
 //     // TODO: maybe it will be rational to get attempt value from
 //     //  existing request with same key

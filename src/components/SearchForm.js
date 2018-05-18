@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Field, reduxForm } from 'redux-form';
+// to use with configured "babel-plugin-transform-imports"
+import { reduxForm, Field } from 'redux-form';
 import { Grid, Row, Col } from 'react-bootstrap';
 
 import ControlsContainer from 'containers/ControlsContainer';
@@ -27,11 +28,11 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
       isSubmitted: false,
       isShortNameUsed: false,
       // validation: {},
-      wallOwnerId: '',
-      wallOwnerShortName: '',
-      wallOwnerType: 'group',
-      postAuthorId: '',
-      searchResultsLimit: '',
+      // wallOwnerId: '',
+      // wallOwnerShortName: '',
+      // wallOwnerType: 'group',
+      // postAuthorId: '',
+      // searchResultsLimit: '',
     };
     this.validation = {};
     this.renderCount = 0;
@@ -117,6 +118,7 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
         <form className="search-form" onSubmit={handleSubmit(this.handleSubmit)}>
           <Row>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
+              {/* TODO: isRequired={!isShortNameUsed} */}
               <Field
                 name="wallOwnerId"
                 component={WallOwnerIdField}

@@ -1,5 +1,5 @@
 import { jsonpTimeout } from 'config/common';
-import axios from 'axios-jsonp-pro';
+// import axios from 'axios-jsonp-pro';
 
 export default function axiosJSONP(url, customTimeout = jsonpTimeout) {
   return axios.jsonp(url, {
