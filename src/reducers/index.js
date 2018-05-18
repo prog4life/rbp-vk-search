@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import { createSelector } from 'reselect';
 import { reducer as formReducer } from 'redux-form';
-import sortBy from 'lodash.sortby';
+import sortBy from 'lodash-es/sortBy';
 import { sortItemsByNumField } from 'utils/sorting';
 // import * as reducers from './auth';
 import auth from './authReducer';

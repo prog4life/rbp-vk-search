@@ -2,7 +2,7 @@
 // import 'whatwg-fetch';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import _debounce from 'lodash.debounce';
+import debounce from 'lodash-es/debounce';
 
 // import 'bootstrap/dist/css/bootstrap.min.css';
 // import 'bootstrap/dist/css/bootstrap-theme.min.css';
@@ -45,7 +45,7 @@ const store = configureStore({
 store.subscribe(() => console.log('State update ', (new Date()).toLocaleTimeString()));
 
 // TODO: wrap in throttle or debounce
-const saveStateDebounced = _debounce(() => {
+const saveStateDebounced = debounce(() => {
   const { auth } = store.getState();
   const stateToStore = {
     auth: { ...auth, isRedirecting: false, hasAuthOffer: false },
