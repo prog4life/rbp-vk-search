@@ -1,9 +1,12 @@
+import requests from './requestsReducer';
+
 const defaultSearchState = {
   isActive: false,
   offset: 0,
   processed: 0,
   // progress: 0,
   // total: undefined,
+  requests: {},
 };
 
 const search = (state = defaultSearchState, action) => {
@@ -14,11 +17,13 @@ const search = (state = defaultSearchState, action) => {
         offset: 0,
         processed: 0,
         // progress: 0,
+        requests: requests(state.requests, action),
       };
     case 'WALL_POSTS_SEARCH_END':
       return {
         ...state,
         isActive: false,
+        // requests: requests(state, action), // ???
       };
     case 'SET_OFFSET':
       return {
@@ -30,6 +35,13 @@ const search = (state = defaultSearchState, action) => {
     //     ...state,
     //     intervalId: action.intervalId
     //   };
+    case 'REQUEST_START':
+    case 'REQUEST_SUCCESS':
+    case 'REQUEST_FAIL':
+      return {
+        ...state,
+        requests: requests(state.requests, action),
+      };
     case 'SEARCH_UPDATE':
       return {
         ...state,
@@ -43,6 +55,7 @@ const search = (state = defaultSearchState, action) => {
         offset: 0,
         processed: 0,
         // progress: 0,
+        requests: requests(state.requests, action),
       };
     default:
       return state;
@@ -93,4 +106,3 @@ export const getIsActive = state => state.isActive;
 //       return state;
 //   }
 // }
-

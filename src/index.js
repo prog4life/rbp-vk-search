@@ -1,5 +1,4 @@
-// import 'babel-polyfill';
-// import 'whatwg-fetch';
+import 'config/polyfills'; // NOTE: import fetch and babel-polyfill separately ?
 import React from 'react';
 import ReactDOM from 'react-dom';
 import debounce from 'lodash-es/debounce';

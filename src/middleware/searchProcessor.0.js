@@ -125,47 +125,47 @@ const searchProcessor = ({ dispatch, getState }) => {
       // checkpoint = performance.now();
       // console.warn(`NEW interval TICK: ${checkpoint - tempCheckpoint}`);
 
-      const { results, search: { offset, total, requests } } = getState();
-      const reqs = requests.byId;
-      const failed = requests.failedIds;
-      const pending = requests.pendingIds;
-      // let nextOffset;
-
-      // NOTE: max amount of parallel requests via JSONP ???
+      const { results, requests, search: { offset, total } } = getState();
+      const reqs = Object.values(requests);
+      let nextOffset;
+      let completelyFailed = 0;
 
       // TODO: think over search.isActive check
+      if (reqs.length > 0) {
+        // console.log('REQUESTS LEFT: ', JSON.stringify(reqs, null, 2));
 
-      if (failed.length > 0) {
-        const [nextId] = failed;
-        console.log(`Repeat FAILED with ${reqs[nextId].offset} ` +
-          `offset and attempt ${reqs[nextId].attempt + 1} `);
+        const failedReq = reqs.find(req => (
+          !req.isPending && req.attempt < maxAttempts
+        ));
+        // repeat first failed request
+        if (failedReq) {
+          console.log(`Repeat FAILED with ${failedReq.offset} ` +
+            `offset and attempt ${failedReq.attempt + 1} `);
 
-        makeCallToAPI(reqs[nextId].offset, reqs[nextId].attempt + 1);
-        return;
+          makeCallToAPI(failedReq.offset, failedReq.attempt + 1);
+          return;
+        }
+        nextOffset = offset + offsetModifier;
+
+        if (nextOffset > total) { // TODO: add !total ?
+          // NOTE: or just not add such requests to "requests" on start
+          // OR just count them and do: reqs.length - completelyFailed.length === 0
+          // failed requests that have exceeded max attempt limit
+          completelyFailed = reqs.filter(req => (
+            !req.isPending && req.attempt >= maxAttempts
+          ));
+          console.warn('completelyFailed: ', completelyFailed);
+          console.info('reqs after completelyFailed were counted: ', reqs);
+          // some pending requests are still present - repeat check on next
+          // timer tick
+          if (reqs.length > completelyFailed) {
+            nextOffset -= offsetModifier;
+            return;
+          }
+        }
+      } else {
+        nextOffset = offset + offsetModifier;
       }
-
-      const nextOffset = offset + offsetModifier;
-      // nextOffset = offset + offsetModifier;
-
-      if (nextOffset > total) { // TODO: add !total ?
-        console.log('NEXT ofset > TOTAL');
-      }
-
-      // if (reqs.length > 0) {
-      //   nextOffset = offset + offsetModifier;
-      //
-      //   if (nextOffset > total) { // TODO: add !total ?
-      //     // some pending requests are still present - repeat check on next
-      //     // timer tick
-      //     if (reqs.length > completelyFailed) {
-      //       nextOffset -= offsetModifier;
-      //       return;
-      //     }
-      //   }
-      // } else {
-      //   nextOffset = offset + offsetModifier;
-      // }
-
       next({ type: 'SET_OFFSET', offset: nextOffset });
 
       if (!searchResultsLimit || results.length < searchResultsLimit) {
@@ -176,7 +176,8 @@ const searchProcessor = ({ dispatch, getState }) => {
         }
       }
 
-      if (failed.length === 0 && pending.length === 0) {
+      // TODO: replace by if (reqs.length - completelyFailed.length === 0)
+      if (reqs.length === 0) {
         clearInterval(searchIntervalId);
         next({ type: searchEndType });
       }

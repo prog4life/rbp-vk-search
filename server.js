@@ -17,7 +17,7 @@ const app = express();
 const port = process.env.PORT || '7031';
 // const hostname = process.env.IP || 'localhost';
 
-const publicPath = path.join(__dirname, 'public');
+const publicPath = path.join(__dirname, 'build');
 
 // const compiler = webpack(config);
 // app.use(webpackHotMiddleware(compiler));

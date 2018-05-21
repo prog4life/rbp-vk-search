@@ -1,6 +1,6 @@
 import { apiVersion, tokenRequestURL } from 'config/common';
 import fetchJSONP from './fetchJSONP';
-import jsonpPromise from './jsonpPromise';
+// import jsonpPromise from './jsonpPromise';
 
 export const redirectToTokenRequestUrl = () => (
   window.location.assign(tokenRequestURL)

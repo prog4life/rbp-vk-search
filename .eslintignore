@@ -1,6 +1,7 @@
 build/
 public/
 dist/
+TEMP/
 
 **/bundle.js
 **/bundle.js.map

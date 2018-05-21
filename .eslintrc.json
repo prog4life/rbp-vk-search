@@ -3,6 +3,7 @@
   "parserOptions": {
     "ecmaVersion": 2017,
     "sourceType": "module",
+    "allowImportExportEverywhere": false,
     "ecmaFeatures": {
       "globalReturn": false,
       "impliedStrict": false,
@@ -51,7 +52,7 @@
     "react/jsx-max-depth": [0, { "max": 2 }],
     "react/jsx-no-literals": ["warn", { "noStrings": false }],
     "react/jsx-sort-props": ["warn", { "noSortAlphabetically": true }],
-    "react/no-set-state": "warn",
+    "react/no-set-state": 0,
     "jsx-a11y/anchor-is-valid": [ "error", {
       "components": [ "Link" ],
       "specialLink": [ "to" ]

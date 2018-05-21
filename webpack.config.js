@@ -46,7 +46,7 @@ module.exports = {
   output: {
     filename: isProduction ? 'js/[name].[chunkhash:4].js' : '[name].[id].js',
     chunkFilename: isProduction ? 'js/[name].[chunkhash:4].js' : '[name].js',
-    path: path.resolve(__dirname, 'public'),
+    path: path.resolve(__dirname, 'build'),
     publicPath: '/',
   },
   optimization: {
@@ -62,6 +62,13 @@ module.exports = {
       chunks: 'all', // to work for not only async chunks too
       // name: false, // switch off name generation
       cacheGroups: {
+        // polyfills: {
+        //   test: /polyfills/,
+        //   name: 'polyfills',
+        //   chunks: 'initial',
+        //   // reuseExistingChunk: false,
+        //   // enforce: true,
+        // },
         'react-bootstrap': {
           test: /react-bootstrap/,
         },
@@ -83,9 +90,9 @@ module.exports = {
     },
     // adds an additonal chunk to each entrypoint containing only the runtime
     // runtimeChunk: true, // something like extracting a manifest
-    // runtimeChunk: {
-    //   name: 'manifest',
-    // },
+    runtimeChunk: {
+      name: 'manifest',
+    },
   },
   plugins: [
     // extractStyles,
@@ -93,7 +100,7 @@ module.exports = {
       // Options similar to the same options in webpackOptions.output
       // both options are optional
       filename: isProduction ? 'css/styles.[contenthash:4].css' : '[name].css',
-      chunkFilename: isProduction ? 'css/[name].[contenthash].css' : '[id].css',
+      chunkFilename: isProduction ? 'css/[name].[contenthash:4].css' : '[id].css',
     }),
     // new webpack.DefinePlugin({
     //   'process.env': {
@@ -101,7 +108,7 @@ module.exports = {
     //   },
     // }),
     new CleanWebpackPlugin(
-      ['public'], // OR 'build' OR 'dist', removes folder
+      ['build'], // OR 'build' OR 'dist', removes folder
       { exclude: ['index.html'] },
     ),
     new HTMLWebpackPlugin({
@@ -185,7 +192,7 @@ module.exports = {
         options: {
           plugins: [
             'react-hot-loader/babel',
-            'fast-async',
+            // 'fast-async',
             'syntax-dynamic-import',
             'transform-class-properties',
             [BabelPluginTransformImports, { // TODO: try "transform-imports"
@@ -217,8 +224,8 @@ module.exports = {
                 ],
               },
               exclude: [
-                'transform-regenerator',
-                'transform-async-to-generator',
+                // 'transform-regenerator',
+                // 'transform-async-to-generator',
               ],
             }],
             'react',
@@ -295,7 +302,7 @@ module.exports = {
   },
   devServer: {
     progress: true,
-    contentBase: path.resolve(__dirname, 'public'),
+    contentBase: path.resolve(__dirname, 'build'),
     compress: true,
     historyApiFallback: true,
     hot: true,
