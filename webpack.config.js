@@ -160,6 +160,7 @@ module.exports = {
     // }),
     new BundleAnalyzerPlugin({
       analyzerMode: 'static',
+      // reportFilename: '../temp', // relative to output.path
       openAnalyzer: false,
     }),
     new DuplPkgCheckrPlugin(),

@@ -15,7 +15,7 @@ const logger = createLogger({
   // predicate: (getState, action) => action.type !== 'SEARCH_UPDATE'
   predicate: (getState, action) => {
     const hiddenTypes = [
-      'SET_OFFSET',
+      // 'SEARCH::SET-OFFSET',
       // 'SEARCH_UPDATE',
       // 'REQUEST_START',
       // 'REQUEST_SUCCESS',
@@ -31,6 +31,8 @@ const middleware = [watcher, search, callAPI, thunk, logger];
 
 const configureStore = (preloadedState = {}) => {
   const composeEnhancers = composeWithDevTools({
+    name: 'vk-search',
+    // to turn it off in production if NODE_ENV is not set
     // realtime: true,
     // port setting required to use with local "remotedev-server", OR
     // use remotedev.io/local alternatively

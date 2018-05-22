@@ -198,7 +198,7 @@ const searchProcessor = ({ dispatch, getState }) => {
       } else {
         nextOffset = offset + offsetModifier;
       }
-      next({ type: 'SET_OFFSET', offset: nextOffset });
+      next({ type: 'SEARCH::SET-OFFSET', offset: nextOffset });
 
       if (!searchResultsLimit || results.length < searchResultsLimit) {
         // request next portion of items using increased offset OR end search

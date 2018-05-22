@@ -2,13 +2,13 @@ import { combineReducers } from 'redux';
 import { createSelector } from 'reselect';
 import { reducer as formReducer } from 'redux-form';
 import sortBy from 'lodash-es/sortBy';
-import { sortItemsByNumField } from 'utils/sorting';
+// import { sortItemsByNumField } from 'utils/sorting';
 // import * as reducers from './auth';
 import auth from './authReducer';
 import search, * as fromSearch from './searchReducer';
 import results from './resultsReducer';
 import posts, * as fromPosts from './postsReducer';
-import requests from './requestsReducer';
+// import requests from './requestsReducer';
 
 // root reducer
 export default combineReducers({
@@ -16,7 +16,7 @@ export default combineReducers({
   results,
   posts,
   search,
-  requests,
+  // requests,
   form: formReducer,
 });
 

@@ -67,12 +67,12 @@ export const setSearchIntervalId = id => ({
 
 // will be utilized by searchProcessor middleware
 export const startWallPostsSearch = (inputData) => {
-  // TEMP:
-  const { postAuthorIdDef, ownerIdDef } = inputDefaults;
+  // TEMP: for testing
+  const { postAuthorIdDef } = inputDefaults;
 
-  const { wallOwnerType, wallOwnerShortName } = inputData;
+  const { wallOwnerType, wallOwnerShortName = '' } = inputData;
   const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
-  const wallOwnerId = inputData.wallOwnerId || ownerIdDef;
+  const wallOwnerId = inputData.wallOwnerId || '';
   const postAuthorId = Number(inputData.postAuthorId) || postAuthorIdDef;
   const searchResultsLimit = Number(inputData.searchResultsLimit) || undefined;
 
@@ -101,8 +101,9 @@ export const startWallPostsSearch = (inputData) => {
       searchResultsLimit,
       offsetModifier, // should be equal to request url "count" param value
       requestInterval,
-      waitPending, // TODO: remove completely this feature
-      waitTimeout,
+      // TODO: remove completely next 2 features
+      // waitPending,
+      // waitTimeout,
     },
   };
 };

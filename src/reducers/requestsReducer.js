@@ -1,4 +1,3 @@
-import { maxAttempts } from 'config/common';
 import { combineReducers } from 'redux';
 import { addIfNotExist } from './reducerUtils';
 
@@ -14,27 +13,35 @@ import { addIfNotExist } from './reducerUtils';
 //   failedIds: [],
 // };
 
-const byId = (state = {}, action) => {
-  switch (action.type) {
+const byId = (state = {}, { type, id, offset, startTime }) => {
+  switch (type) {
     case 'REQUEST_START':
-    case 'REQUEST_FAIL': // NOTE: unnecessary ??? different attempts !!!
-      // TODO: reject to add on maxAttempts
       return {
         ...state,
-        [action.id]: {
-          id: action.id,
-          attempt: action.attempt,
-          offset: action.offset,
-          startTime: action.startTime,
+        [id]: {
+          id,
+          attempt: state[id] ? (state[id].attempt + 1) : 1,
+          offset,
+          startTime,
         },
       };
+    // case 'REQUEST_FAIL': // NOTE: unnecessary
+    //   return {
+    //     ...state,
+    //     [id]: {
+    //       id,
+    //       attempt: state[id].attempt,
+    //       offset,
+    //       startTime,
+    //     },
+    //   };
     case 'REQUEST_SUCCESS': {
       const nextState = { ...state };
-      delete nextState[action.id];
+      delete nextState[id];
       return nextState;
     }
     case 'WALL_POSTS_SEARCH_START':
-    case 'TERMINATE_SEARCH':
+    case 'TERMINATE_SEARCH': // NOTE: remove ???
       return {};
     default:
       return state;
@@ -49,7 +56,7 @@ const pendingIds = (state = [], action) => {
     case 'REQUEST_FAIL':
       return state.filter(id => action.id !== id);
     case 'WALL_POSTS_SEARCH_START':
-    case 'TERMINATE_SEARCH':
+    case 'TERMINATE_SEARCH': // NOTE: remove ???
       return [];
     default:
       return state;
@@ -62,25 +69,21 @@ const failedIds = (state = [], action) => {
     case 'REQUEST_SUCCESS':
       return state.filter(id => action.id !== id);
     case 'REQUEST_FAIL':
-      return action.attempt === maxAttempts
-        ? state
-        : addIfNotExist(state, action.id);
+      return addIfNotExist(state, action.id);
     case 'WALL_POSTS_SEARCH_START':
-    case 'TERMINATE_SEARCH':
+    case 'TERMINATE_SEARCH': // NOTE: remove ???
       return [];
     default:
       return state;
   }
 };
 
-const completelyFailedIds = (state = [], action) => {
+const succeededIds = (state = [], action) => {
   switch (action.type) {
-    case 'REQUEST_FAIL':
-      return action.attempt === maxAttempts
-        ? addIfNotExist(state, action.id)
-        : state;
+    case 'REQUEST_SUCCESS':
+      return addIfNotExist(state, action.id);
     case 'WALL_POSTS_SEARCH_START':
-    case 'TERMINATE_SEARCH':
+    case 'TERMINATE_SEARCH': // NOTE: remove ???
       return [];
     default:
       return state;
@@ -114,7 +117,7 @@ export default combineReducers({
   byId,
   pendingIds,
   failedIds,
-  completelyFailedIds,
+  succeededIds,
 });
 
 // export default function requests(state = initialState, action) {

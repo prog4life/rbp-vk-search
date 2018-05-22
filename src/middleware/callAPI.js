@@ -9,15 +9,15 @@ export const schema = {
   // wallComments: 'WALL_COMMENTS'
 };
 
-const onRequestStart = (next, offset, attempt) => {
-  const key = `offset_${offset}`;
+const onRequestStart = (next, offset) => {
+  const id = `offset_${offset}`;
 
   next({
     type: 'REQUEST_START',
-    id: key,
+    id,
     offset,
     startTime: Date.now(),
-    attempt,
+    // attempt,
   });
 };
 
@@ -27,50 +27,47 @@ const throwIfSearchIsOver = (isActive, offset) => {
   }
 };
 
-// such request obj was removed from store earlier
-const throwIfRequestIsExcess = (request, offset) => {
-  if (!request) {
-    throw Error(`Request with ${offset} offset has been succeeded already`);
+// if request obj was removed from store or added to completely failed
+const throwIfRequestIsExcess = (succeeded, id) => {
+  if (succeeded.includes(id)) {
+    throw new Error(`Request with id: "${id}" has been succeeded already`);
   }
 };
 
 // remove successful request obj from "requests"
 const onRequestSuccess = (next, getState, offset) => (response) => {
-  const { search, requests } = getState();
-  const key = `offset_${offset}`;
+  const { search } = getState();
+  const { requests } = search;
+  const id = `offset_${offset}`;
+
   // console.log(`SUCCESS offset: ${offset}`);
 
   throwIfSearchIsOver(search.isActive, offset);
-  throwIfRequestIsExcess(requests[key], offset);
+  throwIfRequestIsExcess(requests.succeededIds, id);
 
-  next({
-    type: 'REQUEST_SUCCESS',
-    id: key,
-  });
+  next({ type: 'REQUEST_SUCCESS', id });
 
   return response;
 };
 
-// add failed request obj with isPending: false to "requests"
+// add failed request obj to "requests"
 const onRequestFail = (next, getState, offset) => (e) => {
-  const { search, requests } = getState();
-  const key = `offset_${offset}`;
+  const { search } = getState();
+  const { requests } = search;
+  const id = `offset_${offset}`;
   // console.log(`FAIL offset: ${offset}`);
 
   // TODO: think over case when belated failed but pending repeated exists
 
   throwIfSearchIsOver(search.isActive, offset);
-  throwIfRequestIsExcess(requests[key], offset);
 
-  next({
-    type: 'REQUEST_FAIL',
-    id: key,
-    offset,
-    startTime: requests[key].startTime,
-    attempt: requests[key].attempt,
-  });
+  if (!requests.pendingIds.includes(id)) {
+    throw new Error(`Offset "${offset}" has been processed already`);
+  }
 
-  throw Error(`Request with ${offset} offset failed, ${e.message}`);
+  next({ type: 'REQUEST_FAIL', id });
+
+  throw new Error(`Request with ${offset} offset failed, ${e.message}`);
 };
 
 const onSearchProgress = ({ next, getState, type }) => (response) => {
@@ -130,8 +127,9 @@ export default ({ getState, dispatch }) => next => (action) => {
   if (typeof url !== 'string') {
     throw new Error('Specify a string request URL');
   }
-  if (!Number.isInteger(offset) || !Number.isInteger(attempt)) {
-    throw new Error('Expected offset and attempt to be integers');
+  // if (!Number.isInteger(offset) || !Number.isInteger(attempt)) {
+  if (!Number.isInteger(offset)) {
+    throw new Error('Expected offset to be integer number');
   }
   if (!Number.isInteger(authorId)) {
     throw new Error('Expected authorId to be integer');
@@ -139,7 +137,7 @@ export default ({ getState, dispatch }) => next => (action) => {
 
   const [addResultsType, updateProgressType] = types;
   // add request obj with isPending: true to "requests"
-  onRequestStart(next, offset, attempt);
+  onRequestStart(next, offset);
 
   // TODO: is it necessary ?
   // const actionWith = (data) => {

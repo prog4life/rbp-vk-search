@@ -15,7 +15,7 @@ import rootReducer from '../reducers';
 //   // predicate: (getState, action) => action.type !== 'SEARCH_UPDATE'
 //   predicate: (getState, action) => {
 //     const hiddenTypes = [
-//       'SET_OFFSET',
+//       'SEARCH::SET-OFFSET',
 //       'SEARCH_UPDATE',
 //       'REQUEST_START',
 //       'REQUEST_SUCCESS',

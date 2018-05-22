@@ -1,3 +1,4 @@
+import { SEARCH_SET_OFFSET } from 'middleware/searchProcessor';
 import requests from './requestsReducer';
 
 const defaultSearchState = {
@@ -25,7 +26,7 @@ const search = (state = defaultSearchState, action) => {
         isActive: false,
         // requests: requests(state, action), // ???
       };
-    case 'SET_OFFSET':
+    case SEARCH_SET_OFFSET:
       return {
         ...state,
         offset: action.offset,
