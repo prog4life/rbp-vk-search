@@ -114,15 +114,20 @@ const searchProcessor = ({ dispatch, getState }) => {
         `&offset=${offset}`;
 
       dispatch({
-        types: [addResultsType, updateProgressType],
-        [CALL_API]: {
-          url: currentAPIReqUrl,
-          offset,
-          // attempt,
-          authorId,
-          resultsLimit: searchResultsLimit,
-        },
+        type: 'SEARCH::Call-API',
+        endpoint: currentAPIReqUrl,
       });
+
+      // dispatch({
+      //   types: [addResultsType, updateProgressType],
+      //   [CALL_API]: {
+      //     url: currentAPIReqUrl,
+      //     offset,
+      //     // attempt,
+      //     authorId,
+      //     resultsLimit: searchResultsLimit,
+      //   },
+      // });
     };
     // first request before timer tick
     makeCallToAPI();

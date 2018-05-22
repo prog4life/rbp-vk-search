@@ -1,6 +1,13 @@
 // search
 export const ADD_RESULTS = 'ADD_RESULTS';
+export const TERMINATE_SEARCH = 'TERMINATE_SEARCH';
+
 export const WALL_POSTS_SEARCH_START = 'WALL_POSTS_SEARCH_START';
+export const WALL_POSTS_SEARCH_END = 'WALL_POSTS_SEARCH_END';
+
+export const REQUEST_START = 'REQUEST_START';
+export const REQUEST_SUCCESS = 'REQUEST_SUCCESS';
+export const REQUEST_FAIL = 'REQUEST_FAIL';
 
 // auth
 export const SAVE_AUTH_DATA = 'SAVE_AUTH_DATA';

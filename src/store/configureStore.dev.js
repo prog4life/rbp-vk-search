@@ -1,5 +1,6 @@
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
+import createSagaMiddleware from 'redux-saga';
 import immutabilityWatcher from 'redux-immutable-state-invariant';
 import { createLogger } from 'redux-logger';
 // to use with Chrome Extension
@@ -7,8 +8,10 @@ import { createLogger } from 'redux-logger';
 import { composeWithDevTools } from 'remote-redux-devtools';
 import search from 'middleware/searchProcessor';
 import callAPI from 'middleware/callAPI';
+import { watchSearchCallAPI } from 'actions';
 import rootReducer from '../reducers';
 
+const sagaMiddleware = createSagaMiddleware();
 // must be the last middleware in chain
 const logger = createLogger({
   duration: true,
@@ -24,10 +27,9 @@ const logger = createLogger({
     return !hiddenTypes.some(type => type === action.type);
   },
 });
-
 const watcher = immutabilityWatcher();
 
-const middleware = [watcher, search, callAPI, thunk, logger];
+const middleware = [watcher, search, callAPI, sagaMiddleware, thunk, logger];
 
 const configureStore = (preloadedState = {}) => {
   const composeEnhancers = composeWithDevTools({
@@ -45,6 +47,8 @@ const configureStore = (preloadedState = {}) => {
     preloadedState,
     composeEnhancers(applyMiddleware(...middleware)),
   );
+
+  sagaMiddleware.run(watchSearchCallAPI);
 
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers
