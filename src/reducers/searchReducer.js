@@ -1,29 +1,36 @@
 import { SEARCH_SET_OFFSET } from 'middleware/searchProcessor';
-import requests from './requestsReducer';
+import requests, {
+  getAllById, getPendingIds, getFailedIds,
+} from './requestsReducer';
 
-const defaultSearchState = {
+const initialState = {
   isActive: false,
   offset: 0,
   processed: 0,
-  // progress: 0,
-  // total: undefined,
-  requests: {},
+  // TODO: resolve case with count: 0
+  total: null, // equivalent of "count" field in vk API response
+  requests: {
+    byId: {},
+    pendingIds: [],
+    failedIds: [],
+  },
 };
 
-const search = (state = defaultSearchState, action) => {
+const search = (state = initialState, action) => {
   switch (action.type) {
     case 'WALL_POSTS_SEARCH_START':
       return {
         isActive: true,
         offset: 0,
         processed: 0,
-        // progress: 0,
+        total: null,
         requests: requests(state.requests, action),
       };
     case 'WALL_POSTS_SEARCH_END':
       return {
         ...state,
         isActive: false,
+        // offset: 0, // TODO: use it
         // requests: requests(state, action), // ???
       };
     case SEARCH_SET_OFFSET:
@@ -31,11 +38,6 @@ const search = (state = defaultSearchState, action) => {
         ...state,
         offset: action.offset,
       };
-    // case 'SET_SEARCH_INTERVAL_ID':
-    //   return {
-    //     ...state,
-    //     intervalId: action.intervalId
-    //   };
     case 'REQUEST_START':
     case 'REQUEST_SUCCESS':
     case 'REQUEST_FAIL':
@@ -46,16 +48,15 @@ const search = (state = defaultSearchState, action) => {
     case 'SEARCH_UPDATE':
       return {
         ...state,
-        total: action.total || state.total, // equal to response.count
+        total: action.total !== null ? action.total : state.total,
         processed: action.processed || state.processed,
-        // progress: action.progress,
       };
     case 'TERMINATE_SEARCH':
       return {
         isActive: false,
         offset: 0,
         processed: 0,
-        // progress: 0,
+        total: null,
         requests: requests(state.requests, action),
       };
     default:
@@ -66,11 +67,16 @@ const search = (state = defaultSearchState, action) => {
 export default search;
 
 export const getTotal = state => state.total;
+export const getOffset = state => state.offset;
 export const getProcessed = state => state.processed;
 export const getIsActive = state => state.isActive;
 
+export const getRequestsById = state => getAllById(state.requests);
+export const getPendingRequestIds = state => getPendingIds(state.requests);
+export const getFailedRequestIds = state => getFailedIds(state.requests);
+
 // PREV version
-// export default function search(state = defaultSearchState, action) {
+// export default function search(state = initialState, action) {
 //   switch (action.type) {
 //     // case 'PREPARE_SEARCH':
 //     //   return {

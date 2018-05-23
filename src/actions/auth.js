@@ -1,5 +1,5 @@
 // import moment from 'moment';
-import { getAuthData, getAccessToken } from 'reducers';
+import { getAuthData, getAccessToken } from 'selectors';
 import {
   requestUserName, redirectToTokenRequestUrl, parseAccessTokenHash,
 } from 'utils/api';
@@ -66,7 +66,7 @@ export const fetchUserName = (userId, token) => (dispatch, getState) => {
   );
 };
 
-// TODO: remove, use selector instead?
+// TODO: remove, selector is used instead
 export const checkAccessToken = () => (dispatch, getState) => {
   const { accessToken, tokenExpiresAt } = getAuthData(getState());
 

@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 
 import * as actionCreators from 'actions';
-import { getSortedPosts, getSearchIsActive, getAccessToken } from 'reducers';
+import { getSortedPosts, getSearchIsActive, getAccessToken } from 'selectors';
 import TopBar from 'components/TopBar';
 import SearchForm from 'components/SearchForm';
 import ResultsPanel from 'components/ResultsPanel';

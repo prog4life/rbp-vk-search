@@ -28,8 +28,8 @@ const throwIfSearchIsOver = (isActive, offset) => {
 };
 
 // if request obj was removed from store or added to completely failed
-const throwIfRequestIsExcess = (succeeded, id) => {
-  if (succeeded.includes(id)) {
+const throwIfRequestIsExcess = (request, id) => {
+  if (!request) {
     throw new Error(`Request with id: "${id}" has been succeeded already`);
   }
 };
@@ -43,7 +43,7 @@ const onRequestSuccess = (next, getState, offset) => (response) => {
   // console.log(`SUCCESS offset: ${offset}`);
 
   throwIfSearchIsOver(search.isActive, offset);
-  throwIfRequestIsExcess(requests.succeededIds, id);
+  throwIfRequestIsExcess(requests.byId[id], id);
 
   next({ type: 'REQUEST_SUCCESS', id });
 

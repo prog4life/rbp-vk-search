@@ -1,5 +1,9 @@
 // TODO: replace next dependency to configureStore
 import { maxAttempts as maxAttemptsDefault } from 'config/common';
+import {
+  getAccessToken, getSearchTotal, getSearchOffset,
+  getRequestsById, getIdsOfFailed, getIdsOfPending,
+} from 'selectors';
 // TODO: pass with action
 import { CALL_API } from 'middleware/callAPI';
 
@@ -37,7 +41,7 @@ const searchProcessor = ({ dispatch, getState }) => {
   // };
 
   return next => (action) => {
-    const { auth: { accessToken } } = getState();
+    const accessToken = getAccessToken(getState());
     // TODO: destructure from action callAPI and handleResponse functions with
     // imported defaults
     const { type, types } = action;
@@ -138,10 +142,16 @@ const searchProcessor = ({ dispatch, getState }) => {
       // console.warn(`NEW interval TICK: ${checkpoint - tempCheckpoint}`);
 
       // total is equivalent of "count" field in response from vk API
-      const { results, search: { offset, total, requests } } = getState();
-      const reqs = requests.byId;
-      const failed = requests.failedIds;
-      const pending = requests.pendingIds;
+      const state = getState();
+      const { results } = state;
+      // const results = getResults(state);
+      const offset = getSearchOffset(state);
+      const total = getSearchTotal(state);
+      const reqs = getRequestsById(state);
+      // const failed = requests.failedIds;
+      // const pending = requests.pendingIds;
+      const failed = getIdsOfFailed(state);
+      const pending = getIdsOfPending(state);
 
       // NOTE: max number of parallel requests/connections ~ 6-8 / 17
       // TODO: maxPendingCount ~ 6
@@ -165,6 +175,8 @@ const searchProcessor = ({ dispatch, getState }) => {
 
       const nextOffset = offset + offsetModifier;
 
+      // TODO: resolve case with count: 0
+      // TODO: no more results in store, pass specific selector from action
       // request next portion of items using increased offset
       if (
         (!searchResultsLimit || results.length < searchResultsLimit) &&

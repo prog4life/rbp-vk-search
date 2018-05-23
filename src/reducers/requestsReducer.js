@@ -17,6 +17,67 @@ import { addIfNotExist, createReducer } from './reducerUtils';
 //   failedIds: [],
 // };
 
+const byId = createReducer({}, {
+  [REQUEST_START]: (state, { id, offset, startTime }) => ({
+    ...state,
+    [id]: {
+      id,
+      attempt: state[id] ? (state[id].attempt + 1) : 1,
+      offset,
+      startTime,
+    },
+  }),
+  [REQUEST_SUCCESS]: (state, { id }) => {
+    const nextState = { ...state };
+    delete nextState[id];
+    return nextState;
+  },
+  [WALL_POSTS_SEARCH_START]: () => ({}),
+  [TERMINATE_SEARCH]: () => ({}), // NOTE: remove ???
+});
+
+const removeId = (state, action) => state.filter(id => action.id !== id);
+
+const pendingIds = createReducer([], {
+  [REQUEST_START]: (state, { id }) => addIfNotExist(state, id),
+  [REQUEST_SUCCESS]: removeId,
+  [REQUEST_FAIL]: removeId,
+  [WALL_POSTS_SEARCH_START]: () => ([]),
+  [TERMINATE_SEARCH]: () => ([]), // NOTE: remove ???
+});
+
+const failedIds = createReducer([], {
+  [REQUEST_START]: removeId,
+  [REQUEST_SUCCESS]: removeId,
+  [REQUEST_FAIL]: (state, { id }) => addIfNotExist(state, id),
+  [WALL_POSTS_SEARCH_START]: () => ([]),
+  [TERMINATE_SEARCH]: () => ([]), // NOTE: remove ???
+});
+
+// NOTE: is unnecessary, check for presence in entities
+// const succeededIds = (state = [], action) => {
+//   switch (action.type) {
+//     case REQUEST_SUCCESS:
+//       return addIfNotExist(state, action.id);
+//     case WALL_POSTS_SEARCH_START:
+//     case TERMINATE_SEARCH: // NOTE: remove ???
+//       return [];
+//     default:
+//       return state;
+//   }
+// };
+
+export default combineReducers({
+  byId,
+  pendingIds,
+  failedIds,
+  // succeededIds,
+});
+
+export const getAllById = state => state.byId;
+export const getPendingIds = state => state.pendingIds;
+export const getFailedIds = state => state.failedIds;
+
 // const byId = (state = {}, { type, id, offset, startTime }) => {
 //   switch (type) {
 //     case REQUEST_START:
@@ -52,25 +113,6 @@ import { addIfNotExist, createReducer } from './reducerUtils';
 //   }
 // };
 
-const byId = createReducer({}, {
-  [REQUEST_START]: (state, { id, offset, startTime }) => ({
-    ...state,
-    [id]: {
-      id,
-      attempt: state[id] ? (state[id].attempt + 1) : 1,
-      offset,
-      startTime,
-    },
-  }),
-  [REQUEST_SUCCESS]: (state, { id }) => {
-    const nextState = { ...state };
-    delete nextState[id];
-    return nextState;
-  },
-  [WALL_POSTS_SEARCH_START]: () => ({}),
-  [TERMINATE_SEARCH]: () => ({}), // NOTE: remove ???
-});
-
 // const pendingIds = (state = [], action) => {
 //   switch (action.type) {
 //     case REQUEST_START:
@@ -86,49 +128,22 @@ const byId = createReducer({}, {
 //   }
 // };
 
-const removeId = (state, action) => state.filter(id => action.id !== id);
+// const failedIds = (state = [], action) => {
+//   switch (action.type) {
+//     case REQUEST_START:
+//     case REQUEST_SUCCESS:
+//       return state.filter(id => action.id !== id);
+//     case REQUEST_FAIL:
+//       return addIfNotExist(state, action.id);
+//     case WALL_POSTS_SEARCH_START:
+//     case TERMINATE_SEARCH: // NOTE: remove ???
+//       return [];
+//     default:
+//       return state;
+//   }
+// };
 
-const pendingIds = createReducer([], {
-  [REQUEST_START]: (state, { id }) => addIfNotExist(state, id),
-  [REQUEST_SUCCESS]: removeId,
-  [REQUEST_FAIL]: removeId,
-  [WALL_POSTS_SEARCH_START]: () => ([]),
-  [TERMINATE_SEARCH]: () => ([]), // NOTE: remove ???
-});
-
-const failedIds = (state = [], action) => {
-  switch (action.type) {
-    case REQUEST_START:
-    case REQUEST_SUCCESS:
-      return state.filter(id => action.id !== id);
-    case REQUEST_FAIL:
-      return addIfNotExist(state, action.id);
-    case WALL_POSTS_SEARCH_START:
-    case TERMINATE_SEARCH: // NOTE: remove ???
-      return [];
-    default:
-      return state;
-  }
-};
-
-const succeededIds = (state = [], action) => {
-  switch (action.type) {
-    case REQUEST_SUCCESS:
-      return addIfNotExist(state, action.id);
-    case WALL_POSTS_SEARCH_START:
-    case TERMINATE_SEARCH: // NOTE: remove ???
-      return [];
-    default:
-      return state;
-  }
-};
-
-export default combineReducers({
-  byId,
-  pendingIds,
-  failedIds,
-  succeededIds,
-});
+// ----------------------------------------------------------------------------
 
 // endTime: Date.now(), // TODO: remove or change to action.endTime later?
 
