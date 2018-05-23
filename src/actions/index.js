@@ -1,3 +1,3 @@
 export * from './auth';
 export * from './search';
-export { default as watchSearchCallAPI } from './sagas';
+export { default as mainSaga } from './sagas';

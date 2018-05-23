@@ -8,7 +8,7 @@ import { createLogger } from 'redux-logger';
 import { composeWithDevTools } from 'remote-redux-devtools';
 import search from 'middleware/searchProcessor';
 import callAPI from 'middleware/callAPI';
-import { watchSearchCallAPI } from 'actions';
+import { mainSaga } from 'actions';
 import rootReducer from '../reducers';
 
 const sagaMiddleware = createSagaMiddleware();
@@ -48,7 +48,7 @@ const configureStore = (preloadedState = {}) => {
     composeEnhancers(applyMiddleware(...middleware)),
   );
 
-  sagaMiddleware.run(watchSearchCallAPI);
+  sagaMiddleware.run(mainSaga);
 
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers
