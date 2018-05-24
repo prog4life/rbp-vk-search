@@ -1,7 +1,6 @@
 import { combineReducers } from 'redux';
 import {
-  REQUEST_START, REQUEST_SUCCESS, REQUEST_FAIL,
-  WALL_POSTS_SEARCH_START, TERMINATE_SEARCH,
+  REQUEST_START, REQUEST_SUCCESS, REQUEST_FAIL, SEARCH_START, TERMINATE_SEARCH,
 } from 'constants/actionTypes';
 import { addIfNotExist, createReducer } from './reducerUtils';
 
@@ -16,6 +15,8 @@ import { addIfNotExist, createReducer } from './reducerUtils';
 //   pendingIds: [],
 //   failedIds: [],
 // };
+
+// TODO: change id to offset -> requestsByOffset
 
 const byId = createReducer({}, {
   [REQUEST_START]: (state, { id, offset, startTime }) => ({
@@ -32,7 +33,7 @@ const byId = createReducer({}, {
     delete nextState[id];
     return nextState;
   },
-  [WALL_POSTS_SEARCH_START]: () => ({}),
+  [SEARCH_START]: () => ({}),
   [TERMINATE_SEARCH]: () => ({}), // NOTE: remove ???
 });
 
@@ -42,7 +43,7 @@ const pendingIds = createReducer([], {
   [REQUEST_START]: (state, { id }) => addIfNotExist(state, id),
   [REQUEST_SUCCESS]: removeId,
   [REQUEST_FAIL]: removeId,
-  [WALL_POSTS_SEARCH_START]: () => ([]),
+  [SEARCH_START]: () => ([]),
   [TERMINATE_SEARCH]: () => ([]), // NOTE: remove ???
 });
 
@@ -50,7 +51,7 @@ const failedIds = createReducer([], {
   [REQUEST_START]: removeId,
   [REQUEST_SUCCESS]: removeId,
   [REQUEST_FAIL]: (state, { id }) => addIfNotExist(state, id),
-  [WALL_POSTS_SEARCH_START]: () => ([]),
+  [SEARCH_START]: () => ([]),
   [TERMINATE_SEARCH]: () => ([]), // NOTE: remove ???
 });
 
@@ -59,7 +60,7 @@ const failedIds = createReducer([], {
 //   switch (action.type) {
 //     case REQUEST_SUCCESS:
 //       return addIfNotExist(state, action.id);
-//     case WALL_POSTS_SEARCH_START:
+//     case SEARCH_START:
 //     case TERMINATE_SEARCH: // NOTE: remove ???
 //       return [];
 //     default:
@@ -105,7 +106,7 @@ export const getFailedIds = state => state.failedIds;
 //     //       startTime,
 //     //     },
 //     //   };
-//     case WALL_POSTS_SEARCH_START:
+//     case SEARCH_START:
 //     case TERMINATE_SEARCH: // NOTE: remove ???
 //       return {};
 //     default:
@@ -120,7 +121,7 @@ export const getFailedIds = state => state.failedIds;
 //     case REQUEST_SUCCESS:
 //     case REQUEST_FAIL:
 //       return state.filter(id => action.id !== id);
-//     case WALL_POSTS_SEARCH_START:
+//     case SEARCH_START:
 //     case TERMINATE_SEARCH: // NOTE: remove ???
 //       return [];
 //     default:
@@ -135,7 +136,7 @@ export const getFailedIds = state => state.failedIds;
 //       return state.filter(id => action.id !== id);
 //     case REQUEST_FAIL:
 //       return addIfNotExist(state, action.id);
-//     case WALL_POSTS_SEARCH_START:
+//     case SEARCH_START:
 //     case TERMINATE_SEARCH: // NOTE: remove ???
 //       return [];
 //     default:
@@ -160,8 +161,8 @@ export const getFailedIds = state => state.failedIds;
 //         return typeOfRequests === 'pending'
 //           ? state.filter(id => action.id !== id)
 //           : addIfNotExist(state, action.id);
-//       case 'WALL_POSTS_SEARCH_START':
-//       case 'TERMINATE_SEARCH':
+//       case SEARCH_START:
+//       case TERMINATE_SEARCH:
 //         return [];
 //       default:
 //         return state;
@@ -202,8 +203,8 @@ export const getFailedIds = state => state.failedIds;
 //           startTime: action.startTime,
 //         },
 //       };
-//     case 'WALL_POSTS_SEARCH_START':
-//     case 'TERMINATE_SEARCH':
+//     case SEARCH_START:
+//     case TERMINATE_SEARCH:
 //       return {};
 //     default:
 //       return state;

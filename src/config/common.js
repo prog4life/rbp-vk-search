@@ -15,11 +15,7 @@ const state = 55555; // optional
 const requestInterval = 350;
 // better to leave default
 const jsonpTimeout = 1000; // default for fetch-jsonp: 5000
-// make or not request with next offset if current one get no response yet
-const waitPending = false;
-const waitTimeout = 500;
-// pending request that exceeded "waitTimeout" will be considered as failed
-// (get isPending: false) and it will be repeated but not canceled - if it then
+// failed request will be repeated but not canceled - if it then
 // receives a response, duplicate results can be obtained. These extra results
 // must be filtered by reducer OR response handler
 const maxAttempts = 5; // min: 1 - no retry attempts
@@ -53,8 +49,6 @@ export {
   offsetModifier,
   requestInterval,
   jsonpTimeout,
-  waitPending,
-  waitTimeout,
   maxAttempts,
   resultsSortOrder,
   inputDefaults,

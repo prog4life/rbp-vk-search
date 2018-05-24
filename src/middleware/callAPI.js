@@ -1,6 +1,10 @@
+import {
+  getAccessToken, getSearchTotal, getSearchOffset, getSearchIsActive,
+  getRequestById, getIdsOfPending,
+} from 'selectors';
 import fetchJSONP from 'utils/fetchJSONP';
 import jsonpPromise from 'utils/jsonpPromise';
-import prepareWallPosts from 'utils/responseHandling';
+import transformResponse from 'utils/responseHandling';
 
 export const CALL_API = 'Call API';
 
@@ -9,16 +13,12 @@ export const schema = {
   // wallComments: 'WALL_COMMENTS'
 };
 
-const onRequestStart = (next, offset) => {
-  const id = `offset_${offset}`;
+const makeId = offset => `offset_${offset}`;
 
-  next({
-    type: 'REQUEST_START',
-    id,
-    offset,
-    startTime: Date.now(),
-    // attempt,
-  });
+const onRequestStart = (next, offset, type) => {
+  const id = makeId(offset);
+
+  next({ type, id, offset, startTime: Date.now() }); // attempt,
 };
 
 const throwIfSearchIsOver = (isActive, offset) => {
@@ -35,37 +35,35 @@ const throwIfRequestIsExcess = (request, id) => {
 };
 
 // remove successful request obj from "requests"
-const onRequestSuccess = (next, getState, offset) => (response) => {
-  const { search } = getState();
-  const { requests } = search;
-  const id = `offset_${offset}`;
+const onRequestSuccess = (next, getState, offset, type) => (response) => {
+  const state = getState();
+  const id = makeId(offset);
+  const isActive = getSearchIsActive(state);
+  const requestById = getRequestById(state, id);
 
-  // console.log(`SUCCESS offset: ${offset}`);
+  throwIfSearchIsOver(isActive, offset);
+  throwIfRequestIsExcess(requestById, id);
 
-  throwIfSearchIsOver(search.isActive, offset);
-  throwIfRequestIsExcess(requests.byId[id], id);
-
-  next({ type: 'REQUEST_SUCCESS', id });
+  next({ type, id });
 
   return response;
 };
 
 // add failed request obj to "requests"
-const onRequestFail = (next, getState, offset) => (e) => {
-  const { search } = getState();
-  const { requests } = search;
-  const id = `offset_${offset}`;
-  // console.log(`FAIL offset: ${offset}`);
+const onRequestFail = (next, getState, offset, type) => (e) => {
+  const state = getState();
+  const id = makeId(offset);
+  const isActive = getSearchIsActive(state);
+  const pending = getIdsOfPending(state);
 
   // TODO: think over case when belated failed but pending repeated exists
-
-  throwIfSearchIsOver(search.isActive, offset);
-
-  if (!requests.pendingIds.includes(id)) {
+  throwIfSearchIsOver(isActive, offset);
+  // TODO: replace by specific memoized selector or check in reducer
+  if (!pending.includes(id)) {
     throw new Error(`Offset "${offset}" has been processed already`);
   }
 
-  next({ type: 'REQUEST_FAIL', id });
+  next({ type, id }); // refuse: true flag for processed offsets
 
   throw new Error(`Request with ${offset} offset failed, ${e.message}`);
 };
@@ -97,16 +95,12 @@ const onSearchProgress = ({ next, getState, type }) => (response) => {
 const savePartOfResults = (next, limit, type) => (results) => {
   // if (chunk && chunk.length > 0) {
   if (typeof results === 'object' && Object.keys(results).length > 0) {
-    next({
-      type,
-      results,
-      limit,
-    });
+    next({ type, results, limit });
   }
   return results;
 };
 
-export default ({ getState, dispatch }) => next => (action) => {
+export default ({ getState }) => next => (action) => {
   const callParams = action[CALL_API];
   const { types } = action;
 
@@ -118,8 +112,8 @@ export default ({ getState, dispatch }) => next => (action) => {
     url, offset, attempt, authorId, resultsLimit,
   } = callParams;
 
-  if (!Array.isArray(types) || types.length !== 2) {
-    throw new Error('Expected an array of two action types');
+  if (!Array.isArray(types) || types.length !== 4) {
+    throw new Error('Expected an array of four action types');
   }
   if (!types.every(t => typeof t === 'string')) {
     throw new Error('Expected action types to be strings');
@@ -135,9 +129,10 @@ export default ({ getState, dispatch }) => next => (action) => {
     throw new Error('Expected authorId to be integer');
   }
 
-  const [addResultsType, updateProgressType] = types;
+  // const [addResultsType, updateProgressType] = types;
+  const [requestType, successType, failType, updateSearchType] = types;
   // add request obj with isPending: true to "requests"
-  onRequestStart(next, offset);
+  onRequestStart(next, offset, requestType);
 
   // TODO: is it necessary ?
   // const actionWith = (data) => {
@@ -149,18 +144,37 @@ export default ({ getState, dispatch }) => next => (action) => {
   //   return finalAction;
   // };
 
+  // TODO: change id to offset -> requestsByOffset
+
+  const onSuccess = (response) => {
+    const state = getState();
+    const id = makeId(offset);
+    const isActive = getSearchIsActive(state);
+    const requestById = getRequestById(state, id);
+
+    throwIfSearchIsOver(isActive, offset);
+    throwIfRequestIsExcess(requestById, id);
+
+    const result = transformResponse('wall-posts', authorId)(response);
+
+    next({ successType, id, ...result });
+
+    return response;
+  };
+
   return jsonpPromise(url)
     .then(
-      onRequestSuccess(next, getState, offset),
-      onRequestFail(next, getState, offset),
+      // onRequestSuccess(next, getState, offset, successType),
+      onSuccess,
+      onRequestFail(next, getState, offset, failType),
     )
     .then(onSearchProgress({
       next,
       getState,
-      type: updateProgressType,
+      type: updateSearchType,
     }))
     // TODO: change to more generic then(transformResponse(schema))
-    .then(prepareWallPosts(authorId))
-    .then(savePartOfResults(next, resultsLimit, addResultsType))
-    .catch(e => console.error(e));
+    // .then(transformResponse('wall-posts', authorId))
+    // .then(savePartOfResults(next, resultsLimit, addResultsType))
+    .catch(e => console.warn(e));
 };

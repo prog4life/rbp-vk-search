@@ -1,4 +1,6 @@
-export function extractPostsById(response, authorId) {
+import { compose } from 'redux';
+
+function extractPostsById(response, authorId) {
   let posts;
   try {
     ({ items: posts } = response);
@@ -11,32 +13,51 @@ export function extractPostsById(response, authorId) {
       post.from_id === authorId || post.signer_id === authorId
     ));
   }
-  throw Error('Posts from response is not array');
+  throw Error('Posts from response is not an array');
 }
 
-export const formatWallPosts = posts => (
-  posts && posts.map(post => ({
+const formatPosts = posts => (
+  posts.map(post => ({
     // TODO: resolve, must be signer_id in some cases; rename to postAuthor
     authorId: post.signer_id || post.from_id,
     timestamp: post.date,
-    postId: post.id,
+    id: post.id,
     text: post.text,
     link: `https://vk.com/wall${post.owner_id}_${post.id}`,
   }))
 );
 
-export const transformToPostsById = (posts) => {
-  const postsById = {};
-  posts.forEach((one) => {
-    postsById[one.postId] = one;
+export const normalizeShallowly = (items) => {
+  const result = {
+    itemsById: {},
+    ids: [],
+  };
+
+  items.forEach((item) => {
+    result.itemsById[item.id] = { ...item };
+    result.ids.push(item.id);
   });
-  return postsById;
+  return result;
 };
 
-const prepareWallPosts = authorId => (response) => {
-  const formatted = formatWallPosts(extractPostsById(response, authorId));
-  return transformToPostsById(formatted);
+export const handleWallPosts = (response, authorId) => {
+  const formatted = formatPosts(extractPostsById(response, authorId));
+  return normalizeShallowly(formatted);
+  // TODO: try redux.compose
+  // return compose(
+  //   normalizeShallowly,
+  //   formatPosts,
+  //   extractPostsById
+  // )(response, authorId);
 };
 
-export default prepareWallPosts;
+const transformResponse = (schema, authorId) => (response) => {
+  switch (schema) {
+    case 'wall-posts':
+      return handleWallPosts(response, authorId);
+    default:
+      return response;
+  }
+};
 
+export default transformResponse;

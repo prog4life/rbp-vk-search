@@ -1,4 +1,6 @@
-import { SEARCH_SET_OFFSET } from 'middleware/searchProcessor';
+import {
+  SEARCH_START, SEARCH_END, SEARCH_SET_OFFSET, TERMINATE_SEARCH,
+} from 'constants/actionTypes';
 import requests, {
   getAllById, getPendingIds, getFailedIds,
 } from './requestsReducer';
@@ -18,7 +20,7 @@ const initialState = {
 
 const search = (state = initialState, action) => {
   switch (action.type) {
-    case 'WALL_POSTS_SEARCH_START':
+    case SEARCH_START:
       return {
         isActive: true,
         offset: 0,
@@ -26,7 +28,7 @@ const search = (state = initialState, action) => {
         total: null,
         requests: requests(state.requests, action),
       };
-    case 'WALL_POSTS_SEARCH_END':
+    case SEARCH_END:
       return {
         ...state,
         isActive: false,
@@ -51,7 +53,7 @@ const search = (state = initialState, action) => {
         total: action.total !== null ? action.total : state.total,
         processed: action.processed || state.processed,
       };
-    case 'TERMINATE_SEARCH':
+    case TERMINATE_SEARCH:
       return {
         isActive: false,
         offset: 0,
@@ -83,13 +85,13 @@ export const getFailedRequestIds = state => getFailedIds(state.requests);
 //     //     ...state,
 //     //     isActive: true
 //     //   };
-//     case 'WALL_POSTS_SEARCH_START':
+//     case SEARCH_START:
 //       return {
 //         isActive: true,
 //         processed: 0
 //         // progress: 0
 //       };
-//     case 'WALL_POSTS_SEARCH_END':
+//     case SEARCH_END:
 //       // TODO: clean up search state values
 //       return {
 //         ...state,
@@ -102,7 +104,7 @@ export const getFailedRequestIds = state => getFailedIds(state.requests);
 //         total: action.total || state.total,
 //         processed: action.processed || state.processed
 //       };
-//     case 'TERMINATE_SEARCH':
+//     case TERMINATE_SEARCH:
 //       // TODO: clean up search state values
 //       return {
 //         isActive: false,

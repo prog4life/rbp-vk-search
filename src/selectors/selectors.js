@@ -1,7 +1,8 @@
 import { createSelector } from 'reselect';
 import sortBy from 'lodash-es/sortBy';
 // import { sortItemsByNumField } from 'utils/sorting';
-import { fromSearch, fromPosts } from 'reducers';
+import * as fromSearch from 'reducers/searchReducer';
+import * as fromPosts from 'reducers/postsReducer';
 
 // const state = {
 //   auth,
@@ -52,12 +53,26 @@ export const getSearchProgress = createSelector(
   },
 );
 
-const getPostsById = state => state.posts;
+export const getPostsById = state => fromPosts.getById(state.posts);
+export const getIdsOfPosts = state => fromPosts.getIds(state.posts);
 
-export const getSortedPosts = (state) => {
-  // add getLimit
-  // const allPosts = fromPosts.getPosts(state.posts);
-  // return sortItemsByNumField(allPosts, 'timestamp');
-  const postsById = getPostsById(state);
-  return sortBy(postsById, ['timestamp']).reverse();
-};
+export const getSortedPosts = createSelector(
+  getPostsById,
+  (state, filter = 'timestamp') => filter,
+  // TODO: rename order to reverse
+  (state, filter, order = 'desc') => order,
+  (postsById, filter, order) => {
+    const arrayOfPosts = Object.values(postsById);
+    const sorted = sortBy(arrayOfPosts, [filter]);
+
+    return order === 'desc' ? sorted.reverse() : sorted;
+  },
+);
+
+// export const getSortedPosts = (state) => {
+//   // add getLimit
+//   // const allPosts = fromPosts.getPosts(state.posts);
+//   // return sortItemsByNumField(allPosts, 'timestamp');
+//   const postsById = getPostsById(state);
+//   return sortBy(postsById, ['timestamp']).reverse();
+// };

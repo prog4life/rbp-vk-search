@@ -1,10 +1,15 @@
-// search
-export const ADD_RESULTS = 'ADD_RESULTS';
-export const TERMINATE_SEARCH = 'TERMINATE_SEARCH';
+// search middleware NOTE: maybe place next to middleware
+export const SEARCH_SET_OFFSET = 'SEARCH::Set-Offset';
+export const SEARCH_START = 'SEARCH::Start';
+export const SEARCH_END = 'SEARCH::End';
+export const TERMINATE_SEARCH = 'SEARCH::Terminate';
 
-export const WALL_POSTS_SEARCH_START = 'WALL_POSTS_SEARCH_START';
-export const WALL_POSTS_SEARCH_END = 'WALL_POSTS_SEARCH_END';
+// wall posts search
+export const FETCH_WALL_POSTS_REQUEST = 'FETCH_WALL_POSTS_REQUEST';
+export const FETCH_WALL_POSTS_SUCCESS = 'FETCH_WALL_POSTS_SUCCESS';
+export const FETCH_WALL_POSTS_FAIL = 'FETCH_WALL_POSTS_FAIL';
 
+// requests
 export const REQUEST_START = 'REQUEST_START';
 export const REQUEST_SUCCESS = 'REQUEST_SUCCESS';
 export const REQUEST_FAIL = 'REQUEST_FAIL';

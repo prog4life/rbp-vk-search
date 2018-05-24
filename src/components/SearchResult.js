@@ -5,13 +5,13 @@ import { ListGroupItem } from 'react-bootstrap';
 
 function SearchResult({ result, number }) {
   const {
-    timestamp, authorId, postId, text, link,
+    timestamp, authorId, id, text, link,
   } = result;
 
   const resultNumber = `[${number}]`;
   const linkText = 'Link to post at wall';
   const linkToUserPage = `https://vk.com/id${authorId}`;
-  const postIdLabel = `[post id: ${postId}]`;
+  const idLabel = `[post id: ${id}]`;
   const authorIdLabel = `[id${authorId}]`;
   const postDate = new Date(timestamp * 1000);
   const dayOfMonth = postDate.getDate();
@@ -38,7 +38,7 @@ function SearchResult({ result, number }) {
       </span>
       <span>
         {' '}
-        {postIdLabel}
+        {idLabel}
       </span>
       <span>
         {' '}
@@ -64,7 +64,7 @@ SearchResult.propTypes = {
   result: PropTypes.shape({
     timestamp: PropTypes.number.isRequired,
     authorId: PropTypes.number.isRequired,
-    postId: PropTypes.number.isRequired,
+    id: PropTypes.number.isRequired,
     text: PropTypes.string.isRequired,
     link: PropTypes.string.isRequired,
   }).isRequired,

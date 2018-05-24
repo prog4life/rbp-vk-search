@@ -1,6 +1,9 @@
 // TODO: replace next dependency to configureStore
 import { maxAttempts as maxAttemptsDefault } from 'config/common';
 import {
+  TERMINATE_SEARCH, SEARCH_START, SEARCH_SET_OFFSET, SEARCH_END,
+} from 'constants/actionTypes';
+import {
   getAccessToken, getSearchTotal, getSearchOffset,
   getRequestsById, getIdsOfFailed, getIdsOfPending,
 } from 'selectors';
@@ -8,7 +11,6 @@ import {
 import { CALL_API } from 'middleware/callAPI';
 
 export const SEARCH_CONFIG = 'SEARCH::Config'; // TODO: rename to search parameters
-export const SEARCH_SET_OFFSET = 'SEARCH::Set-Offset';
 
 // IDEA
 export const kindsOfData = {
@@ -44,16 +46,16 @@ const searchProcessor = ({ dispatch, getState }) => {
     const accessToken = getAccessToken(getState());
     // TODO: destructure from action callAPI and handleResponse functions with
     // imported defaults
-    const { type, types } = action;
+    const { type, types, getNumberOfResults } = action;
     const searchConfig = action[SEARCH_CONFIG];
 
-    if (typeof searchConfig === 'undefined' && type !== 'TERMINATE_SEARCH') {
+    if (typeof searchConfig === 'undefined' && type !== TERMINATE_SEARCH) {
       return next(action);
     }
-    if (!types && type !== 'TERMINATE_SEARCH') {
+    if (!types && type !== TERMINATE_SEARCH) {
       return next(action);
     }
-    if (type === 'TERMINATE_SEARCH') {
+    if (type === TERMINATE_SEARCH) {
       clearInterval(searchIntervalId);
       return next(action);
     }
@@ -64,6 +66,9 @@ const searchProcessor = ({ dispatch, getState }) => {
     if (typeof searchConfig !== 'object') {
       throw new Error('Expected an object with search config params');
     }
+    if (typeof getNumberOfResults !== 'function') {
+      throw new Error('Expected "getNumberOfResults" to be function');
+    }
     if (!types.every(t => typeof t === 'string')) {
       throw new Error('Expected action types to be strings');
     }
@@ -72,17 +77,17 @@ const searchProcessor = ({ dispatch, getState }) => {
     }
 
     const [
-      searchStartType,
-      addResultsType,
-      updateProgressType, // TODO: make it interval const
-      searchEndType,
+      requestType,
+      successType,
+      failType, // TODO: make it interval const
+      updateSearchType,
     ] = types;
 
-    // TODO: import offsetModifier, requestInterval, waitPending and waitTimeout
+    // TODO: import offsetModifier, requestInterval
     // from common config and set as defaults here
     const {
       // TODO: not destructure authorId here and pass whole searchConfig obj to
-      // handleResponse(prepareWallPosts)
+      // handleResponse(transformResponse)
       authorId,
       baseAPIReqUrl,
       searchResultsLimit,
@@ -98,7 +103,7 @@ const searchProcessor = ({ dispatch, getState }) => {
     clearInterval(searchIntervalId);
     // to notify reducers about search start
     // will also clear "requests" in store
-    next({ type: searchStartType });
+    next({ type: SEARCH_START });
 
     // let checkpoint = performance.now(); // TEMP:
     // let checkpoint2 = performance.now(); // TEMP:
@@ -117,21 +122,21 @@ const searchProcessor = ({ dispatch, getState }) => {
         `&access_token=${accessToken}` +
         `&offset=${offset}`;
 
-      dispatch({
-        type: 'SEARCH::Call-API',
-        endpoint: currentAPIReqUrl,
-      });
-
       // dispatch({
-      //   types: [addResultsType, updateProgressType],
-      //   [CALL_API]: {
-      //     url: currentAPIReqUrl,
-      //     offset,
-      //     // attempt,
-      //     authorId,
-      //     resultsLimit: searchResultsLimit,
-      //   },
+      //   type: 'SEARCH::Call-API',
+      //   endpoint: currentAPIReqUrl,
       // });
+
+      dispatch({
+        types: [requestType, successType, failType, updateSearchType],
+        [CALL_API]: {
+          url: currentAPIReqUrl,
+          offset,
+          // attempt,
+          authorId,
+          resultsLimit: searchResultsLimit,
+        },
+      });
     };
     // first request before timer tick
     makeCallToAPI();
@@ -143,8 +148,7 @@ const searchProcessor = ({ dispatch, getState }) => {
 
       // total is equivalent of "count" field in response from vk API
       const state = getState();
-      const { results } = state;
-      // const results = getResults(state);
+      const resultsCount = getNumberOfResults(state);
       const offset = getSearchOffset(state);
       const total = getSearchTotal(state);
       const reqs = getRequestsById(state);
@@ -165,21 +169,22 @@ const searchProcessor = ({ dispatch, getState }) => {
       // repeat first of failed requests
       if (toSendAgain.length > 0) {
         const [nextId] = toSendAgain;
-        console.log(`Repeat FAILED with ${reqs[nextId].offset} ` +
-          `offset and attempt ${reqs[nextId].attempt + 1} `);
+        const requestToRepeat = reqs[nextId];
+        console.log(`Repeat FAILED with ${requestToRepeat.offset} ` +
+          `offset and attempt ${requestToRepeat.attempt + 1} `);
 
         // makeCallToAPI(reqs[nextId].offset, reqs[nextId].attempt + 1);
-        makeCallToAPI(reqs[nextId].offset);
+        makeCallToAPI(requestToRepeat.offset);
         return;
       }
 
       const nextOffset = offset + offsetModifier;
 
       // TODO: resolve case with count: 0
-      // TODO: no more results in store, pass specific selector from action
+
       // request next portion of items using increased offset
       if (
-        (!searchResultsLimit || results.length < searchResultsLimit) &&
+        (!searchResultsLimit || resultsCount.length < searchResultsLimit) &&
         (!total || nextOffset <= total)
       ) {
         next({ type: SEARCH_SET_OFFSET, offset: nextOffset });
@@ -190,11 +195,11 @@ const searchProcessor = ({ dispatch, getState }) => {
       // end search
       if (pending.length === 0) {
         clearInterval(searchIntervalId);
-        next({ type: searchEndType });
+        next({ type: SEARCH_END });
       }
     }, requestInterval);
     // NOTE: return was added for eslint, maybe replace it with
-    // next(initialAction); OR next({ type: searchStartType });
+    // next(initialAction); OR next({ type: requestType });
     return null;
   };
 };

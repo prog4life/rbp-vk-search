@@ -1,6 +1,6 @@
 import {
   ADD_RESULTS,
-  WALL_POSTS_SEARCH_START,
+  SEARCH_START,
 } from 'constants/actionTypes.js';
 
 // const sortByTimestamp = (posts, order) => (
@@ -48,14 +48,14 @@ export default function results(state = [], action) {
   switch (action.type) {
     // case ADD_RESULTS:
     //   return sortItemsByNumField(
-    //     addOnlyUniqueItems(state, action.results, 'postId'),
+    //     addOnlyUniqueItems(state, action.results, 'id'),
     //     'timestamp',
     //     action.order,
     //   ).slice(0, action.limit);
     // to clear results at search start
     // case 'PREPARE_SEARCH':
     //   return [];
-    case WALL_POSTS_SEARCH_START:
+    case SEARCH_START:
       return [];
     default:
       return state;
@@ -64,6 +64,6 @@ export default function results(state = [], action) {
 
 // const duplicatedRemoved = [
 //   ...state,
-//   results.filter(result => !state.some(prev => prev.postId === result.postId))
+//   results.filter(result => !state.some(prev => prev.id === result.id))
 //     .map(filtered => ({ ...filtered }))
 // ];
