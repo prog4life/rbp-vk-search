@@ -2,24 +2,24 @@ import {
   getAccessToken, getSearchTotal, getSearchOffset, getSearchIsActive,
   getRequestById, getIdsOfPending,
 } from 'selectors';
-import fetchJSONP from 'utils/fetchJSONP';
+// import fetchJSONP from 'utils/fetchJSONP';
 import jsonpPromise from 'utils/jsonpPromise';
 import transformResponse from 'utils/responseHandling';
 
-export const CALL_API = 'Call API';
+export const API_CALL_PARAMS = 'CallAPI::Parameters';
 
-export const schema = {
+export const schemas = {
   wallPosts: 'WALL_POSTS',
   // wallComments: 'WALL_COMMENTS'
 };
 
 const makeId = offset => `offset_${offset}`;
 
-const onRequestStart = (next, offset, type) => {
-  const id = makeId(offset);
-
-  next({ type, id, offset, startTime: Date.now() }); // attempt,
-};
+// const onRequestStart = (next, offset, type) => {
+//   const id = makeId(offset);
+//
+//   next({ type, id, offset, startTime: Date.now() });
+// };
 
 const throwIfSearchIsOver = (isActive, offset) => {
   if (!isActive) {
@@ -63,7 +63,7 @@ const onRequestFail = (next, getState, offset, type) => (e) => {
     throw new Error(`Offset "${offset}" has been processed already`);
   }
 
-  next({ type, id }); // refuse: true flag for processed offsets
+  next({ type, id }); // TODO: refused: true flag for processed offsets
 
   throw new Error(`Request with ${offset} offset failed, ${e.message}`);
 };
@@ -101,16 +101,14 @@ const savePartOfResults = (next, limit, type) => (results) => {
 };
 
 export default ({ getState }) => next => (action) => {
-  const callParams = action[CALL_API];
+  const callParams = action[API_CALL_PARAMS];
   const { types } = action;
 
   if (typeof callParams === 'undefined') {
     return next(action);
   }
 
-  const {
-    url, offset, attempt, authorId, resultsLimit,
-  } = callParams;
+  const { url, offset, authorId } = callParams;
 
   if (!Array.isArray(types) || types.length !== 4) {
     throw new Error('Expected an array of four action types');
@@ -121,7 +119,6 @@ export default ({ getState }) => next => (action) => {
   if (typeof url !== 'string') {
     throw new Error('Specify a string request URL');
   }
-  // if (!Number.isInteger(offset) || !Number.isInteger(attempt)) {
   if (!Number.isInteger(offset)) {
     throw new Error('Expected offset to be integer number');
   }
@@ -129,10 +126,12 @@ export default ({ getState }) => next => (action) => {
     throw new Error('Expected authorId to be integer');
   }
 
-  // const [addResultsType, updateProgressType] = types;
-  const [requestType, successType, failType, updateSearchType] = types;
+  const [requestType, successType, failType, resultsType] = types;
   // add request obj with isPending: true to "requests"
-  onRequestStart(next, offset, requestType);
+  // onRequestStart(next, offset, requestType);
+  const id = makeId(offset);
+
+  next({ type: requestType, id, offset, startTime: Date.now() });
 
   // TODO: is it necessary ?
   // const actionWith = (data) => {
@@ -140,7 +139,7 @@ export default ({ getState }) => next => (action) => {
   //     ...action,
   //     ...data,
   //   };
-  //   delete finalAction[CALL_API];
+  //   delete finalAction[SEARCH_REQUEST];
   //   return finalAction;
   // };
 
@@ -154,11 +153,11 @@ export default ({ getState }) => next => (action) => {
 
     throwIfSearchIsOver(isActive, offset);
     throwIfRequestIsExcess(requestById, id);
+    next({ type: successType, id });
 
-    const result = transformResponse('wall-posts', authorId)(response);
+    // return transformResponse('wall-posts', authorId)(response);
 
-    next({ successType, id, ...result });
-
+    // next({ type: resultsType, ...results });
     return response;
   };
 
@@ -168,13 +167,18 @@ export default ({ getState }) => next => (action) => {
       onSuccess,
       onRequestFail(next, getState, offset, failType),
     )
+    .then(response => transformResponse(response, 'wall-posts', authorId))
+    .then(
+      results => next({ type: resultsType, ...results }),
+      error => console.warn(error), // TODO: try error.message and next()
+    )
     .then(onSearchProgress({
       next,
       getState,
-      type: updateSearchType,
-    }))
-    // TODO: change to more generic then(transformResponse(schema))
-    // .then(transformResponse('wall-posts', authorId))
-    // .then(savePartOfResults(next, resultsLimit, addResultsType))
-    .catch(e => console.warn(e));
+      type: resultsType,
+    }));
+  // TODO: change to more generic then(transformResponse(schema))
+  // .then(transformResponse('wall-posts', authorId))
+  // .then(savePartOfResults(next, resultsLimit, addResultsType))
+  // .catch(e => console.warn(e));
 };

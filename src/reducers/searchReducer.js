@@ -40,9 +40,9 @@ const search = (state = initialState, action) => {
         ...state,
         offset: action.offset,
       };
-    case 'REQUEST_START':
-    case 'REQUEST_SUCCESS':
-    case 'REQUEST_FAIL':
+    case 'SEARCH_REQUEST':
+    case 'SEARCH_REQUEST_SUCCESS':
+    case 'SEARCH_REQUEST_FAIL':
       return {
         ...state,
         requests: requests(state.requests, action),

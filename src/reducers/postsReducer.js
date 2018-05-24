@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { FETCH_WALL_POSTS_SUCCESS, SEARCH_START } from 'constants/actionTypes.js';
+import { POSTS_RECEIVED, SEARCH_START } from 'constants/actionTypes.js';
 import { createReducer, makeUnion } from './reducerUtils';
 
 // export default function posts(state = {}, action) {
@@ -22,22 +22,31 @@ import { createReducer, makeUnion } from './reducerUtils';
 // TODO: add flag to check to show or not intermediate results during search
 
 const byId = createReducer({}, {
-  [FETCH_WALL_POSTS_SUCCESS]: (state, action) => (
-    action.ids.length === 0 ? state : { ...state, ...action.itemsById }
+  [POSTS_RECEIVED]: (state, action) => (
+    action.ids.length > 0
+      ? { ...state, ...action.itemsById }
+      : state
   ),
   [SEARCH_START]: () => ({}),
 });
 
 const ids = createReducer({}, {
-  [FETCH_WALL_POSTS_SUCCESS]: (state, action) => (
-    action.ids.length === 0 ? state : makeUnion(state, action.ids)
+  [POSTS_RECEIVED]: (state, action) => (
+    action.ids.length > 0
+      ? makeUnion(state, action.ids)
+      : state
   ),
   [SEARCH_START]: () => ([]),
+});
+
+const limit = createReducer(null, {
+  [SEARCH_START]: (state, action) => action.limit,
 });
 
 export default combineReducers({
   byId,
   ids,
+  limit,
 });
 
 export const getById = state => state.byId;

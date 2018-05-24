@@ -51,7 +51,8 @@ export const handleWallPosts = (response, authorId) => {
   // )(response, authorId);
 };
 
-const transformResponse = (schema, authorId) => (response) => {
+// const transformResponse = (schema, authorId) => (response) => {
+const transformResponse = (response, schema, authorId) => {
   switch (schema) {
     case 'wall-posts':
       return handleWallPosts(response, authorId);

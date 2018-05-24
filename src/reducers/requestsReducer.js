@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 import {
-  REQUEST_START, REQUEST_SUCCESS, REQUEST_FAIL, SEARCH_START, TERMINATE_SEARCH,
+  SEARCH_REQUEST, SEARCH_REQUEST_SUCCESS, SEARCH_REQUEST_FAIL,
+  SEARCH_START, TERMINATE_SEARCH,
 } from 'constants/actionTypes';
 import { addIfNotExist, createReducer } from './reducerUtils';
 
@@ -19,7 +20,7 @@ import { addIfNotExist, createReducer } from './reducerUtils';
 // TODO: change id to offset -> requestsByOffset
 
 const byId = createReducer({}, {
-  [REQUEST_START]: (state, { id, offset, startTime }) => ({
+  [SEARCH_REQUEST]: (state, { id, offset, startTime }) => ({
     ...state,
     [id]: {
       id,
@@ -28,7 +29,7 @@ const byId = createReducer({}, {
       startTime,
     },
   }),
-  [REQUEST_SUCCESS]: (state, { id }) => {
+  [SEARCH_REQUEST_SUCCESS]: (state, { id }) => {
     const nextState = { ...state };
     delete nextState[id];
     return nextState;
@@ -40,17 +41,17 @@ const byId = createReducer({}, {
 const removeId = (state, action) => state.filter(id => action.id !== id);
 
 const pendingIds = createReducer([], {
-  [REQUEST_START]: (state, { id }) => addIfNotExist(state, id),
-  [REQUEST_SUCCESS]: removeId,
-  [REQUEST_FAIL]: removeId,
+  [SEARCH_REQUEST]: (state, { id }) => addIfNotExist(state, id),
+  [SEARCH_REQUEST_SUCCESS]: removeId,
+  [SEARCH_REQUEST_FAIL]: removeId,
   [SEARCH_START]: () => ([]),
   [TERMINATE_SEARCH]: () => ([]), // NOTE: remove ???
 });
 
 const failedIds = createReducer([], {
-  [REQUEST_START]: removeId,
-  [REQUEST_SUCCESS]: removeId,
-  [REQUEST_FAIL]: (state, { id }) => addIfNotExist(state, id),
+  [SEARCH_REQUEST]: removeId,
+  [SEARCH_REQUEST_SUCCESS]: removeId,
+  [SEARCH_REQUEST_FAIL]: (state, { id }) => addIfNotExist(state, id),
   [SEARCH_START]: () => ([]),
   [TERMINATE_SEARCH]: () => ([]), // NOTE: remove ???
 });
@@ -58,7 +59,7 @@ const failedIds = createReducer([], {
 // NOTE: is unnecessary, check for presence in entities
 // const succeededIds = (state = [], action) => {
 //   switch (action.type) {
-//     case REQUEST_SUCCESS:
+//     case SEARCH_REQUEST_SUCCESS:
 //       return addIfNotExist(state, action.id);
 //     case SEARCH_START:
 //     case TERMINATE_SEARCH: // NOTE: remove ???
@@ -81,7 +82,7 @@ export const getFailedIds = state => state.failedIds;
 
 // const byId = (state = {}, { type, id, offset, startTime }) => {
 //   switch (type) {
-//     case REQUEST_START:
+//     case SEARCH_REQUEST:
 //       return {
 //         ...state,
 //         [id]: {
@@ -91,12 +92,12 @@ export const getFailedIds = state => state.failedIds;
 //           startTime,
 //         },
 //       };
-//     case REQUEST_SUCCESS: {
+//     case SEARCH_REQUEST_SUCCESS: {
 //       const nextState = { ...state };
 //       delete nextState[id];
 //       return nextState;
 //     }
-//     // case REQUEST_FAIL: // NOTE: unnecessary
+//     // case SEARCH_REQUEST_FAIL: // NOTE: unnecessary
 //     //   return {
 //     //     ...state,
 //     //     [id]: {
@@ -116,10 +117,10 @@ export const getFailedIds = state => state.failedIds;
 
 // const pendingIds = (state = [], action) => {
 //   switch (action.type) {
-//     case REQUEST_START:
+//     case SEARCH_REQUEST:
 //       return addIfNotExist(state, action.id);
-//     case REQUEST_SUCCESS:
-//     case REQUEST_FAIL:
+//     case SEARCH_REQUEST_SUCCESS:
+//     case SEARCH_REQUEST_FAIL:
 //       return state.filter(id => action.id !== id);
 //     case SEARCH_START:
 //     case TERMINATE_SEARCH: // NOTE: remove ???
@@ -131,10 +132,10 @@ export const getFailedIds = state => state.failedIds;
 
 // const failedIds = (state = [], action) => {
 //   switch (action.type) {
-//     case REQUEST_START:
-//     case REQUEST_SUCCESS:
+//     case SEARCH_REQUEST:
+//     case SEARCH_REQUEST_SUCCESS:
 //       return state.filter(id => action.id !== id);
-//     case REQUEST_FAIL:
+//     case SEARCH_REQUEST_FAIL:
 //       return addIfNotExist(state, action.id);
 //     case SEARCH_START:
 //     case TERMINATE_SEARCH: // NOTE: remove ???
@@ -151,13 +152,13 @@ export const getFailedIds = state => state.failedIds;
 // const createIdsReducer = (typeOfRequests) => {
 //   const idsReducer = (state = [], action) => {
 //     switch (action.type) {
-//       case 'REQUEST_START':
+//       case 'SEARCH_REQUEST':
 //         return typeOfRequests === 'pending'
 //           ? addIfNotExist(state, action.id)
 //           : state.filter(id => action.id !== id);
-//       case 'REQUEST_SUCCESS':
+//       case 'SEARCH_REQUEST_SUCCESS':
 //         return state.filter(id => action.id !== id);
-//       case 'REQUEST_FAIL':
+//       case 'SEARCH_REQUEST_FAIL':
 //         return typeOfRequests === 'pending'
 //           ? state.filter(id => action.id !== id)
 //           : addIfNotExist(state, action.id);
@@ -175,7 +176,7 @@ export const getFailedIds = state => state.failedIds;
 
 // export default function requests(state = initialState, action) {
 //   switch (action.type) {
-//     case 'REQUEST_START':
+//     case 'SEARCH_REQUEST':
 //       return {
 //         ...state,
 //         [action.id]: {
@@ -187,11 +188,11 @@ export const getFailedIds = state => state.failedIds;
 //           startTime: action.startTime,
 //         },
 //       };
-//     case 'REQUEST_SUCCESS': {
+//     case 'SEARCH_REQUEST_SUCCESS': {
 //       const { [action.id]: successful, ...rest } = state;
 //       return { ...rest };
 //     }
-//     case 'REQUEST_FAIL':
+//     case 'SEARCH_REQUEST_FAIL':
 //       return {
 //         ...state,
 //         [action.id]: {

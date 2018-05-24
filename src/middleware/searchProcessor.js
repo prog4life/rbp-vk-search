@@ -2,13 +2,14 @@
 import { maxAttempts as maxAttemptsDefault } from 'config/common';
 import {
   TERMINATE_SEARCH, SEARCH_START, SEARCH_SET_OFFSET, SEARCH_END,
+  SEARCH_REQUEST, SEARCH_REQUEST_SUCCESS, SEARCH_REQUEST_FAIL,
 } from 'constants/actionTypes';
 import {
   getAccessToken, getSearchTotal, getSearchOffset,
   getRequestsById, getIdsOfFailed, getIdsOfPending,
 } from 'selectors';
 // TODO: pass with action
-import { CALL_API } from 'middleware/callAPI';
+import { API_CALL_PARAMS } from 'middleware/callAPI';
 
 export const SEARCH_CONFIG = 'SEARCH::Config'; // TODO: rename to search parameters
 
@@ -57,11 +58,11 @@ const searchProcessor = ({ dispatch, getState }) => {
     }
     if (type === TERMINATE_SEARCH) {
       clearInterval(searchIntervalId);
-      return next(action);
+      return next(action); // TODO: pass limit to cut extra results ?
     }
 
-    if (!Array.isArray(types) || types.length !== 4) {
-      throw new Error('Expected an array of four action types.');
+    if (!Array.isArray(types) || types.length !== 1) {
+      throw new Error('Expected an array of 1 action types.');
     }
     if (typeof searchConfig !== 'object') {
       throw new Error('Expected an object with search config params');
@@ -77,10 +78,10 @@ const searchProcessor = ({ dispatch, getState }) => {
     }
 
     const [
-      requestType,
-      successType,
-      failType, // TODO: make it interval const
-      updateSearchType,
+      // requestType,
+      // successType,
+      // failType, // TODO: make it interval const
+      resultsType,
     ] = types;
 
     // TODO: import offsetModifier, requestInterval
@@ -103,7 +104,7 @@ const searchProcessor = ({ dispatch, getState }) => {
     clearInterval(searchIntervalId);
     // to notify reducers about search start
     // will also clear "requests" in store
-    next({ type: SEARCH_START });
+    next({ type: SEARCH_START, limit: searchResultsLimit });
 
     // let checkpoint = performance.now(); // TEMP:
     // let checkpoint2 = performance.now(); // TEMP:
@@ -118,9 +119,8 @@ const searchProcessor = ({ dispatch, getState }) => {
       // add request obj with isPending: true to "requests"
       // onRequestStart(next, offset, attempt);
 
-      const currentAPIReqUrl = `${baseAPIReqUrl}` +
-        `&access_token=${accessToken}` +
-        `&offset=${offset}`;
+      const currentAPIReqUrl = `${baseAPIReqUrl}&offset=${offset}` +
+        `&access_token=${accessToken}`;
 
       // dispatch({
       //   type: 'SEARCH::Call-API',
@@ -128,13 +128,15 @@ const searchProcessor = ({ dispatch, getState }) => {
       // });
 
       dispatch({
-        types: [requestType, successType, failType, updateSearchType],
-        [CALL_API]: {
+        types: [
+          SEARCH_REQUEST, SEARCH_REQUEST_SUCCESS, SEARCH_REQUEST_FAIL, resultsType,
+        ],
+        [API_CALL_PARAMS]: {
           url: currentAPIReqUrl,
           offset,
           // attempt,
           authorId,
-          resultsLimit: searchResultsLimit,
+          resultsLimit: searchResultsLimit, // TODO: remove, passed at start
         },
       });
     };
@@ -184,7 +186,7 @@ const searchProcessor = ({ dispatch, getState }) => {
 
       // request next portion of items using increased offset
       if (
-        (!searchResultsLimit || resultsCount.length < searchResultsLimit) &&
+        (!searchResultsLimit || resultsCount < searchResultsLimit) &&
         (!total || nextOffset <= total)
       ) {
         next({ type: SEARCH_SET_OFFSET, offset: nextOffset });

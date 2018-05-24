@@ -5,14 +5,15 @@ export const SEARCH_END = 'SEARCH::End';
 export const TERMINATE_SEARCH = 'SEARCH::Terminate';
 
 // wall posts search
+export const POSTS_RECEIVED = 'POSTS_RECEIVED';
+
 export const FETCH_WALL_POSTS_REQUEST = 'FETCH_WALL_POSTS_REQUEST';
-export const FETCH_WALL_POSTS_SUCCESS = 'FETCH_WALL_POSTS_SUCCESS';
 export const FETCH_WALL_POSTS_FAIL = 'FETCH_WALL_POSTS_FAIL';
 
 // requests
-export const REQUEST_START = 'REQUEST_START';
-export const REQUEST_SUCCESS = 'REQUEST_SUCCESS';
-export const REQUEST_FAIL = 'REQUEST_FAIL';
+export const SEARCH_REQUEST = 'SEARCH_REQUEST';
+export const SEARCH_REQUEST_SUCCESS = 'SEARCH_REQUEST_SUCCESS';
+export const SEARCH_REQUEST_FAIL = 'SEARCH_REQUEST_FAIL';
 
 // auth
 export const SAVE_AUTH_DATA = 'SAVE_AUTH_DATA';

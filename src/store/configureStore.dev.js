@@ -20,9 +20,9 @@ const logger = createLogger({
     const hiddenTypes = [
       // 'SEARCH::SET-OFFSET',
       // 'SEARCH_UPDATE',
-      // 'REQUEST_START',
-      // 'REQUEST_SUCCESS',
-      // 'REQUEST_FAIL',
+      // 'SEARCH_REQUEST',
+      // 'SEARCH_REQUEST_SUCCESS',
+      // 'SEARCH_REQUEST_FAIL',
     ];
     return !hiddenTypes.some(type => type === action.type);
   },

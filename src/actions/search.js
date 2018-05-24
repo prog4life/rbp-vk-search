@@ -1,5 +1,5 @@
 import {
-  FETCH_WALL_POSTS_REQUEST, FETCH_WALL_POSTS_SUCCESS, FETCH_WALL_POSTS_FAIL,
+  FETCH_WALL_POSTS_REQUEST, POSTS_RECEIVED, FETCH_WALL_POSTS_FAIL,
   TERMINATE_SEARCH,
 } from 'constants/actionTypes';
 import {
@@ -16,19 +16,19 @@ import { getIdsOfPosts } from 'selectors';
 // });
 
 export const requestStart = (offset, attempt = 1) => ({
-  type: 'REQUEST_START',
+  type: 'SEARCH_REQUEST',
   offset,
   startTime: Date.now(),
   attempt,
 });
 
 export const requestSuccess = offset => ({
-  type: 'REQUEST_SUCCESS',
+  type: 'SEARCH_REQUEST_SUCCESS',
   offset,
 });
 
 export const requestFail = (offset, attempt = 1) => ({
-  type: 'REQUEST_FAIL',
+  type: 'SEARCH_REQUEST_FAIL',
   offset,
   attempt,
 });
@@ -82,13 +82,13 @@ export const startWallPostsSearch = (inputData) => {
   return {
     types: [
       // SEARCH_START,
-      FETCH_WALL_POSTS_REQUEST,
-      FETCH_WALL_POSTS_SUCCESS,
-      FETCH_WALL_POSTS_FAIL,
-      // 'REQUEST_START',
-      // 'REQUEST_SUCCESS',
-      // 'REQUEST_FAIL',
-      'SEARCH_UPDATE',
+      // FETCH_WALL_POSTS_REQUEST,
+      // POSTS_RECEIVED,
+      // FETCH_WALL_POSTS_FAIL,
+      // 'SEARCH_REQUEST',
+      // 'SEARCH_REQUEST_SUCCESS',
+      // 'SEARCH_REQUEST_FAIL',
+      'POSTS_RECEIVED',
       // SEARCH_END,
     ],
     // TODO:
