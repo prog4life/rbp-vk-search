@@ -35,10 +35,10 @@ export const getSearchOffset = state => fromSearch.getOffset(state.search);
 export const getSearchTotal = state => fromSearch.getTotal(state.search);
 export const getSearchProcessed = state => fromSearch.getProcessed(state.search);
 
-export const getRequestsById = state => fromSearch.getRequestsById(state.search);
-export const getRequestById = (state, id) => getRequestsById(state)[id];
-export const getIdsOfPending = state => fromSearch.getPendingRequestIds(state.search);
-export const getIdsOfFailed = state => fromSearch.getFailedRequestIds(state.search);
+export const getRequestsByOffset = state => fromSearch.getRequestsByOffset(state.search);
+export const getRequestByOffset = (state, id) => getRequestsByOffset(state)[id];
+export const getPendingList = state => fromSearch.getPendingList(state.search);
+export const getFailedList = state => fromSearch.getFailedList(state.search);
 
 export const getSearchProgress = createSelector(
   getSearchTotal,
@@ -49,7 +49,7 @@ export const getSearchProgress = createSelector(
       // return Number(((processsed / total) * 100).toFixed());
       return Math.round(((processsed / total) * 100));
     }
-    return 0;
+    return 0; // TODO: return 0 if no total and processed is 0, otherwise null
   },
 );
 

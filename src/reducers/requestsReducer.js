@@ -12,46 +12,45 @@ import { addIfNotExist, createReducer } from './reducerUtils';
 // attempt: action.attempt,
 
 // const initialState = {
-//   byId: {},
-//   pendingIds: [],
-//   failedIds: [],
+//   byOffset: {},
+//   pendingList: [],
+//   failedList: [],
 // };
 
 // TODO: change id to offset -> requestsByOffset
 
-const byId = createReducer({}, {
-  [SEARCH_REQUEST]: (state, { id, offset, startTime }) => ({
+const byOffset = createReducer({}, {
+  [SEARCH_REQUEST]: (state, { offset, startTime }) => ({
     ...state,
-    [id]: {
-      id,
-      attempt: state[id] ? (state[id].attempt + 1) : 1,
+    [offset]: {
       offset,
+      attempt: state[offset] ? (state[offset].attempt + 1) : 1,
       startTime,
     },
   }),
-  [SEARCH_REQUEST_SUCCESS]: (state, { id }) => {
+  [SEARCH_REQUEST_SUCCESS]: (state, { offset }) => {
     const nextState = { ...state };
-    delete nextState[id];
+    delete nextState[offset];
     return nextState;
   },
   [SEARCH_START]: () => ({}),
   [TERMINATE_SEARCH]: () => ({}), // NOTE: remove ???
 });
 
-const removeId = (state, action) => state.filter(id => action.id !== id);
+const removeOffset = (state, action) => state.filter(o => action.offset !== o);
 
-const pendingIds = createReducer([], {
-  [SEARCH_REQUEST]: (state, { id }) => addIfNotExist(state, id),
-  [SEARCH_REQUEST_SUCCESS]: removeId,
-  [SEARCH_REQUEST_FAIL]: removeId,
+const pending = createReducer([], {
+  [SEARCH_REQUEST]: (state, { offset }) => addIfNotExist(state, offset),
+  [SEARCH_REQUEST_SUCCESS]: removeOffset,
+  [SEARCH_REQUEST_FAIL]: removeOffset,
   [SEARCH_START]: () => ([]),
   [TERMINATE_SEARCH]: () => ([]), // NOTE: remove ???
 });
 
-const failedIds = createReducer([], {
-  [SEARCH_REQUEST]: removeId,
-  [SEARCH_REQUEST_SUCCESS]: removeId,
-  [SEARCH_REQUEST_FAIL]: (state, { id }) => addIfNotExist(state, id),
+const failed = createReducer([], {
+  [SEARCH_REQUEST]: removeOffset,
+  [SEARCH_REQUEST_SUCCESS]: removeOffset,
+  [SEARCH_REQUEST_FAIL]: (state, { offset }) => addIfNotExist(state, offset),
   [SEARCH_START]: () => ([]),
   [TERMINATE_SEARCH]: () => ([]), // NOTE: remove ???
 });
@@ -70,17 +69,16 @@ const failedIds = createReducer([], {
 // };
 
 export default combineReducers({
-  byId,
-  pendingIds,
-  failedIds,
-  // succeededIds,
+  byOffset,
+  pending,
+  failed,
 });
 
-export const getAllById = state => state.byId;
-export const getPendingIds = state => state.pendingIds;
-export const getFailedIds = state => state.failedIds;
+export const getAllByOffset = state => state.byOffset;
+export const getPending = state => state.pending;
+export const getFailed = state => state.failed;
 
-// const byId = (state = {}, { type, id, offset, startTime }) => {
+// const byOffset = (state = {}, { type, id, offset, startTime }) => {
 //   switch (type) {
 //     case SEARCH_REQUEST:
 //       return {
@@ -115,7 +113,7 @@ export const getFailedIds = state => state.failedIds;
 //   }
 // };
 
-// const pendingIds = (state = [], action) => {
+// const pendingList = (state = [], action) => {
 //   switch (action.type) {
 //     case SEARCH_REQUEST:
 //       return addIfNotExist(state, action.id);
@@ -130,7 +128,7 @@ export const getFailedIds = state => state.failedIds;
 //   }
 // };
 
-// const failedIds = (state = [], action) => {
+// const failedList = (state = [], action) => {
 //   switch (action.type) {
 //     case SEARCH_REQUEST:
 //     case SEARCH_REQUEST_SUCCESS:

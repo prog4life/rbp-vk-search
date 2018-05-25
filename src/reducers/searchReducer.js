@@ -3,7 +3,7 @@ import {
   SEARCH_REQUEST, SEARCH_REQUEST_SUCCESS, SEARCH_REQUEST_FAIL,
 } from 'constants/actionTypes';
 import requests, {
-  getAllById, getPendingIds, getFailedIds,
+  getAllByOffset, getPending, getFailed,
 } from './requestsReducer';
 
 const initialState = {
@@ -13,9 +13,9 @@ const initialState = {
   // TODO: resolve case with count: 0
   total: null, // equivalent of "count" field in vk API response
   requests: {
-    byId: {},
-    pendingIds: [],
-    failedIds: [],
+    byOffset: {},
+    pending: [],
+    failed: [],
   },
 };
 
@@ -82,9 +82,9 @@ export const getOffset = state => state.offset;
 export const getProcessed = state => state.processed;
 export const getIsActive = state => state.isActive;
 
-export const getRequestsById = state => getAllById(state.requests);
-export const getPendingRequestIds = state => getPendingIds(state.requests);
-export const getFailedRequestIds = state => getFailedIds(state.requests);
+export const getRequestsByOffset = state => getAllByOffset(state.requests);
+export const getPendingList = state => getPending(state.requests);
+export const getFailedList = state => getFailed(state.requests);
 
 // PREV version
 // export default function search(state = initialState, action) {

@@ -6,7 +6,7 @@ import {
 } from 'constants/actionTypes';
 import {
   getAccessToken, getSearchTotal, getSearchOffset,
-  getRequestsById, getIdsOfFailed, getIdsOfPending,
+  getRequestsByOffset, getFailedList, getPendingList,
 } from 'selectors';
 // TODO: pass with action
 import { API_CALL_PARAMS } from 'middleware/callAPI';
@@ -110,7 +110,7 @@ const searchProcessor = ({ dispatch, getState }) => {
     // let checkpoint2 = performance.now(); // TEMP:
 
     // TODO: replace to top level
-    const makeCallToAPI = (offset = 0, attempt = 1) => {
+    const makeCallToAPI = (offset = 0) => {
       // const tempCheckpoint2 = checkpoint2;
       // checkpoint2 = performance.now();
       // console.warn(`NEW REQUEST with ${offset} offset, attempt: ` +
@@ -134,9 +134,7 @@ const searchProcessor = ({ dispatch, getState }) => {
         [API_CALL_PARAMS]: {
           url: currentAPIReqUrl,
           offset,
-          // attempt,
           authorId,
-          resultsLimit: searchResultsLimit, // TODO: remove, passed at start
         },
       });
     };
@@ -153,11 +151,9 @@ const searchProcessor = ({ dispatch, getState }) => {
       const resultsCount = getNumberOfResults(state);
       const offset = getSearchOffset(state);
       const total = getSearchTotal(state);
-      const reqs = getRequestsById(state);
-      // const failed = requests.failedIds;
-      // const pending = requests.pendingIds;
-      const failed = getIdsOfFailed(state);
-      const pending = getIdsOfPending(state);
+      const reqs = getRequestsByOffset(state);
+      const failed = getFailedList(state);
+      const pending = getPendingList(state);
 
       // NOTE: max number of parallel requests/connections ~ 6-8 / 17
       // TODO: maxPendingCount ~ 6
@@ -166,17 +162,17 @@ const searchProcessor = ({ dispatch, getState }) => {
 
       // requests that reach maxAttempts limit are considered completely failed
       // next failed requests should be sent again
-      const toSendAgain = failed.filter(id => reqs[id].attempt < maxAttempts);
+      const toSendAgain = failed.filter(o => reqs[o].attempt < maxAttempts);
 
       // repeat first of failed requests
       if (toSendAgain.length > 0) {
-        const [nextId] = toSendAgain;
-        const requestToRepeat = reqs[nextId];
-        console.log(`Repeat FAILED with ${requestToRepeat.offset} ` +
-          `offset and attempt ${requestToRepeat.attempt + 1} `);
+        const [offsetToRepeat] = toSendAgain;
+        // const requestToRepeat = reqs[offsetToRepeat];
+        console.log(`Repeat FAILED with ${offsetToRepeat} ` +
+          `offset and attempt ${reqs[offsetToRepeat].attempt + 1} `);
 
-        // makeCallToAPI(reqs[nextId].offset, reqs[nextId].attempt + 1);
-        makeCallToAPI(requestToRepeat.offset);
+        // makeCallToAPI(reqs[offsetToRepeat].offset, reqs[offsetToRepeat].attempt + 1);
+        makeCallToAPI(offsetToRepeat);
         return;
       }
 

@@ -1,6 +1,5 @@
 import {
-  getAccessToken, getSearchTotal, getSearchOffset, getSearchIsActive,
-  getRequestById, getIdsOfPending,
+  getSearchIsActive, getRequestByOffset, getPendingList,
 } from 'selectors';
 // import fetchJSONP from 'utils/fetchJSONP';
 import jsonpPromise from 'utils/jsonpPromise';
@@ -13,12 +12,10 @@ export const schemas = {
   // wallComments: 'WALL_COMMENTS'
 };
 
-const makeId = offset => `offset_${offset}`;
+// const makeId = offset => `offset_${offset}`;
 
 // const onRequestStart = (next, offset, type) => {
-//   const id = makeId(offset);
-//
-//   next({ type, id, offset, startTime: Date.now() });
+//   next({ type, offset, startTime: Date.now() });
 // };
 
 const throwIfSearchIsOver = (isActive, offset) => {
@@ -27,24 +24,23 @@ const throwIfSearchIsOver = (isActive, offset) => {
   }
 };
 
-// if request obj was removed from store or added to completely failed
-const throwIfRequestIsExcess = (request, id) => {
+// if request with such offset was completed and removed from store already
+const throwIfRequestIsExcess = (request, offset) => {
   if (!request) {
-    throw new Error(`Request with id: "${id}" has been succeeded already`);
+    throw new Error(`Request (offset: ${offset}) has been succeeded already`);
   }
 };
 
 // remove successful request obj from "requests"
 const onRequestSuccess = (next, getState, offset, type) => (response) => {
   const state = getState();
-  const id = makeId(offset);
   const isActive = getSearchIsActive(state);
-  const requestById = getRequestById(state, id);
+  const requestByOffset = getRequestByOffset(state, offset);
 
   throwIfSearchIsOver(isActive, offset);
-  throwIfRequestIsExcess(requestById, id);
+  throwIfRequestIsExcess(requestByOffset, offset);
 
-  next({ type, id });
+  next({ type, offset });
 
   return response;
 };
@@ -52,18 +48,17 @@ const onRequestSuccess = (next, getState, offset, type) => (response) => {
 // add failed request obj to "requests"
 const onRequestFail = (next, getState, offset, type) => (e) => {
   const state = getState();
-  const id = makeId(offset);
   const isActive = getSearchIsActive(state);
-  const pending = getIdsOfPending(state);
+  const pending = getPendingList(state);
 
   // TODO: think over case when belated failed but pending repeated exists
   throwIfSearchIsOver(isActive, offset);
   // TODO: replace by specific memoized selector or check in reducer
-  if (!pending.includes(id)) {
+  if (!pending.includes(offset)) {
     throw new Error(`Offset "${offset}" has been processed already`);
   }
 
-  next({ type, id }); // TODO: refused: true flag for processed offsets
+  next({ type, offset }); // TODO: refused: true flag for processed offsets
 
   throw new Error(`Request with ${offset} offset failed, ${e.message}`);
 };
@@ -129,9 +124,7 @@ export default ({ getState }) => next => (action) => {
   const [requestType, successType, failType, resultsType] = types;
   // add request obj with isPending: true to "requests"
   // onRequestStart(next, offset, requestType);
-  const id = makeId(offset);
-
-  next({ type: requestType, id, offset, startTime: Date.now() });
+  next({ type: requestType, offset, startTime: Date.now() });
 
   // TODO: is it necessary ?
   // const actionWith = (data) => {
@@ -147,15 +140,14 @@ export default ({ getState }) => next => (action) => {
 
   const onSuccess = (response) => {
     const state = getState();
-    const id = makeId(offset);
     const isActive = getSearchIsActive(state);
-    const requestById = getRequestById(state, id);
+    const requestByOffset = getRequestByOffset(state, offset);
 
     throwIfSearchIsOver(isActive, offset);
-    throwIfRequestIsExcess(requestById, id);
+    throwIfRequestIsExcess(requestByOffset, offset);
     next({
       type: successType,
-      id,
+      offset,
       total: response.count || null,
       // NOTE: OR if can't get items length -> pass count (offsetModifier) ?
       amount: response.items ? response.items.length : null,
