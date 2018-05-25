@@ -1,5 +1,6 @@
 import {
   SEARCH_START, SEARCH_END, SEARCH_SET_OFFSET, TERMINATE_SEARCH,
+  SEARCH_REQUEST, SEARCH_REQUEST_SUCCESS, SEARCH_REQUEST_FAIL,
 } from 'constants/actionTypes';
 import requests, {
   getAllById, getPendingIds, getFailedIds,
@@ -40,19 +41,27 @@ const search = (state = initialState, action) => {
         ...state,
         offset: action.offset,
       };
-    case 'SEARCH_REQUEST':
-    case 'SEARCH_REQUEST_SUCCESS':
-    case 'SEARCH_REQUEST_FAIL':
+    case SEARCH_REQUEST:
+    case SEARCH_REQUEST_FAIL:
       return {
         ...state,
         requests: requests(state.requests, action),
       };
-    case 'SEARCH_UPDATE':
+    case SEARCH_REQUEST_SUCCESS:
       return {
         ...state,
         total: action.total !== null ? action.total : state.total,
-        processed: action.processed || state.processed,
+        processed: action.amount !== null
+          ? state.processed + action.amount
+          : state.processed,
+        requests: requests(state.requests, action),
       };
+    // case 'SEARCH_UPDATE':
+    //   return {
+    //     ...state,
+    //     total: action.total !== null ? action.total : state.total,
+    //     processed: action.processed || state.processed,
+    //   };
     case TERMINATE_SEARCH:
       return {
         isActive: false,

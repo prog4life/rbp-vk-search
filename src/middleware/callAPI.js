@@ -153,7 +153,13 @@ export default ({ getState }) => next => (action) => {
 
     throwIfSearchIsOver(isActive, offset);
     throwIfRequestIsExcess(requestById, id);
-    next({ type: successType, id });
+    next({
+      type: successType,
+      id,
+      total: response.count || null,
+      // NOTE: OR if can't get items length -> pass count (offsetModifier) ?
+      amount: response.items ? response.items.length : null,
+    });
 
     // return transformResponse('wall-posts', authorId)(response);
 
@@ -171,12 +177,12 @@ export default ({ getState }) => next => (action) => {
     .then(
       results => next({ type: resultsType, ...results }),
       error => console.warn(error), // TODO: try error.message and next()
-    )
-    .then(onSearchProgress({
-      next,
-      getState,
-      type: resultsType,
-    }));
+    );
+  // .then(onSearchProgress({
+  //   next,
+  //   getState,
+  //   type: resultsType,
+  // }));
   // TODO: change to more generic then(transformResponse(schema))
   // .then(transformResponse('wall-posts', authorId))
   // .then(savePartOfResults(next, resultsLimit, addResultsType))
