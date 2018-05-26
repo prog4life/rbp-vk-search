@@ -8,7 +8,6 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const DuplPkgCheckrPlugin = require('duplicate-package-checker-webpack-plugin');
 const BabelPluginTransformImports = require('babel-plugin-transform-imports');
-// const ExtractTextPlugin = require('extract-text-webpack-plugin');
 // const CompressionPlugin = require('compression-webpack-plugin');
 // const VisualizerPlugin = require('webpack-visualizer-plugin');
 // const autoprefixer = require('autoprefixer');
@@ -23,14 +22,71 @@ const isProduction = env === 'production';
 console.log('env', env);
 console.log('process.env.NODE_ENV: ', process.env.NODE_ENV);
 
-// const extractStyles = new ExtractTextPlugin({
-//   // filename: 'css/styles.[contenthash].css',
-//   filename: 'styles.css', // TODO: change to func or add 'styles' entry
-//   allChunks: true,
-//   // inline loading in development is recommended for HMR and build speed
-//   disable: !isProduction, // OR env === 'development'
-// });
+const htmlWebpackPlugin = new HTMLWebpackPlugin({
+  title: 'vk-search with reactbootstrap',
+  favicon: path.resolve(__dirname, 'src/assets/favicon.png'),
+  // meta: { viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no' },
+  inject: false,
+  template: path.resolve(__dirname, 'src/assets/template.html'),
+  // chunksSortMode(a, b) {
+  //   const order = ['polyfills', 'react-bootstrap', 'vendors', 'main'];
+  //   return order.indexOf(a.names[0]) - order.indexOf(b.names[0]);
+  // },
+  appMountId: 'app',
+  mobile: true,
+});
 
+// TODO: use .babelrc instead ?
+const babelLoaderOptions = {
+  // ------------------------ BABEL PLUGINS -----------------------------------
+  plugins: [
+    'react-hot-loader/babel',
+    // 'fast-async',
+    'syntax-dynamic-import',
+    'transform-class-properties',
+    // 'transform-flow-strip-types',
+    [BabelPluginTransformImports, { // TODO: try "transform-imports"
+      'react-bootstrap': {
+        transform(importName) {
+          return `react-bootstrap/lib/${importName}`;
+        },
+        preventFullImport: true,
+      },
+      'redux-form': {
+        transform(importName) {
+          return `redux-form/es/${importName}`;
+        },
+        preventFullImport: true,
+      },
+    }],
+  ].concat(isProduction ? [] : ['transform-react-jsx-source']),
+  // ------------------------ BABEL PRESETS -----------------------------------
+  presets: [
+    ['env', {
+      modules: false,
+      useBuiltIns: 'usage', // 'entry' OR false
+      debug: true,
+      targets: {
+        // browsers: ['defaults', 'firefox 52', 'not ie <= 11'],
+        browsers: [
+          'last 2 versions',
+          'not ie <= 11',
+          'not android <= 62',
+        ],
+      },
+      exclude: [
+        // 'transform-regenerator',
+        // 'transform-async-to-generator',
+      ],
+    }],
+    // 'flow',
+    'react',
+    'stage-3',
+  ],
+  cacheDirectory: true,
+};
+
+// ========================== WEBPACK CONFIG ==================================
 module.exports = {
   mode: env,
   entry: {
@@ -58,6 +114,7 @@ module.exports = {
       }),
       new OptimizeCssAssetsPlugin({}),
     ],
+    // ------------------------ SPLIT CHUNKS ----------------------------------
     splitChunks: {
       chunks: 'all', // to work for not only async chunks too
       // name: false, // switch off name generation
@@ -95,68 +152,20 @@ module.exports = {
     },
   },
   plugins: [
-    // extractStyles,
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
       filename: isProduction ? 'css/styles.[contenthash:4].css' : '[name].css',
       chunkFilename: isProduction ? 'css/[name].[contenthash:4].css' : '[id].css',
     }),
-    // new webpack.DefinePlugin({
-    //   'process.env': {
-    //     NODE_ENV: JSON.stringify(env),
-    //   },
-    // }),
     new CleanWebpackPlugin(
       ['build'], // OR 'build' OR 'dist', removes folder
       { exclude: ['index.html'] },
     ),
-    new HTMLWebpackPlugin({
-      title: 'vk-search with reactbootstrap',
-      favicon: path.resolve(__dirname, 'src/assets/favicon.png'),
-      // meta: {
-      //   viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'
-      // },
-      inject: false,
-      template: path.resolve(__dirname, 'src/assets/template.html'),
-      // chunksSortMode(a, b) {
-      //   const order = ['polyfills', 'react-bootstrap', 'vendors', 'main'];
-      //   return order.indexOf(a.names[0]) - order.indexOf(b.names[0]);
-      // },
-      appMountId: 'app',
-      mobile: true,
-      // minify: false,
-      // filename: 'assets/custom.html'
-      // hash: true // usefull for cache busting
-    }),
+    htmlWebpackPlugin,
     // new CompressionPlugin({
     //   deleteOriginalAssets: true,
     //   test: /\.js/
-    // }),
-    // new webpack.optimize.CommonsChunkPlugin({
-    //   name: 'vendors',
-    //   chunks: ['main'],
-    //   minChunks(module) { // 1st arg: 'module', 2nd: count
-    //     // This prevents stylesheet resources with the .css or .scss extension
-    //     // from being moved from their original chunk to the vendor chunk
-    //     if (module.resource && (/^.*\.(css|scss)$/).test(module.resource)) {
-    //       return false;
-    //     } // eslint-disable-next-line
-    //     return module.context && module.context.includes('node_modules');
-    //   },
-    // }),
-    // new webpack.optimize.CommonsChunkPlugin({
-    //   name: ['react-bootstrap'],
-    //   chunks: ['vendors'],
-    //   minChunks: ({ resource }) => resource && (/react-bootstrap/).test(resource),
-    // }),
-    // new webpack.optimize.CommonsChunkPlugin({
-    //   name: 'common',
-    //   minChunks: 2
-    // }),
-    // new webpack.optimize.CommonsChunkPlugin({
-    //   name: 'manifest',
-    //   // minChunks: Infinity
     // }),
     new BundleAnalyzerPlugin({
       analyzerMode: 'static',
@@ -185,56 +194,15 @@ module.exports = {
   },
   module: {
     rules: [
+      // -------------------- JS/JSX BABEL-LOADER -----------------------------
       {
         test: /\.(js|jsx)$/,
         loader: 'babel-loader',
         include: [path.resolve(__dirname, 'src')],
         exclude: [path.resolve(__dirname, 'node_modules')],
-        options: {
-          plugins: [
-            'react-hot-loader/babel',
-            // 'fast-async',
-            'syntax-dynamic-import',
-            'transform-class-properties',
-            [BabelPluginTransformImports, { // TODO: try "transform-imports"
-              'react-bootstrap': {
-                transform(importName) {
-                  return `react-bootstrap/lib/${importName}`;
-                },
-                preventFullImport: true,
-              },
-              'redux-form': {
-                transform(importName) {
-                  return `redux-form/es/${importName}`;
-                },
-                preventFullImport: true,
-              },
-            }],
-          ].concat(isProduction ? [] : ['transform-react-jsx-source']),
-          presets: [
-            ['env', {
-              modules: false,
-              useBuiltIns: 'usage', // 'entry' OR false
-              debug: true,
-              targets: {
-                // browsers: ['defaults', 'firefox 52', 'not ie <= 11'],
-                browsers: [
-                  'last 2 versions',
-                  'not ie <= 11',
-                  'not android <= 62',
-                ],
-              },
-              exclude: [
-                // 'transform-regenerator',
-                // 'transform-async-to-generator',
-              ],
-            }],
-            'react',
-            'stage-3',
-          ],
-          cacheDirectory: true,
-        },
+        options: babelLoaderOptions,
       },
+      // --------------------- CSS/SCSS LOADERS -------------------------------
       {
         test: /\.(scss|css)$/, // OR /\.s?[ac]ss$/,
         include: [
@@ -243,17 +211,6 @@ module.exports = {
           path.resolve(__dirname, 'src/components'),
           path.resolve(__dirname, 'node_modules'),
         ],
-        // use: extractStyles.extract({
-        //   use: [
-        //     {
-        //       loader: 'css-loader',
-        //       options: { importLoaders: 1, sourceMap: true },
-        //     },
-        //     // 'resolve-url-loader',
-        //     { loader: 'sass-loader', options: { sourceMap: true } },
-        //   ],
-        //   fallback: 'style-loader',
-        // }),
         use: [
           isProduction ? MiniCssExtractPlugin.loader : 'style-loader',
           { // not translates url() that starts with "/"
@@ -270,6 +227,7 @@ module.exports = {
         // TODO: consider to remove include
         include: path.resolve(__dirname, 'src'),
         use: [
+          // --------------------- FILE-LOADER --------------------------------
           {
             loader: 'file-loader',
             options: {
@@ -292,6 +250,7 @@ module.exports = {
           // }
         ],
       },
+      // --------------------------- URL-LOADER -------------------------------
       {
         test: /\.(png|jpe?g|gif|svg|eot|ttf|woff|woff2)$/,
         loader: 'url-loader',
