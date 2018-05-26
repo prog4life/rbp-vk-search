@@ -63,7 +63,8 @@ const babelLoaderOptions = {
   // ------------------------ BABEL PRESETS -----------------------------------
   presets: [
     ['env', {
-      modules: false,
+      // need to be turned on for Jest testing
+      // modules: env === 'development' ? false : 'commonjs',
       useBuiltIns: 'usage', // 'entry' OR false
       debug: true,
       targets: {

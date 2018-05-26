@@ -4,7 +4,7 @@
   "description": "vk.com search app with react bootstrap",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "npm run build && node server.js",
     "build": "cross-env NODE_ENV=production webpack --color --progress",
     "build-dev": "webpack --color --progress",
@@ -39,7 +39,6 @@
     "react-router-prop-types": "^1.0.3",
     "redux": "^4.0.0",
     "redux-api-middleware": "^2.3.0",
-    "redux-axios-middleware": "^4.0.0",
     "redux-form": "^7.2.3",
     "redux-promise-middleware": "^5.1.1",
     "redux-saga": "^0.16.0",
@@ -51,6 +50,7 @@
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
+    "babel-jest": "^23.0.0",
     "babel-loader": "^7.1.4",
     "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
@@ -65,17 +65,21 @@
     "cross-env": "^5.1.6",
     "css-loader": "^0.28.11",
     "duplicate-package-checker-webpack-plugin": "^3.0.0",
-    "extract-text-webpack-plugin": "^3.0.2",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
     "fast-async": "^6.3.7",
     "file-loader": "^1.1.11",
     "html-webpack-plugin": "^3.2.0",
+    "jest": "^23.0.0",
     "mini-css-extract-plugin": "^0.4.0",
     "node-sass": "^4.9.0",
     "optimize-css-assets-webpack-plugin": "^4.0.1",
     "react-hot-loader": "^4.2.0",
+    "react-test-renderer": "^16.4.0",
     "redux-freeze": "^0.1.5",
     "redux-immutable-state-invariant": "^2.1.0",
     "redux-logger": "^3.0.6",
+    "regenerator-runtime": "^0.11.1",
     "remote-redux-devtools": "^0.5.12",
     "remotedev-extension": "0.0.10",
     "remotedev-server": "0.1.5",
@@ -89,6 +93,16 @@
     "webpack-cli": "^2.1.4",
     "webpack-dev-server": "^3.1.4",
     "webpack-merge": "^4.1.2"
+  },
+  "jest": {
+    "moduleDirectories": [
+      "node_modules",
+      "src"
+    ],
+    "verbose": true,
+    "transformIgnorePatterns": [
+      "node_modules/(?!(lodash-es))"
+    ]
   },
   "browserslist": [
     "last 2 versions"

@@ -88,7 +88,7 @@ export const startWallPostsSearch = (inputData) => {
       // 'SEARCH_REQUEST',
       // 'SEARCH_REQUEST_SUCCESS',
       // 'SEARCH_REQUEST_FAIL',
-      'POSTS_RECEIVED',
+      POSTS_RECEIVED,
       // SEARCH_END,
     ],
     // TODO:
