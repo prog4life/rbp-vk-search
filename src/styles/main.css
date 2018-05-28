@@ -6,6 +6,8 @@
   left: 0; */
 }
 
+/* TODO: add permanent scrollbar ? */
+
 .wall-posts-search {
   margin-top: 58px;
 
@@ -49,7 +51,7 @@
 }
 
 /* TODO: cut overflowing text if it is too long */
-.progress-viewer__processed-info {
+.search-status {
   margin-bottom: 0;
   line-height: 1;
   font-size: 13px;

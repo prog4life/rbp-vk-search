@@ -4,6 +4,7 @@ import { ProgressBar, ButtonToolbar, Button } from 'react-bootstrap';
 
 // import SearchControlButtons from 'components/SearchControlButtons';
 import ProgressViewer from 'components/ProgressViewer';
+import SearchStatus from 'components/SearchStatus';
 
 class SearchControls extends Component {
   // componentWillUnmount() {
@@ -20,6 +21,7 @@ class SearchControls extends Component {
   render() {
     const {
       isSearchActive,
+      isSearchCompleted,
       itemsName,
       processed,
       total,
@@ -34,6 +36,7 @@ class SearchControls extends Component {
           isSearchActive={isSearchActive}
           onStopClick={terminateSearch}
         /> */}
+        {/* TODO: add RESET button for completed state ? */}
         <ButtonToolbar className="search-controls__search-buttons">
           {isSearchActive
             ?
@@ -44,7 +47,7 @@ class SearchControls extends Component {
                 {'Stop Search'}
               </Button>
             :
-              <Button // TODO: change to onClick instead of submit
+              <Button
                 bsStyle="info"
                 type="submit"
               >
@@ -52,20 +55,22 @@ class SearchControls extends Component {
               </Button>
           }
         </ButtonToolbar>
-        {isSearchActive &&
+        {(isSearchActive || isSearchCompleted) &&
+          // TODO: rename to StatusViewer
           <ProgressViewer className="search-controls__progress-viewer">
-            {/* TODO: extract component ProgressTextInfo, change className to __progress-text */}
-            <p className="progress-viewer__processed-info">
-              {processed && total
-                ? `Processed ${processed} of ${total} ${itemsName}`
-                : 'Search in progress'
-              }
-            </p>
+            {/* TODO: or ProgressTextInfo/ProgressMessage */}
+            <SearchStatus
+              isActive={isSearchActive}
+              isCompleted={isSearchCompleted}
+              processed={processed}
+              total={total}
+              name={itemsName}
+            />
             <ProgressBar
               bsStyle="info"
               className="progress-viewer__progress-bar"
               label={Number.isFinite(progress) ? `${progress}%` : ''}
-              now={progress || undefined}
+              now={Number.isFinite(progress) ? progress : undefined}
             />
           </ProgressViewer>
         }
@@ -77,7 +82,7 @@ class SearchControls extends Component {
 // const preProgViewer = (
 //   <div className="progress-viewer">
 //     {/* TODO: extract component ProgressTextInfo, change className to __progress-text */}
-//     <p className="progress-viewer__processed-info">
+//     <p className="search-status">
 //       {processed && total
 //         ? `Processed ${processed} of ${total} ${itemsName}`
 //         : 'Search in progress'
@@ -94,16 +99,17 @@ class SearchControls extends Component {
 
 SearchControls.propTypes = {
   isSearchActive: PropTypes.bool.isRequired,
+  isSearchCompleted: PropTypes.bool.isRequired,
   itemsName: PropTypes.string,
   processed: PropTypes.number.isRequired,
-  progress: PropTypes.number.isRequired,
+  progress: PropTypes.number,
   terminateSearch: PropTypes.func.isRequired,
   total: PropTypes.number,
 };
 
 SearchControls.defaultProps = {
   itemsName: 'items',
-  // progress: null,
+  progress: null,
   total: null,
 };
 

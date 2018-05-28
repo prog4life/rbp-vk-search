@@ -21,35 +21,43 @@ export const getAccessToken = createSelector(
     const TEN_MINUTES = 10 * 60 * 1000;
 
     if (!accessToken) {
-      return '';
+      return null;
     }
     if (tokenExpiresAt < Date.now() - TEN_MINUTES) {
-      return '';
+      return null;
     }
     return accessToken;
   },
 );
 
 export const getSearchIsActive = state => fromSearch.getIsActive(state.search);
+export const getIsCompleted = state => fromSearch.getIsCompleted(state.search);
 export const getSearchOffset = state => fromSearch.getOffset(state.search);
 export const getSearchTotal = state => fromSearch.getTotal(state.search);
 export const getSearchProcessed = state => fromSearch.getProcessed(state.search);
 
-export const getRequestsByOffset = state => fromSearch.getRequestsByOffset(state.search);
-export const getRequestByOffset = (state, id) => getRequestsByOffset(state)[id];
+export const getRequestsByOffset = state => (
+  fromSearch.getRequestsByOffset(state.search)
+);
+export const getRequestByOffset = (state, offset) => (
+  getRequestsByOffset(state)[offset]
+);
 export const getPendingList = state => fromSearch.getPendingList(state.search);
 export const getFailedList = state => fromSearch.getFailedList(state.search);
 
 export const getSearchProgress = createSelector(
   getSearchTotal,
   getSearchProcessed,
-  (total, processsed) => {
-    // count progress in percents
-    if (Number.isInteger(total) && Number.isInteger(processsed)) {
-      // return Number(((processsed / total) * 100).toFixed());
-      return Math.round(((processsed / total) * 100));
+  // count progress in percents
+  (total, processed) => {
+    if (total === null && processed === 0) {
+      return 0;
     }
-    return 0; // TODO: return 0 if no total and processed is 0, otherwise null
+    if (total && Number.isInteger(total) && Number.isInteger(processed)) {
+      // return Number(((processed / total) * 100).toFixed());
+      return Math.round(((processed / total) * 100));
+    }
+    return null;
   },
 );
 
@@ -59,7 +67,7 @@ export const getIdsOfPosts = state => fromPosts.getIds(state.posts);
 export const getSortedPosts = createSelector(
   getPostsById,
   (state, filter = 'timestamp') => filter,
-  // TODO: rename order to reverse
+  // TODO: rename order to reverse ?
   (state, filter, order = 'desc') => order,
   (postsById, filter, order) => {
     const arrayOfPosts = Object.values(postsById);

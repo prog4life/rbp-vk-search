@@ -21,7 +21,7 @@ ProgressViewer.defaultProps = {
 // const ProgressViewer = ({ progress, processed, total, itemsName }) => (
 //   <div className="progress-viewer">
 //     {/* TODO: extract component ProgressTextInfo, change className to __progress-text */}
-//     <p className="progress-viewer__processed-info">
+//     <p className="search-status">
 //       {processed && total
 //         ? `Processed ${processed} of ${total} ${itemsName}`
 //         : 'Search in progress'
