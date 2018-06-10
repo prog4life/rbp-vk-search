@@ -34,7 +34,6 @@ const middleware = [watcher, search, callAPI, sagaMiddleware, thunk, logger];
 const configureStore = (preloadedState = {}) => {
   const composeEnhancers = composeWithDevTools({
     name: 'vk-search',
-    // to turn it off in production if NODE_ENV is not set
     // realtime: true,
     // port setting required to use with local "remotedev-server", OR
     // use remotedev.io/local alternatively

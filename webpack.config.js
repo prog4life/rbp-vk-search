@@ -19,7 +19,7 @@ process.traceDeprecation = true; // or run process with --trace-deprecation flag
 const env = process.env.NODE_ENV || 'development';
 const isProduction = env === 'production';
 
-console.log('env', env);
+console.log('env: ', env);
 console.log('process.env.NODE_ENV: ', process.env.NODE_ENV);
 
 const htmlWebpackPlugin = new HTMLWebpackPlugin({
@@ -120,25 +120,29 @@ module.exports = {
       chunks: 'all', // to work for not only async chunks too
       // name: false, // switch off name generation
       cacheGroups: {
-        // polyfills: {
-        //   test: /polyfills/,
-        //   name: 'polyfills',
-        //   chunks: 'initial',
-        //   // reuseExistingChunk: false,
-        //   // enforce: true,
-        // },
-        'react-bootstrap': {
-          test: /react-bootstrap/,
-        },
-        // 'react-dom': {
-        //   test: /react-dom/,
+        // 'react-bootstrap': {
+        //   test: /react-bootstrap/,
         // },
         // commons: {
         //   test: /[\\/]node_modules[\\/]/,
         //   name: 'vendors',
         //   // chunks: 'initial',
         // },
-        // styles: { // to extract css to one file
+        base: {
+          // test: /(react|react-dom|react-router|react-router-dom)/,
+          test(module, chunks) {
+            const name = module.nameForCondition && module.nameForCondition();
+            const re = /[\\/](react|react-dom|react-router|react-router-dom|history|react-bootstrap|core-js|whatwg-fetch)[\\/]/;
+            const result = re.test(name);
+
+            // console.log(`module.nameForCondition: ${name}`);
+            // console.log(`RegExp .test() RESULT: ${result}`);
+
+            return result;
+          },
+        },
+        // to extract css to single file
+        // 'common-styles': {
         //   name: 'styles',
         //   test: /\.css$/,
         //   chunks: 'all',
@@ -161,7 +165,7 @@ module.exports = {
     }),
     new CleanWebpackPlugin(
       ['build'], // OR 'build' OR 'dist', removes folder
-      { exclude: ['index.html'] },
+      { exclude: ['index.html'] }, // TEMP
     ),
     htmlWebpackPlugin,
     // new CompressionPlugin({

@@ -3,11 +3,11 @@ try {
   isProduction = process.env.NODE_ENV === 'production';
 } catch (e) {} // eslint-disable-line
 
-export const addIfNotExist = (dest, addition) => {
-  if (dest.includes(addition)) {
-    return [].concat(dest);
+export const addIfNotExist = (receiver, addition) => {
+  if (receiver.includes(addition)) {
+    return [].concat(receiver);
   }
-  return dest.concat(addition);
+  return receiver.concat(addition);
 };
 
 // make array with unique values from 2 arrays
@@ -37,7 +37,7 @@ export function createReducer(...args) {
   }
 
   const newReducer = (state = initialState, action) => {
-    if (handlers.hasOwnProperty(action.type)) { // eslint-disable-line
+    if (handlers.hasOwnProperty(action.type)) {
       return handlers[action.type](state, action);
     }
     return state;
