@@ -6,7 +6,6 @@ import thunk from 'redux-thunk';
 // import { composeWithDevTools } from 'redux-devtools-extension';
 // import { composeWithDevTools } from 'remote-redux-devtools';
 import search from 'middleware/searchProcessor';
-import callAPI from 'middleware/callAPI';
 import rootReducer from '../reducers';
 
 // must be the last middleware in chain
@@ -28,8 +27,8 @@ import rootReducer from '../reducers';
 // const watcher = immutabilityWatcher();
 
 const middleware = process.env.NODE_ENV === 'development'
-  ? [search, callAPI, thunk] // watcher(was 1st) and logger(was last) were removed
-  : [search, callAPI, thunk];
+  ? [search, thunk] // watcher(was 1st) and logger(was last) were removed
+  : [search, thunk];
 
 const configureStore = (preloadedState = {}) => {
   // const composeEnhancers = composeWithDevTools({

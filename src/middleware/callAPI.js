@@ -3,7 +3,7 @@ import {
 } from 'selectors';
 // import fetchJSONP from 'utils/fetchJSONP';
 import jsonpPromise from 'utils/jsonpPromise';
-import transformResponse from 'utils/responseHandling';
+import transformResponse from './transformResponse';
 
 export const API_CALL_PARAMS = 'CallAPI::Parameters';
 
@@ -32,18 +32,18 @@ const throwIfRequestIsExcess = (request, offset) => {
 };
 
 // remove successful request obj from "requests"
-const onRequestSuccess = (next, getState, offset, type) => (response) => {
-  const state = getState();
-  const isActive = getSearchIsActive(state);
-  const requestByOffset = getRequestByOffset(state, offset);
-
-  throwIfSearchIsOver(isActive, offset);
-  throwIfRequestIsExcess(requestByOffset, offset);
-
-  next({ type, offset });
-
-  return response;
-};
+// const onRequestSuccess = (next, getState, offset, type) => (response) => {
+//   const state = getState();
+//   const isActive = getSearchIsActive(state);
+//   const requestByOffset = getRequestByOffset(state, offset);
+//
+//   throwIfSearchIsOver(isActive, offset);
+//   throwIfRequestIsExcess(requestByOffset, offset);
+//
+//   next({ type, offset });
+//
+//   return response;
+// };
 
 // add failed request obj to "requests"
 const onRequestFail = (next, getState, offset, type) => (e) => {
@@ -63,37 +63,55 @@ const onRequestFail = (next, getState, offset, type) => (e) => {
   throw new Error(`Request with ${offset} offset failed, ${e.message}`);
 };
 
-const onSearchProgress = ({ next, getState, type }) => (response) => {
-  const { total, processed } = getState().search;
-  // to get updated "total"
-  const nextTotal = response && response.count ? response.count : total;
-  const itemsLength = response && response.items && response.items.length;
+// const onSearchProgress = ({ next, getState, type }) => (response) => {
+//   const { total, processed } = getState().search;
+//   // to get updated "total"
+//   const nextTotal = response && response.count ? response.count : total;
+//   const itemsLength = response && response.items && response.items.length;
+//
+//   let nextProcessed = processed;
+//
+//   if (itemsLength) {
+//     nextProcessed += itemsLength;
+//   }
+//
+//   if (nextTotal !== total || nextProcessed !== processed) {
+//     // console.info(`next processed ${nextProcessed} and total ${nextTotal}`);
+//
+//     next({
+//       type,
+//       total: nextTotal,
+//       processed: nextProcessed,
+//     });
+//   }
+//   return response;
+// };
 
-  let nextProcessed = processed;
+// const savePartOfResults = (next, limit, type) => (results) => {
+//   // if (chunk && chunk.length > 0) {
+//   if (typeof results === 'object' && Object.keys(results).length > 0) {
+//     next({ type, results, limit });
+//   }
+//   return results;
+// };
 
-  if (itemsLength) {
-    nextProcessed += itemsLength;
-  }
+// ----------------- FROM "makeCallToAPI" in searchProcessor ------------------
+// dispatch({
+//   type: 'SEARCH::Call-API',
+//   endpoint: currentAPIReqUrl,
+// });
 
-  if (nextTotal !== total || nextProcessed !== processed) {
-    // console.info(`next processed ${nextProcessed} and total ${nextTotal}`);
-
-    next({
-      type,
-      total: nextTotal,
-      processed: nextProcessed,
-    });
-  }
-  return response;
-};
-
-const savePartOfResults = (next, limit, type) => (results) => {
-  // if (chunk && chunk.length > 0) {
-  if (typeof results === 'object' && Object.keys(results).length > 0) {
-    next({ type, results, limit });
-  }
-  return results;
-};
+// dispatch({
+//   types: [
+//     SEARCH_REQUEST, SEARCH_REQUEST_SUCCESS, SEARCH_REQUEST_FAIL, resultsType,
+//   ],
+//   [API_CALL_PARAMS]: {
+//     url: currentAPIReqUrl,
+//     offset,
+//     authorId,
+//   },
+// });
+// ----------------------------------------------------------------------------
 
 export default ({ getState }) => next => (action) => {
   const callParams = action[API_CALL_PARAMS];
@@ -135,8 +153,6 @@ export default ({ getState }) => next => (action) => {
   //   delete finalAction[SEARCH_REQUEST];
   //   return finalAction;
   // };
-
-  // TODO: change id to offset -> requestsByOffset
 
   const onSuccess = (response) => {
     const state = getState();

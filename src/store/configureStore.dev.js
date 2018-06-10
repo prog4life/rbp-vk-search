@@ -7,7 +7,6 @@ import { createLogger } from 'redux-logger';
 // import { composeWithDevTools } from 'redux-devtools-extension';
 import { composeWithDevTools } from 'remote-redux-devtools';
 import search from 'middleware/searchProcessor';
-import callAPI from 'middleware/callAPI';
 import { mainSaga } from 'actions';
 import rootReducer from '../reducers';
 
@@ -29,7 +28,7 @@ const logger = createLogger({
 });
 const watcher = immutabilityWatcher();
 
-const middleware = [watcher, search, callAPI, sagaMiddleware, thunk, logger];
+const middleware = [watcher, search, sagaMiddleware, thunk, logger];
 
 const configureStore = (preloadedState = {}) => {
   const composeEnhancers = composeWithDevTools({

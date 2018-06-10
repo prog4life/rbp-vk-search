@@ -1,15 +1,18 @@
 // TODO: replace next dependency to configureStore
 import { maxAttempts as maxAttemptsDefault } from 'config/common';
 import {
-  TERMINATE_SEARCH, SEARCH_START, SEARCH_SET_OFFSET, SEARCH_END,
-  SEARCH_REQUEST, SEARCH_REQUEST_SUCCESS, SEARCH_REQUEST_FAIL,
+  TERMINATE_SEARCH, SEARCH_START, SEARCH_SET_OFFSET, SEARCH_END, SEARCH_REQUEST,
 } from 'constants/actionTypes';
 import {
   getAccessToken, getSearchTotal, getSearchOffset,
   getRequestsByOffset, getFailedList, getPendingList,
 } from 'selectors';
+// import fetchJSONP from 'utils/fetchJSONP';
+import jsonpPromise from 'utils/jsonpPromise';
+import { onSuccess, onFail } from './requestHandlers';
+import transformResponse from './transformResponse';
 // TODO: pass with action
-import { API_CALL_PARAMS } from 'middleware/callAPI';
+// import { API_CALL_PARAMS } from 'middleware/callAPI';
 
 export const SEARCH_CONFIG = 'SEARCH::Config'; // TODO: rename to search parameters
 
@@ -113,30 +116,25 @@ const searchProcessor = ({ dispatch, getState }) => {
     const makeCallToAPI = (offset = 0) => {
       // const tempCheckpoint2 = checkpoint2;
       // checkpoint2 = performance.now();
-      // console.warn(`NEW REQUEST with ${offset} offset, attempt: ` +
-      //   `${attempt}, interval: ${checkpoint2 - tempCheckpoint2} and
+      // console.warn(`NEW REQUEST with ${offset} offset, ` +
+      //   `interval: ${checkpoint2 - tempCheckpoint2} and
       //    shift: ${performance.now() - checkpoint}`);
       // add request obj with isPending: true to "requests"
-      // onRequestStart(next, offset, attempt);
+      next({ type: SEARCH_REQUEST, offset, startTime: Date.now() });
 
-      const currentAPIReqUrl = `${baseAPIReqUrl}&offset=${offset}` +
+      const currentAPICallUrl = `${baseAPIReqUrl}&offset=${offset}` +
         `&access_token=${accessToken}`;
 
-      // dispatch({
-      //   type: 'SEARCH::Call-API',
-      //   endpoint: currentAPIReqUrl,
-      // });
-
-      dispatch({
-        types: [
-          SEARCH_REQUEST, SEARCH_REQUEST_SUCCESS, SEARCH_REQUEST_FAIL, resultsType,
-        ],
-        [API_CALL_PARAMS]: {
-          url: currentAPIReqUrl,
-          offset,
-          authorId,
-        },
-      });
+      return jsonpPromise(currentAPICallUrl)
+        .then(
+          onSuccess(next, getState, offset),
+          onFail(next, getState, offset),
+        )
+        .then(response => transformResponse(response, 'wall-posts', authorId))
+        .then(
+          results => next({ type: resultsType, ...results }),
+          error => console.warn(error), // TODO: try error.message and next()
+        );
     };
     // first request before timer tick
     makeCallToAPI();
@@ -158,8 +156,6 @@ const searchProcessor = ({ dispatch, getState }) => {
       // NOTE: max number of parallel requests/connections ~ 6-8 / 17
       // TODO: maxPendingCount ~ 6
 
-      // TODO: increase attempt in reducer
-
       // requests that reach maxAttempts limit are considered completely failed
       // next failed requests should be sent again
       const toSendAgain = failed.filter(o => reqs[o].attempt < maxAttempts);
@@ -171,7 +167,6 @@ const searchProcessor = ({ dispatch, getState }) => {
         console.log(`Repeat FAILED with ${offsetToRepeat} ` +
           `offset and attempt ${reqs[offsetToRepeat].attempt + 1} `);
 
-        // makeCallToAPI(reqs[offsetToRepeat].offset, reqs[offsetToRepeat].attempt + 1);
         makeCallToAPI(offsetToRepeat);
         return;
       }
