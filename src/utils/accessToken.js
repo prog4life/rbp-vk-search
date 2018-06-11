@@ -9,10 +9,8 @@ export const parseAccessTokenHash = (hash) => {
     return false;
   }
   if (typeof hash !== 'string') {
-    console.error('Hash must be string');
-    return false;
+    throw new Error('Hash must be string');
   }
-  // TODO: consider using decodeURIComponent
   const hashChunks = hash.split('&');
   const parsed = {};
 
@@ -29,21 +27,16 @@ export const parseAccessTokenHash = (hash) => {
   const {
     access_token: accessToken,
     expires_in: expiresIn,
-    user_id: userId = '',
+    user_id: userId,
     error,
     error_description: errorDescription,
   } = parsed;
 
-  if (error) {
-    console.error(`Hash has error: ${error}, description: ${errorDescription}`);
-    return false;
-  }
-
   let tokenExpiresAt = null;
 
   if (expiresIn) {
-    tokenExpiresAt = Date.now() + (expiresIn * 1000);
-    // tokenExpiresAt = moment().add(expiresIn, 'seconds').unix();
+    tokenExpiresAt = Date.now() + (Number(expiresIn) * 1000);
+    // tokenExpiresAt = moment().add(Number(expiresIn), 'seconds').unix();
   }
 
   // TODO: error -> errorCode, if it is code actually

@@ -29,20 +29,21 @@ class WallPostsSearch extends React.Component {
       extractAuthData,
       offerAuthRedirect,
       accessToken,
-      location,
+      location, // TODO: location: { hash, pathname },
       match,
-      history,
     } = this.props;
+    const { hash, pathname } = location;
+    const parsedData = extractAuthData(hash.substr(1), pathname);
 
-    console.log('match obj ', match);
-    console.log('location obj ', location);
+    // TODO: display message to user if error was parsed
+    // also prevent repeated auth offer ?
 
-    if (extractAuthData(location.hash.substr(1))) {
-      // or set url as match.url
-      window.history.replaceState(null, document.title, location.pathname);
+    if (parsedData) {
+      if (parsedData.accessToken) {
+        console.info('new accessToken was retrieved: ', parsedData.accessToken);
+      }
       return;
     }
-    // window.history.replaceState(null, document.title, location.pathname); //  ???
 
     if (!accessToken) {
       offerAuthRedirect();

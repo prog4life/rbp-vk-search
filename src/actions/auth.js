@@ -73,17 +73,22 @@ export const saveAuthData = (accessToken, tokenExpiresAt, userId = '') => ({
   userId,
 });
 
-export const extractAuthData = hash => (dispatch) => {
+export const extractAuthData = (hash, pathname) => (dispatch) => {
   const parsedHash = parseAccessTokenHash(hash);
+
+  if (!parsedHash) {
+    return false;
+  }
   const { accessToken, tokenExpiresAt, userId, error } = parsedHash;
+
+  window.history.replaceState(null, document.title, pathname);
 
   if (error) {
     dispatch(receiveTokenError(error, parsedHash.errorDescription));
   }
-  if (!accessToken) {
-    return false;
+  if (accessToken) {
+    dispatch(saveAuthData(accessToken, tokenExpiresAt, userId));
   }
-  dispatch(saveAuthData(accessToken, tokenExpiresAt, userId));
 
   // TODO: consider to use out of here
   if (userId) {
