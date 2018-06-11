@@ -21,17 +21,14 @@ class RedirectToAuthModal extends React.Component {
   handleRedirectClick = () => {
     const { onRedirectClick } = this.props;
 
-    // this.setState({ isOpened: false });
-
     onRedirectClick();
   }
   handleClose = () => {
     const { isRedirecting, onCancelRedirect } = this.props;
-    // TODO: dispatch "reject auth redirect" to set "hasAuthOffer" to false
+
     if (!isRedirecting) {
       onCancelRedirect();
     }
-
     this.setState({ isOpened: false });
   }
   render() {
