@@ -8,7 +8,6 @@ import { getSortedPosts, getSearchIsActive, getAccessToken } from 'selectors';
 import TopBarContainer from 'containers/TopBarContainer';
 import SearchForm from 'components/SearchForm';
 import ResultsPanel from 'components/ResultsPanel';
-import ResultsFilter from 'components/ResultsFilter';
 import ResultsList from 'components/ResultsList';
 import DelayedRender from 'components/common/DelayedRender';
 import ErrorBoundary from 'components/common/ErrorBoundary';
@@ -105,7 +104,6 @@ class WallPostsSearch extends React.Component {
           onStartSearch={this.handleSearchStart}
         />
         <ResultsPanel header="This is a panel with search results">
-          <ResultsFilter filterText="Here will be filter text" />
           <ResultsList results={posts} />
           {/* <ResultsListContainer /> */}
         </ResultsPanel>
