@@ -64,7 +64,7 @@
         "config": {
           "resolve": {
             "modules": ["./src"],
-            "extensions": [".js", ".jsx"]
+            "extensions": [".js", ".jsx", "*"]
           }
         }
       }

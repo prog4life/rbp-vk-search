@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import * as actionCreators from 'actions';
 import { getSortedPosts, getSearchIsActive, getAccessToken } from 'selectors';
-import TopBar from 'components/TopBar';
+import TopBarContainer from 'containers/TopBarContainer';
 import SearchForm from 'components/SearchForm';
 import ResultsPanel from 'components/ResultsPanel';
 import ResultsFilter from 'components/ResultsFilter';
@@ -22,7 +22,6 @@ class WallPostsSearch extends React.Component {
 
     this.handleSearchStart = this.handleSearchStart.bind(this);
     this.handleSearchStop = this.handleSearchStop.bind(this);
-    this.handleNavSelect = this.handleNavSelect.bind(this);
   }
   componentDidMount() {
     const {
@@ -72,23 +71,9 @@ class WallPostsSearch extends React.Component {
   }
   handleSearchStop() {
     const { isSearchActive, terminateSearch } = this.props;
-    // TODO: check if search is active
+
     if (isSearchActive) {
       terminateSearch();
-    }
-  }
-  handleNavSelect(eventKey, event) {
-    console.log('Select: ', eventKey);
-
-    if (eventKey === 1.2) {
-      const { signOut } = this.props;
-      signOut();
-      this.handleSearchStop();
-      return;
-    }
-    if (eventKey === 2) {
-      const { redirectToAuth } = this.props;
-      redirectToAuth();
     }
   }
   render() {
@@ -99,19 +84,11 @@ class WallPostsSearch extends React.Component {
       posts,
       redirectToAuth,
       cancelAuthRedirect,
-      accessToken,
-      userId,
-      userName,
     } = this.props;
 
     return (
       <div className="wall-posts-search">
-        <TopBar
-          isLoggedIn={Boolean(accessToken)}
-          onNavSelect={this.handleNavSelect}
-          userId={userId}
-          userName={userName}
-        />
+        <TopBarContainer />
         {(hasAuthOffer || isRedirecting) &&
           <ErrorBoundary>
             <DelayedRender delay={3000}>
@@ -163,11 +140,9 @@ WallPostsSearch.propTypes = {
   offerAuthRedirect: PropTypes.func.isRequired,
   posts: PropTypes.arrayOf(PropTypes.object).isRequired,
   redirectToAuth: PropTypes.func.isRequired,
-  signOut: PropTypes.func.isRequired,
+  // signOut: PropTypes.func.isRequired,
   startWallPostsSearch: PropTypes.func.isRequired,
   terminateSearch: PropTypes.func.isRequired,
-  userId: PropTypes.string.isRequired,
-  userName: PropTypes.string.isRequired,
 };
 
 WallPostsSearch.defaultProps = {

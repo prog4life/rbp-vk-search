@@ -1,6 +1,7 @@
 import { createSelector } from 'reselect';
 import sortBy from 'lodash-es/sortBy';
 // import { sortItemsByNumField } from 'utils/sorting';
+import * as fromAuth from 'reducers/authReducer';
 import * as fromSearch from 'reducers/searchReducer';
 import * as fromPosts from 'reducers/postsReducer';
 
@@ -13,6 +14,8 @@ import * as fromPosts from 'reducers/postsReducer';
 // };
 
 export const getAuthData = state => state.auth;
+export const getUserId = state => fromAuth.getUserId(state.auth);
+export const getUserName = state => fromAuth.getUserName(state.auth);
 
 // TODO: extract "isTokenExpired" as separate selector ?
 export const getAccessToken = createSelector(

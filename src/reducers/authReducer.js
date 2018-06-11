@@ -8,7 +8,7 @@ import {
 } from 'constants/actionTypes';
 
 const defaultState = {
-  accessToken: '',
+  accessToken: null,
   tokenExpiresAt: null,
   userId: '',
   userName: '',
@@ -61,6 +61,9 @@ const authReducer = (state = defaultState, action) => {
 };
 
 export default authReducer;
+
+export const getUserId = state => state.userId;
+export const getUserName = state => state.userName;
 
 // export function accessToken(state = '', action) {
 //   switch (action.type) {

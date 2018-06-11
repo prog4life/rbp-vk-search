@@ -91,8 +91,8 @@ export const extractAuthData = (hash, pathname) => (dispatch) => {
   }
 
   // TODO: consider to use out of here
-  if (userId) {
-    dispatch(fetchUserName(userId, accessToken));
-  }
+  // if (userId) {
+  //   dispatch(fetchUserName(userId, accessToken));
+  // }
   return parsedHash;
 };
