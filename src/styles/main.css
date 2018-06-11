@@ -21,6 +21,15 @@
   margin-right: 0;
 }
 
+.search-result__title {
+  padding-bottom: 4px;
+}
+
+.search-result__content {
+  display: flex;
+  justify-content: space-between;
+}
+
 .search-form {
   /* margin: 0 auto; */
   margin-bottom: 1em;
@@ -78,4 +87,5 @@
 
 .post-timestamp {
   background-color: #d9edf7;
+  margin-left: 2px;
 }
