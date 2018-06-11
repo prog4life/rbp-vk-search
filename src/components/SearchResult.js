@@ -14,12 +14,11 @@ function SearchResult({ result, number }) {
   const linkToUserPage = `https://vk.com/id${authorId}`;
   const idLabel = `[post id: ${id}]`;
   const authorIdLabel = `[id${authorId}]`;
-  // const postDate = new Date(timestamp * 1000);
-  const postDate = new Date(1487830000000);
-  // postDate.setDayOfWeek(5);
-  postDate.setMonth(11);
-  postDate.setHours(4);
-  postDate.setMinutes(8);
+  const postDate = new Date(timestamp * 1000);
+  // const postDate = new Date(1487830000000);
+  // postDate.setMonth(11);
+  // postDate.setHours(4);
+  // postDate.setMinutes(8);
   // postDate.setYear(2015);
   const dayOfMonth = postDate.getDate();
   const incrMonth = postDate.getMonth() + 1;
@@ -50,7 +49,7 @@ function SearchResult({ result, number }) {
     <ListGroupItem>
       <div className="search-result__title">
         <span style={{
-          marginRight: '8px',
+          marginRight: '5px',
           padding: '0 4px',
           backgroundColor: '#dedede',
           textAlign: 'center',
