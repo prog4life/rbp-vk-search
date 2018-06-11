@@ -11,6 +11,7 @@ import {
   NO_VALID_TOKEN,
   RECEIVE_TOKEN_ERROR,
   REDIRECT_TO_AUTH,
+  CANCEL_AUTH_REDIRECT,
   OFFER_AUTH_REDIRECT,
 } from 'constants/actionTypes';
 
@@ -37,6 +38,7 @@ export const signOut = () => ({ type: SIGN_OUT });
 // TODO: dispatch it where it is reasonable
 export const noValidToken = () => ({ type: NO_VALID_TOKEN });
 export const offerAuthRedirect = () => ({ type: OFFER_AUTH_REDIRECT });
+export const cancelAuthRedirect = () => ({ type: CANCEL_AUTH_REDIRECT });
 export const fetchUserNameFail = () => ({ type: FETCH_USER_NAME_FAIL });
 
 export const redirectToAuth = () => {

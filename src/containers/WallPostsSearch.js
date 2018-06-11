@@ -98,6 +98,7 @@ class WallPostsSearch extends React.Component {
       hasAuthOffer,
       posts,
       redirectToAuth,
+      cancelAuthRedirect,
       accessToken,
       userId,
       userName,
@@ -117,6 +118,7 @@ class WallPostsSearch extends React.Component {
               <RedirectToAuthModal
                 isRedirecting={isRedirecting}
                 onRedirectClick={redirectToAuth}
+                onCancelRedirect={cancelAuthRedirect}
               />
             </DelayedRender>
           </ErrorBoundary>
@@ -155,6 +157,7 @@ const mapDispatchToProps = dispatch => (
 
 WallPostsSearch.propTypes = {
   accessToken: PropTypes.string,
+  cancelAuthRedirect: PropTypes.func.isRequired,
   extractAuthData: PropTypes.func.isRequired,
   hasAuthOffer: PropTypes.bool.isRequired,
   history: PropTypes.instanceOf(Object).isRequired,

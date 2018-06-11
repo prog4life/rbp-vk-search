@@ -2,6 +2,7 @@ import {
   SAVE_AUTH_DATA,
   SET_USER_NAME,
   REDIRECT_TO_AUTH,
+  CANCEL_AUTH_REDIRECT,
   OFFER_AUTH_REDIRECT,
   SIGN_OUT,
 } from 'constants/actionTypes';
@@ -39,6 +40,11 @@ const authReducer = (state = defaultState, action) => {
       return {
         ...state,
         hasAuthOffer: true,
+      };
+    case CANCEL_AUTH_REDIRECT:
+      return {
+        ...state,
+        hasAuthOffer: false,
       };
     case SIGN_OUT: // change to defaultState?
       return {

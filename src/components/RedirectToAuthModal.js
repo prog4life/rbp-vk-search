@@ -12,6 +12,7 @@ import {
 class RedirectToAuthModal extends React.Component {
   static propTypes = {
     isRedirecting: PropTypes.bool.isRequired,
+    onCancelRedirect: PropTypes.func.isRequired,
     onRedirectClick: PropTypes.func.isRequired,
   }
   state = {
@@ -25,7 +26,11 @@ class RedirectToAuthModal extends React.Component {
     onRedirectClick();
   }
   handleClose = () => {
+    const { isRedirecting, onCancelRedirect } = this.props;
     // TODO: dispatch "reject auth redirect" to set "hasAuthOffer" to false
+    if (!isRedirecting) {
+      onCancelRedirect();
+    }
 
     this.setState({ isOpened: false });
   }
