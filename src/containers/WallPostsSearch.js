@@ -14,7 +14,7 @@ import DelayedRender from 'components/common/DelayedRender';
 import ErrorBoundary from 'components/common/ErrorBoundary';
 import RedirectToAuthModal from 'components/RedirectToAuthModal';
 
-import ResultsListContainer from 'containers/ResultsListContainer';
+// import ResultsListContainer from 'containers/ResultsListContainer';
 
 class WallPostsSearch extends React.Component {
   constructor(props) {
@@ -30,7 +30,6 @@ class WallPostsSearch extends React.Component {
       offerAuthRedirect,
       accessToken,
       location, // TODO: location: { hash, pathname },
-      match,
     } = this.props;
     const { hash, pathname } = location;
     const parsedData = extractAuthData(hash.substr(1), pathname);
@@ -78,7 +77,7 @@ class WallPostsSearch extends React.Component {
       terminateSearch();
     }
   }
-  handleNavSelect(eventKey, e) {
+  handleNavSelect(eventKey, event) {
     console.log('Select: ', eventKey);
 
     if (eventKey === 1.2) {
@@ -127,7 +126,6 @@ class WallPostsSearch extends React.Component {
         <SearchForm
           isSearchActive={isSearchActive}
           onStartSearch={this.handleSearchStart}
-          // search={search}
         />
         <ResultsPanel header="This is a panel with search results">
           <ResultsFilter filterText="Here will be filter text" />
@@ -146,9 +144,7 @@ const mapStateToProps = state => ({
   tokenExpiresAt: state.auth.tokenExpiresAt,
   isRedirecting: state.auth.isRedirecting,
   hasAuthOffer: state.auth.hasAuthOffer,
-  // results: state.results,
   posts: getSortedPosts(state),
-  // search: state.search,
   isSearchActive: getSearchIsActive(state),
 });
 
@@ -161,25 +157,15 @@ WallPostsSearch.propTypes = {
   cancelAuthRedirect: PropTypes.func.isRequired,
   extractAuthData: PropTypes.func.isRequired,
   hasAuthOffer: PropTypes.bool.isRequired,
-  history: PropTypes.instanceOf(Object).isRequired,
   isRedirecting: PropTypes.bool.isRequired,
   isSearchActive: PropTypes.bool.isRequired,
-  location: PropTypes.instanceOf(Object).isRequired,
-  match: PropTypes.instanceOf(Object).isRequired,
+  location: PropTypes.shape({}).isRequired,
   offerAuthRedirect: PropTypes.func.isRequired,
   posts: PropTypes.arrayOf(PropTypes.object).isRequired,
-  // results: PropTypes.arrayOf(PropTypes.object).isRequired,
-  // search: PropTypes.shape({
-  //   isActive: PropTypes.bool,
-  //   total: PropTypes.number,
-  //   processed: PropTypes.number,
-  //   progress: PropTypes.number,
-  // }).isRequired,
   redirectToAuth: PropTypes.func.isRequired,
   signOut: PropTypes.func.isRequired,
   startWallPostsSearch: PropTypes.func.isRequired,
   terminateSearch: PropTypes.func.isRequired,
-  // tokenExpiresAt: PropTypes.number.isRequired
   userId: PropTypes.string.isRequired,
   userName: PropTypes.string.isRequired,
 };
