@@ -47,7 +47,6 @@ const searchProcessor = ({ dispatch, getState }) => {
   // };
 
   return next => (action) => {
-    const accessToken = getAccessToken(getState());
     // TODO: destructure from action callAPI and handleResponse functions with
     // imported defaults
     const { type, types, getNumberOfResults } = action;
@@ -76,6 +75,9 @@ const searchProcessor = ({ dispatch, getState }) => {
     if (!types.every(t => typeof t === 'string')) {
       throw new Error('Expected action types to be strings');
     }
+    const accessToken = getAccessToken(getState());
+
+    // TODO: consider to dispatch action with error message instead
     if (typeof accessToken !== 'string' || !accessToken.length) {
       throw new Error('Expected access token to be not empty string');
     }

@@ -25,6 +25,8 @@ class RedirectToAuthModal extends React.Component {
     onRedirectClick();
   }
   handleClose = () => {
+    // TODO: dispatch "reject auth redirect" to set "hasAuthOffer" to false
+
     this.setState({ isOpened: false });
   }
   render() {

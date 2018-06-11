@@ -10,7 +10,7 @@ import SearchForm from 'components/SearchForm';
 import ResultsPanel from 'components/ResultsPanel';
 import ResultsFilter from 'components/ResultsFilter';
 import ResultsList from 'components/ResultsList';
-import DelayingRender from 'components/common/DelayingRender';
+import DelayedRender from 'components/common/DelayedRender';
 import ErrorBoundary from 'components/common/ErrorBoundary';
 import RedirectToAuthModal from 'components/RedirectToAuthModal';
 
@@ -59,16 +59,16 @@ class WallPostsSearch extends React.Component {
   }
   handleSearchStart = (inputData) => {
     const {
-      startWallPostsSearch, checkAccessToken, redirectToAuth,
+      startWallPostsSearch, accessToken, offerAuthRedirect,
     } = this.props;
 
-    if (checkAccessToken()) {
+    if (accessToken) {
       console.log('FORM STATE: ', inputData); // TEMP
       startWallPostsSearch(inputData);
       return;
     }
     // TODO: save input values to localStorage; show redirection notification
-    redirectToAuth();
+    offerAuthRedirect();
   }
   handleSearchStop() {
     const { isSearchActive, terminateSearch } = this.props;
@@ -113,12 +113,12 @@ class WallPostsSearch extends React.Component {
         />
         {(hasAuthOffer || isRedirecting) &&
           <ErrorBoundary>
-            <DelayingRender delay={3000}>
+            <DelayedRender delay={3000}>
               <RedirectToAuthModal
                 isRedirecting={isRedirecting}
                 onRedirectClick={redirectToAuth}
               />
-            </DelayingRender>
+            </DelayedRender>
           </ErrorBoundary>
         }
         <SearchForm
@@ -154,7 +154,7 @@ const mapDispatchToProps = dispatch => (
 );
 
 WallPostsSearch.propTypes = {
-  accessToken: PropTypes.string.isRequired,
+  accessToken: PropTypes.string,
   extractAuthData: PropTypes.func.isRequired,
   hasAuthOffer: PropTypes.bool.isRequired,
   history: PropTypes.instanceOf(Object).isRequired,
@@ -171,12 +171,17 @@ WallPostsSearch.propTypes = {
   //   processed: PropTypes.number,
   //   progress: PropTypes.number,
   // }).isRequired,
+  redirectToAuth: PropTypes.func.isRequired,
   signOut: PropTypes.func.isRequired,
   startWallPostsSearch: PropTypes.func.isRequired,
   terminateSearch: PropTypes.func.isRequired,
   // tokenExpiresAt: PropTypes.number.isRequired
   userId: PropTypes.string.isRequired,
   userName: PropTypes.string.isRequired,
+};
+
+WallPostsSearch.defaultProps = {
+  accessToken: null,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(WallPostsSearch);

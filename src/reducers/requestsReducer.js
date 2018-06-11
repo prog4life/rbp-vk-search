@@ -15,9 +15,16 @@ import { addIfNotExist, createReducer } from './reducerUtils';
 //   byOffset: {},
 //   pendingList: [],
 //   failedList: [],
+//   IDEA:
+//   errors: [
+//     {
+//       offset: 300,
+//       attempt: 2,
+//       message: 'Description of error',
+//     },
+//     ...
+//   ],
 // };
-
-// TODO: change id to offset -> requestsByOffset
 
 const byOffset = createReducer({}, {
   [SEARCH_REQUEST]: (state, { offset, startTime }) => ({

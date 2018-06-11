@@ -18,6 +18,9 @@ const initialState = {
     pending: [],
     failed: [],
   },
+  // IDEA:
+  // searchedItems: '', <- itemsName
+  // error: '',
 };
 
 const search = (state = initialState, action) => {

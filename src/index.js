@@ -3,8 +3,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import debounce from 'lodash-es/debounce';
 
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import 'bootstrap/dist/css/bootstrap-theme.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap-theme.min.css';
 
 import configureStore from 'store/configureStore';
 import { loadState, saveState } from 'utils/localStorage';

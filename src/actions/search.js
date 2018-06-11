@@ -1,59 +1,12 @@
-import {
-  FETCH_WALL_POSTS_REQUEST, POSTS_RECEIVED, FETCH_WALL_POSTS_FAIL,
-  TERMINATE_SEARCH,
-} from 'constants/actionTypes';
+import { POSTS_RECEIVED, TERMINATE_SEARCH } from 'constants/actionTypes';
 import {
   apiVersion, count, offsetModifier, requestInterval, inputDefaults,
 } from 'config/common';
 import { SEARCH_CONFIG } from 'middleware/searchProcessor';
 import { getIdsOfPosts } from 'selectors';
 
-// export const addResults = (results, limit, order = defaultOrder) => ({
-//   type: 'ADD_RESULTS',
-//   results,
-//   limit,
-//   order,
-// });
-
-export const requestStart = (offset, attempt = 1) => ({
-  type: 'SEARCH_REQUEST',
-  offset,
-  startTime: Date.now(),
-  attempt,
-});
-
-export const requestSuccess = offset => ({
-  type: 'SEARCH_REQUEST_SUCCESS',
-  offset,
-});
-
-export const requestFail = (offset, attempt = 1) => ({
-  type: 'SEARCH_REQUEST_FAIL',
-  offset,
-  attempt,
-});
-
-export const updateSearch = (total, processed) => ({
-  type: 'SEARCH_UPDATE',
-  total,
-  processed,
-});
-
-// export const wallPostsSearchEnd = () => ({
-//   type: SEARCH_END,
-// });
-
 export const terminateSearch = () => ({
   type: TERMINATE_SEARCH,
-});
-
-export const searchTimerTick = () => ({
-  type: 'SEARCH_TIMER_TICK',
-});
-
-export const setSearchIntervalId = id => ({
-  type: 'SET_SEARCH_INTERVAL_ID',
-  intervalId: id,
 });
 
 // NOTE: can retrieve info about author of posts at wall using wall.get with
@@ -91,15 +44,17 @@ export const startWallPostsSearch = (inputData) => {
       POSTS_RECEIVED,
       // SEARCH_END,
     ],
-    // TODO:
-    // getEndpoint() or getToken() instead of endpoint
-    getNumberOfResults: state => getIdsOfPosts(state).length,
+    // TODO: getEndpoint() or getToken() instead of endpoint
+    // state => number of searched items
+    getNumberOfResults: state => getIdsOfPosts(state).length, // OR:
+    // IDEA:
+    // pass searchTarget/itemsName/searchedItems ('WallPosts' || 'WALL_POSTS')
     [SEARCH_CONFIG]: {
       searchResultsLimit,
       authorId: postAuthorId,
       baseAPIReqUrl,
       // TODO: schema: 'wall-posts',
-      // next 2 is optional, defaults must be passed to middleware factory
+      // next 2 is optional, defaults should be passed to middleware factory
       offsetModifier, // should be equal to request url "count" param value
       requestInterval,
     },
