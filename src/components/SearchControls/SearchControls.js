@@ -2,9 +2,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { ProgressBar, ButtonToolbar, Button } from 'react-bootstrap';
 
-// import SearchControlButtons from 'components/SearchControlButtons';
-import ProgressViewer from 'components/ProgressViewer';
-import SearchStatus from 'components/SearchStatus';
+import './style.scss';
+
+// import SearchControlButtons from './SearchControlButtons';
+import ProgressViewer from './ProgressViewer';
+import SearchStatus from './SearchStatus';
 
 class SearchControls extends Component {
   // componentWillUnmount() {
@@ -37,7 +39,7 @@ class SearchControls extends Component {
           onStopClick={terminateSearch}
         /> */}
         {/* TODO: add RESET button for completed state ? */}
-        <ButtonToolbar className="search-controls__search-buttons">
+        <ButtonToolbar className="search-controls__button-toolbar">
           {isSearchActive
             ?
               <Button
@@ -68,7 +70,7 @@ class SearchControls extends Component {
             />
             <ProgressBar
               bsStyle="info"
-              className="progress-viewer__progress-bar"
+              className="search-controls__progress-bar"
               label={Number.isFinite(progress) ? `${progress}%` : ''}
               now={Number.isFinite(progress) ? progress : undefined}
             />
@@ -90,7 +92,7 @@ class SearchControls extends Component {
 //     </p>
 //     <ProgressBar
 //       bsStyle="info"
-//       className="progress-viewer__progress-bar"
+//       className="search-controls__progress-bar"
 //       label={Number.isFinite(progress) ? `${progress}%` : ''}
 //       now={progress || undefined}
 //     />

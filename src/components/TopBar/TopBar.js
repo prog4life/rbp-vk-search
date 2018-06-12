@@ -2,10 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Navbar } from 'react-bootstrap';
-// TODO: try
-// import {
-//   Navbar, NavbarText, NavbarLink, NavbarHeader, NavbarBrand, NavbarCollapse,
-// } from 'react-bootstrap';
 
 import NavAuth from './NavAuth';
 import SignInNav from './SignInNav';

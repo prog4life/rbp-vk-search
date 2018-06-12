@@ -2,13 +2,13 @@ import React from 'react';
 import pt from 'prop-types';
 import { ListGroup, ListGroupItem } from 'react-bootstrap';
 // import uuidv1 from 'uuid/v1';
-import SearchResult from './SearchResult';
+import PostSearchResult from './PostSearchResult';
 
 const renderResultsList = results => (
   results.map((result, index) => (
     // TODO: replace key by post_id
     <ListGroupItem key={result.id}>
-      <SearchResult
+      <PostSearchResult
         number={index + 1}
         result={result}
       />

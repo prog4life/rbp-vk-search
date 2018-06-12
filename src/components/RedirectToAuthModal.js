@@ -36,36 +36,34 @@ class RedirectToAuthModal extends React.Component {
     const { isRedirecting } = this.props;
 
     return (
-      <div className="redirect-offer-modal">
-        {/* <Modal show={isOpened} onHide={this.handleClose}> */}
-        <Modal show={isOpened}>
-          <ModalHeader>
-            <ModalTitle>
-              {isRedirecting
-                ? 'Redirecting...'
-                : 'Redirection for authentication'
-              }
-            </ModalTitle>
-          </ModalHeader>
-          <ModalBody>
+      // onHide={this.handleClose}
+      <Modal show={isOpened}>
+        <ModalHeader>
+          <ModalTitle>
             {isRedirecting
-              ? 'Wait please. You will sign in soon'
-              : `You must be logged in with vk.com to search.
-                Redirect to sign in page now?`
+              ? 'Redirecting...'
+              : 'Redirection for authentication'
             }
-          </ModalBody>
-          <ModalFooter>
-            {isRedirecting ||
-              <Button onClick={this.handleRedirectClick}>
-                {'Redirect'}
-              </Button>
-            }
-            <Button onClick={this.handleClose}>
-              {isRedirecting ? 'OK' : 'Later'}
+          </ModalTitle>
+        </ModalHeader>
+        <ModalBody>
+          {isRedirecting
+            ? 'Wait please. You will sign in soon'
+            : `You must be logged in with vk.com to search.
+              Redirect to sign in page now?`
+          }
+        </ModalBody>
+        <ModalFooter>
+          {isRedirecting ||
+            <Button onClick={this.handleRedirectClick}>
+              {'Redirect'}
             </Button>
-          </ModalFooter>
-        </Modal>
-      </div>
+          }
+          <Button onClick={this.handleClose}>
+            {isRedirecting ? 'OK' : 'Later'}
+          </Button>
+        </ModalFooter>
+      </Modal>
     );
   }
 }

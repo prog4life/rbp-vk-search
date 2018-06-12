@@ -5,11 +5,13 @@ import { reduxForm, Field } from 'redux-form';
 import { Grid, Row, Col } from 'react-bootstrap';
 
 import ControlsContainer from 'containers/ControlsContainer';
-import PostAuthorIdField from './common/PostAuthorIdField';
-import WallOwnerIdField from './common/WallOwnerIdField';
-import OwnerShortNameField from './common/OwnerShortNameField';
-import WallOwnerTypeSelect from './common/WallOwnerTypeSelect';
-import SearchResultsLimitField from './common/SearchResultsLimitField';
+import PostAuthorIdField from 'components/common/PostAuthorIdField';
+import WallOwnerIdField from 'components/common/WallOwnerIdField';
+import OwnerShortNameField from 'components/common/OwnerShortNameField';
+import WallOwnerTypeSelect from 'components/common/WallOwnerTypeSelect';
+import SearchResultsLimitField from 'components/common/SearchResultsLimitField';
+
+import './style.scss';
 
 const propTypes = {
   handleSubmit: PropTypes.func.isRequired,
@@ -17,7 +19,7 @@ const propTypes = {
   onStartSearch: PropTypes.func.isRequired,
 };
 
-class SearchForm extends React.Component { // TODO: use PureComponent ?
+class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
   constructor(props) {
     super(props);
 
@@ -84,7 +86,7 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
     return (
       <Grid>
         <form
-          className="search-form"
+          className="posts-search-form"
           onSubmit={handleSubmit(this.handleSubmit)}
         >
           <Row>
@@ -137,7 +139,7 @@ class SearchForm extends React.Component { // TODO: use PureComponent ?
   }
 }
 
-SearchForm.propTypes = propTypes;
+PostsSearchForm.propTypes = propTypes;
 
 export default reduxForm({
   form: 'wall-posts',
@@ -145,4 +147,4 @@ export default reduxForm({
     wallOwnerType: 'group',
   },
   // onSubmit: component.handleSubmit,
-})(SearchForm);
+})(PostsSearchForm);

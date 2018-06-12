@@ -1,0 +1,38 @@
+.search-controls {
+  margin-top: 1.75em;
+  margin-bottom: 10px;
+}
+
+.search-controls__button-toolbar {
+  display: inline-block;
+}
+
+.search-controls__progress-viewer {
+  float: right;
+  min-width: 63%;
+}
+
+/* TODO: cut overflowing text if it is too long */
+.search-status {
+  margin-bottom: 0;
+  line-height: 1;
+  font-size: 13px;
+  text-align: center;
+}
+
+.search-controls__progress-bar {
+  margin-bottom: 0;
+}
+
+/* bootstrap class */
+.progress-bar {
+  color: #212121;
+
+  /* min-width: 2em; */
+}
+
+@media (max-width: 767px) {
+  .search-controls {
+    margin-top: 0.25em;
+  }
+}

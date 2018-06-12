@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { ButtonToolbar, Button } from 'react-bootstrap';
 
 const SearchControlButtons = ({ isSearchActive, onStopClick }) => (
-  // <ButtonToolbar className="search-buttons">
+  // <ButtonToolbar className="search-controls__button-toolbar">
   //   <Button
   //     bsStyle="info"
   //     disabled={isSearchActive}
@@ -17,7 +17,7 @@ const SearchControlButtons = ({ isSearchActive, onStopClick }) => (
   //     </Button>
   //   }
   // </ButtonToolbar>
-  <ButtonToolbar className="search-buttons">
+  <ButtonToolbar className="search-controls__button-toolbar">
     {isSearchActive
       ?
         <Button

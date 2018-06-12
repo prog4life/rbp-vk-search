@@ -1,0 +1,15 @@
+.search-result__title {
+  display: flex;
+  padding-bottom: 4px;
+}
+
+.search-result__content {
+  display: flex;
+  justify-content: space-between;
+}
+
+.post-timestamp {
+  background-color: #d9edf7;
+  margin: 0 3px;
+  padding: 0 2px;
+}

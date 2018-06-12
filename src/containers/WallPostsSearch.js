@@ -6,10 +6,10 @@ import PropTypes from 'prop-types';
 import * as actionCreators from 'actions';
 import { getSortedPosts, getSearchIsActive, getAccessToken } from 'selectors';
 import TopBarContainer from 'containers/TopBarContainer';
-import SearchForm from 'components/SearchForm';
+import PostsSearchForm from 'components/PostsSearchForm';
 import ResultsPanel from 'components/ResultsPanel';
-import ResultsList from 'components/ResultsPanel/ResultsList';
-import ResultsFilter from 'components/ResultsPanel/ResultsFilter';
+import ResultsList from 'components/ResultsList';
+import ResultsFilter from 'components/SearchResultsFilter';
 import DelayedRender from 'components/common/DelayedRender';
 import ErrorBoundary from 'components/common/ErrorBoundary';
 import RedirectToAuthModal from 'components/RedirectToAuthModal';
@@ -100,7 +100,7 @@ class WallPostsSearch extends React.Component {
             </DelayedRender>
           </ErrorBoundary>
         }
-        <SearchForm
+        <PostsSearchForm
           isSearchActive={isSearchActive}
           onStartSearch={this.handleSearchStart}
         />

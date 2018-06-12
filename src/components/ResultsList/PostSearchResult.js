@@ -4,9 +4,11 @@ import PropTypes from 'prop-types';
 
 import { makeTextualMonth, makeZeroedMinutes } from 'utils/dateFormat';
 
+import './style.scss';
+
 // TODO: rename to SearchedPostResult or PostSearchResult
 
-function SearchResult({ result, number }) {
+function PostSearchResult({ result, number }) {
   const {
     timestamp, authorId, id, text, link,
   } = result;
@@ -107,9 +109,9 @@ function SearchResult({ result, number }) {
   );
 }
 
-export default SearchResult;
+export default PostSearchResult;
 
-SearchResult.propTypes = {
+PostSearchResult.propTypes = {
   number: PropTypes.number.isRequired,
   result: PropTypes.shape({
     timestamp: PropTypes.number.isRequired,

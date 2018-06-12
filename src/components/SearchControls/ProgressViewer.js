@@ -29,7 +29,7 @@ ProgressViewer.defaultProps = {
 //     </p>
 //     <ProgressBar
 //       bsStyle="info"
-//       className="progress-viewer__progress-bar"
+//       className="search-controls__progress-bar"
 //       label={progress ? `${progress}%` : ''}
 //       now={progress || undefined}
 //     />

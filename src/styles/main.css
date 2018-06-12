@@ -17,77 +17,9 @@
   border: 1px solid rgb(111, 201, 55); */
 }
 
-.nav-auth {
-  margin-right: 0;
-}
-
-.search-result__title {
-  display: flex;
-  padding-bottom: 4px;
-}
-
-.search-result__content {
-  display: flex;
-  justify-content: space-between;
-}
-
-.search-form {
-  /* margin: 0 auto; */
-  margin-bottom: 1em;
-
-  /* width: 70%; */
-}
-
-.search-form button:focus {
-  outline: none;
-}
-
-.search-controls {
-  margin-top: 1.75em;
-  margin-bottom: 10px;
-}
-
-.search-controls__search-buttons {
-  display: inline-block;
-}
-
-.search-controls__progress-viewer {
-  float: right;
-  min-width: 63%;
-}
-
-/* TODO: cut overflowing text if it is too long */
-.search-status {
-  margin-bottom: 0;
-  line-height: 1;
-  font-size: 13px;
-  text-align: center;
-}
-
-.progress-viewer__progress-bar {
-  margin-bottom: 0;
-}
-
-/* bootstrap class */
-.progress-bar {
-  color: #212121;
-
-  /* min-width: 2em; */
-}
-
 @media (max-width: 767px) {
-  .search-controls {
-    margin-top: 0.25em;
-  }
-
   /* NOTE: bootstrap classes */
   .navbar-collapse .dropdown a {
     text-align: right;
   }
-}
-
-.post-timestamp {
-  background-color: #d9edf7;
-  margin: 0 3px;
-  padding: 0 2px;
 }
