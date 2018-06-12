@@ -6,9 +6,9 @@ import { makeTextualMonth, makeZeroedMinutes } from 'utils/dateFormat';
 
 import './style.scss';
 
-// TODO: rename to SearchedPostResult or PostSearchResult
+// TODO: rename to SearchedPostResult or FoundPost
 
-function PostSearchResult({ result, number }) {
+function FoundPost({ result, number }) {
   const {
     timestamp, authorId, id, text, link,
   } = result;
@@ -33,7 +33,7 @@ function PostSearchResult({ result, number }) {
 
   return (
     <Fragment>
-      <div className="search-result__title">
+      <div className="found-post__title">
         <div style={{
           marginRight: '5px',
           // padding: '0 4px',
@@ -54,12 +54,12 @@ function PostSearchResult({ result, number }) {
           </span>
         </div>
         <div style={{ minWidth: '180px' }}>
-          <span className="post-timestamp">
+          <span className="found-post__timestamp">
             {/* {moment.unix(timestamp).format('D MMM YYYY  H:mm')} */}
             {`${dayOfMonth} ${month} ${year}`}
             {/* {timestampString} */}
           </span>
-          <span className="post-timestamp">
+          <span className="found-post__timestamp">
             {`${hours}:${minutes}`}
           </span>
         </div>
@@ -88,7 +88,7 @@ function PostSearchResult({ result, number }) {
           </span>
         </div>
       </div>
-      <div className="search-result__content">
+      <div className="found-post__content">
         <p style={{ flex: 9, paddingRight: '8px' }}>
           {text}
         </p>
@@ -109,9 +109,9 @@ function PostSearchResult({ result, number }) {
   );
 }
 
-export default PostSearchResult;
+export default FoundPost;
 
-PostSearchResult.propTypes = {
+FoundPost.propTypes = {
   number: PropTypes.number.isRequired,
   result: PropTypes.shape({
     timestamp: PropTypes.number.isRequired,
@@ -122,9 +122,8 @@ PostSearchResult.propTypes = {
   }).isRequired,
 };
 
-
 // const searchResultsTitle = (
-//   <div className="search-result__title">
+//   <div className="found-post__title">
 //     <span style={{
 //       marginRight: '5px',
 //       padding: '0 4px',
@@ -135,12 +134,12 @@ PostSearchResult.propTypes = {
 //     >
 //       {resultNumber}
 //     </span>
-//     <span className="post-timestamp">
+//     <span className="found-post__timestamp">
 //       {/* {moment.unix(timestamp).format('D MMM YYYY  H:mm')} */}
 //       {`${dayOfMonth} ${month} ${year}`}
 //       {/* {timestampString} */}
 //     </span>
-//     <span className="post-timestamp">
+//     <span className="found-post__timestamp">
 //       {`${hours}:${minutes}`}
 //     </span>
 //     {/* <span>

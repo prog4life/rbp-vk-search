@@ -2,13 +2,13 @@ import React from 'react';
 import pt from 'prop-types';
 import { ListGroup, ListGroupItem } from 'react-bootstrap';
 // import uuidv1 from 'uuid/v1';
-import PostSearchResult from './PostSearchResult';
+import FoundPost from './FoundPost';
 
 const renderResultsList = results => (
   results.map((result, index) => (
     // TODO: replace key by post_id
     <ListGroupItem key={result.id}>
-      <PostSearchResult
+      <FoundPost
         number={index + 1}
         result={result}
       />
@@ -16,7 +16,7 @@ const renderResultsList = results => (
   ))
 );
 
-function ResultsList({ results }) {
+function FoundPostsList({ posts }) {
   const noResultsItem = (
     <ListGroupItem style={{ textAlign: 'center' }}>
       {'No results yet'}
@@ -25,22 +25,22 @@ function ResultsList({ results }) {
 
   return (
     <ListGroup>
-      {results && results.length // TODO: show different message on null and []
-        ? renderResultsList(results)
+      {posts && posts.length // TODO: show different message on null and []
+        ? renderResultsList(posts)
         : noResultsItem
       }
     </ListGroup>
   );
 }
 
-ResultsList.propTypes = {
-  results: pt.arrayOf(pt.shape({
+FoundPostsList.propTypes = {
+  posts: pt.arrayOf(pt.shape({
     id: pt.number.isRequired,
   })),
 };
 
-ResultsList.defaultProps = {
-  results: null,
+FoundPostsList.defaultProps = {
+  posts: null,
 };
 
-export default ResultsList;
+export default FoundPostsList;

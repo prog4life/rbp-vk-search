@@ -1,9 +1,9 @@
 import { connect } from 'react-redux';
 
-import ResultsList from 'components/ResultsList';
+import FoundPostsList from 'components/FoundPostsList';
 
 const mapStateToProps = ({ results }) => ({
   results,
 });
 
-export default connect(mapStateToProps)(ResultsList);
+export default connect(mapStateToProps)(FoundPostsList);

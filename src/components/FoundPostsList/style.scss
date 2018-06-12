@@ -1,14 +1,14 @@
-.search-result__title {
+.found-post__title {
   display: flex;
   padding-bottom: 4px;
 }
 
-.search-result__content {
+.found-post__content {
   display: flex;
   justify-content: space-between;
 }
 
-.post-timestamp {
+.found-post__timestamp {
   background-color: #d9edf7;
   margin: 0 3px;
   padding: 0 2px;
