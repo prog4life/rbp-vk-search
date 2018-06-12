@@ -75,7 +75,7 @@ function SearchResult({ result, number }) {
               {'Author'}
             </span>
             <a
-              style={{ padding: '0 8px' }}
+              style={{ padding: '0 10px' }}
               href={linkToUserPage}
               target="_blank"
             >
@@ -85,11 +85,17 @@ function SearchResult({ result, number }) {
         </div>
       </div>
       <div className="search-result__content">
-        <p style={{ paddingRight: '8px' }}>
+        <p style={{ flex: 9, paddingRight: '8px' }}>
           {text}
         </p>
-        {/* TODO: change textAlign to right at xxl braekpoint */}
-        <div style={{ minWidth: '10%', textAlign: 'center' }}>
+        {/* TODO: add minWidth and change textAlign to right at xxl braekpoint */}
+        <div style={{
+          // minWidth: '10%',
+          flex: 1,
+          textAlign: 'center',
+          // paddingLeft: '8px',
+        }}
+        >
           <a href={link} target="_blank">
             {linkText}
           </a>
