@@ -7,7 +7,6 @@ import * as fromPosts from 'reducers/postsReducer';
 
 // const state = {
 //   auth,
-//   results,
 //   posts,
 //   search,
 //   form,
@@ -73,6 +72,9 @@ export const getSortedPosts = createSelector(
   // TODO: rename order to reverse ?
   (state, filter, order = 'desc') => order,
   (postsById, filter, order) => {
+    if (!postsById) {
+      return null;
+    }
     const arrayOfPosts = Object.values(postsById);
     const sorted = sortBy(arrayOfPosts, [filter]);
 

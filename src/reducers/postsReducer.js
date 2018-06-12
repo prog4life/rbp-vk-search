@@ -21,7 +21,7 @@ import { createReducer, makeUnion } from './reducerUtils';
 // TODO: cut excess results at SEARCH_END
 // TODO: add flag to check to show or not intermediate results during search
 
-const byId = createReducer({}, {
+const byId = createReducer(null, {
   [POSTS_RECEIVED]: (state, action) => (
     action.ids.length > 0
       ? { ...state, ...action.itemsById }
@@ -30,7 +30,7 @@ const byId = createReducer({}, {
   [SEARCH_START]: () => ({}),
 });
 
-const ids = createReducer({}, {
+const ids = createReducer(null, {
   [POSTS_RECEIVED]: (state, action) => (
     action.ids.length > 0
       ? makeUnion(state, action.ids)

@@ -1,16 +1,13 @@
 import React from 'react';
-import {
-  Panel, PanelTitle, PanelHeading, PanelBody, Grid,
-} from 'react-bootstrap';
+import pT from 'prop-types';
+import { Panel, PanelHeading, Grid } from 'react-bootstrap';
 
-import ResultsFilter from 'components/ResultsFilter';
-
-function ResultsPanel({ children, header }) {
+function ResultsPanel({ children, heading }) {
   return (
     <Grid>
-      <Panel header={header} bsStyle="info">
+      <Panel bsStyle="info">
         <PanelHeading>
-          <ResultsFilter />
+          {heading}
         </PanelHeading>
         {/* <PanelTitle>{'Test Title'}</PanelTitle> */}
         {/* <PanelBody>{'Test Body'}</PanelBody> */}
@@ -19,5 +16,10 @@ function ResultsPanel({ children, header }) {
     </Grid>
   );
 }
+
+ResultsPanel.propTypes = {
+  children: pT.node.isRequired,
+  heading: pT.node.isRequired,
+};
 
 export default ResultsPanel;

@@ -8,7 +8,8 @@ import { getSortedPosts, getSearchIsActive, getAccessToken } from 'selectors';
 import TopBarContainer from 'containers/TopBarContainer';
 import SearchForm from 'components/SearchForm';
 import ResultsPanel from 'components/ResultsPanel';
-import ResultsList from 'components/ResultsList';
+import ResultsList from 'components/ResultsPanel/ResultsList';
+import ResultsFilter from 'components/ResultsPanel/ResultsFilter';
 import DelayedRender from 'components/common/DelayedRender';
 import ErrorBoundary from 'components/common/ErrorBoundary';
 import RedirectToAuthModal from 'components/RedirectToAuthModal';
@@ -103,9 +104,8 @@ class WallPostsSearch extends React.Component {
           isSearchActive={isSearchActive}
           onStartSearch={this.handleSearchStart}
         />
-        <ResultsPanel header="This is a panel with search results">
+        <ResultsPanel heading={<ResultsFilter />}>
           <ResultsList results={posts} />
-          {/* <ResultsListContainer /> */}
         </ResultsPanel>
       </div>
     );
@@ -136,7 +136,7 @@ WallPostsSearch.propTypes = {
   isSearchActive: PropTypes.bool.isRequired,
   location: PropTypes.shape({}).isRequired,
   offerAuthRedirect: PropTypes.func.isRequired,
-  posts: PropTypes.arrayOf(PropTypes.object).isRequired,
+  posts: PropTypes.arrayOf(PropTypes.object),
   redirectToAuth: PropTypes.func.isRequired,
   // signOut: PropTypes.func.isRequired,
   startWallPostsSearch: PropTypes.func.isRequired,
@@ -145,6 +145,7 @@ WallPostsSearch.propTypes = {
 
 WallPostsSearch.defaultProps = {
   accessToken: null,
+  posts: null,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(WallPostsSearch);

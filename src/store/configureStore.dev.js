@@ -30,7 +30,7 @@ const watcher = immutabilityWatcher();
 
 const middleware = [watcher, search, sagaMiddleware, thunk, logger];
 
-const configureStore = (preloadedState = {}) => {
+const configureStore = (preloadedState) => {
   const composeEnhancers = composeWithDevTools({
     name: 'vk-search',
     // realtime: true,

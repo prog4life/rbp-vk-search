@@ -30,7 +30,7 @@ const middleware = process.env.NODE_ENV === 'development'
   ? [search, thunk] // watcher(was 1st) and logger(was last) were removed
   : [search, thunk];
 
-const configureStore = (preloadedState = {}) => {
+const configureStore = (preloadedState) => {
   // const composeEnhancers = composeWithDevTools({
   //   realtime: true,
   //   port: 8000, // the port local "remotedev-server" is running at

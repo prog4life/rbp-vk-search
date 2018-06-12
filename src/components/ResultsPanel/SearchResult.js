@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 // import moment from 'moment';
-import { ListGroupItem } from 'react-bootstrap';
 
 import { makeTextualMonth, makeZeroedMinutes } from 'utils/dateFormat';
+
+// TODO: rename to SearchedPostResult or PostSearchResult
 
 function SearchResult({ result, number }) {
   const {
@@ -29,7 +30,7 @@ function SearchResult({ result, number }) {
   // const timestampString = postDate.toLocaleString('en-GB').slice(0, -3);
 
   return (
-    <ListGroupItem>
+    <Fragment>
       <div className="search-result__title">
         <div style={{
           marginRight: '5px',
@@ -63,6 +64,7 @@ function SearchResult({ result, number }) {
         {/* <span>
           {idLabel}
         </span> */}
+        {/* TODO: Remove left auto margin when > xs */}
         <div style={{ marginLeft: 'auto' }}>
           <span style={{ border: '1px solid #dedede' }}>
             <span style={{
@@ -101,7 +103,7 @@ function SearchResult({ result, number }) {
           </a>
         </div>
       </div>
-    </ListGroupItem>
+    </Fragment>
   );
 }
 

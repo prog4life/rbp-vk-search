@@ -15,6 +15,7 @@ import 'styles/main.css';
 
 console.log('process.env.NODE_ENV: ', process.env.NODE_ENV);
 
+// TEMP
 const posts = {
   byId: {
     54525: {
@@ -37,15 +38,23 @@ const posts = {
   },
   ids: [54525, 13585],
 };
+// const posts = null;
 
-const persistedState = loadState('vk-search-state') || {};
+const persistedState = loadState('vk-search-state') || undefined;
+const preloadedState = persistedState || posts
+  ? {
+    ...(persistedState || {}),
+    // TEMP
+    ...({ posts } || {}),
+  }
+  : undefined;
 
-const store = configureStore({
-  ...persistedState,
-  posts,
-});
+const store = configureStore(preloadedState);
 
-store.subscribe(() => console.log('State update ', (new Date()).toLocaleTimeString()));
+store.subscribe(() => console.log(
+  'State update ',
+  (new Date()).toLocaleTimeString('en-Gb'),
+));
 
 // TODO: wrap in throttle or debounce
 const saveStateDebounced = debounce(() => {
@@ -54,7 +63,10 @@ const saveStateDebounced = debounce(() => {
     auth: { ...auth, isRedirecting: false, hasAuthOffer: false },
   };
 
-  console.log('save state debounced ', (new Date()).toLocaleTimeString());
+  console.log(
+    'save state debounced ',
+    (new Date()).toLocaleTimeString('en-Gb'),
+  );
 
   saveState(stateToStore, 'vk-search-state');
 }, 500, { leading: true, trailing: true });
