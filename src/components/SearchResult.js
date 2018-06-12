@@ -3,88 +3,93 @@ import PropTypes from 'prop-types';
 // import moment from 'moment';
 import { ListGroupItem } from 'react-bootstrap';
 
+import { makeTextualMonth, makeZeroedMinutes } from 'utils/dateFormat';
+
 function SearchResult({ result, number }) {
   const {
     timestamp, authorId, id, text, link,
   } = result;
 
-  // const resultNumber = `[${number}]`;
   const resultNumber = `${number}`;
   const linkText = 'Open at wall';
   const linkToUserPage = `https://vk.com/id${authorId}`;
-  const idLabel = `[post id: ${id}]`;
-  const authorIdLabel = `[id${authorId}]`;
-  const postDate = new Date(timestamp * 1000);
-  // const postDate = new Date(1487830000000);
-  // postDate.setMonth(11);
-  // postDate.setHours(4);
-  // postDate.setMinutes(8);
+  // const idLabel = `[post id: ${id}]`;
+  const authorIdLabel = `id${authorId}`;
+  const postDate = new Date((timestamp * 1000) + (1000 * 60 * 418));
+  // const postDate = new Date(1487830000000 + (1000 * 60 * 60 * 18));
+  // postDate.setMonth(8);
+  // postDate.setHours(23);
+  // postDate.setMinutes(58);
   // postDate.setYear(2015);
   const dayOfMonth = postDate.getDate();
-  const incrMonth = postDate.getMonth() + 1;
-  const monthMap = {
-    1: 'January',
-    2: 'February',
-    3: 'March',
-    4: 'April',
-    5: 'May',
-    6: 'June',
-    7: 'July',
-    8: 'August',
-    9: 'September',
-    10: 'October',
-    11: 'November',
-    12: 'December',
-  };
-  // const month = incrMonth < 10 ? `0${incrMonth}` : incrMonth;
-  const month = monthMap[incrMonth];
+  const month = makeTextualMonth(postDate);
   const year = postDate.getFullYear();
-  const rawHours = postDate.getHours();
-  const hours = rawHours < 10 ? `0${rawHours}` : rawHours;
-  const rawMinutes = postDate.getMinutes();
-  const minutes = rawMinutes < 10 ? `0${rawMinutes}` : rawMinutes;
+  const hours = postDate.getHours();
+  const minutes = makeZeroedMinutes(postDate);
   // const timestampString = postDate.toLocaleString('en-GB').slice(0, -3);
 
   return (
     <ListGroupItem>
       <div className="search-result__title">
-        <span style={{
+        <div style={{
           marginRight: '5px',
-          padding: '0 4px',
-          backgroundColor: '#dedede',
+          // padding: '0 4px',
+          // backgroundColor: '#dedede',
           textAlign: 'center',
-          fontWeight: '600',
+          // fontWeight: '600',
+          // flex: '1',
         }}
         >
-          {resultNumber}
-          {/* {' '} */}
-        </span>
-        <span className="post-timestamp">
-          {/* {moment.unix(timestamp).format('D MMM YYYY  H:mm')} */}
-          {`${dayOfMonth} ${month} ${year}`}
-          {/* {timestampString} */}
-        </span>
-        {' '}
-        <span className="post-timestamp">
-          {`${hours}:${minutes}`}
-        </span>
-        <span>
-          {' '}
+          <span style={{
+            padding: '0 4px',
+            backgroundColor: '#dedede',
+            // textAlign: 'center',
+            fontWeight: '600',
+          }}
+          >
+            {resultNumber}
+          </span>
+        </div>
+        <div style={{ minWidth: '180px' }}>
+          <span className="post-timestamp">
+            {/* {moment.unix(timestamp).format('D MMM YYYY  H:mm')} */}
+            {`${dayOfMonth} ${month} ${year}`}
+            {/* {timestampString} */}
+          </span>
+          <span className="post-timestamp">
+            {`${hours}:${minutes}`}
+          </span>
+        </div>
+        {/* <span>
           {idLabel}
-        </span>
-        <span>
-          {' '}
-          <a href={linkToUserPage} target="_blank">
-            {authorIdLabel}
-          </a>
-        </span>
+        </span> */}
+        <div style={{ marginLeft: 'auto' }}>
+          <span style={{ border: '1px solid #dedede' }}>
+            <span style={{
+              // marginRight: '5px',
+              padding: '0 3px',
+              backgroundColor: '#dedede',
+              textAlign: 'center',
+            }}
+            >
+              {'Author'}
+            </span>
+            <a
+              style={{ padding: '0 8px' }}
+              href={linkToUserPage}
+              target="_blank"
+            >
+              {authorIdLabel}
+            </a>
+          </span>
+        </div>
       </div>
       <div className="search-result__content">
-        <p>
+        <p style={{ paddingRight: '8px' }}>
           {text}
-          {' '}
         </p>
-        <div>
+        {/* TODO: change textAlign to right at xxl braekpoint */}
+        <div style={{ minWidth: '10%', textAlign: 'center' }}>
           <a href={link} target="_blank">
             {linkText}
           </a>
@@ -106,3 +111,48 @@ SearchResult.propTypes = {
     link: PropTypes.string.isRequired,
   }).isRequired,
 };
+
+
+// const searchResultsTitle = (
+//   <div className="search-result__title">
+//     <span style={{
+//       marginRight: '5px',
+//       padding: '0 4px',
+//       backgroundColor: '#dedede',
+//       textAlign: 'center',
+//       fontWeight: '600',
+//     }}
+//     >
+//       {resultNumber}
+//     </span>
+//     <span className="post-timestamp">
+//       {/* {moment.unix(timestamp).format('D MMM YYYY  H:mm')} */}
+//       {`${dayOfMonth} ${month} ${year}`}
+//       {/* {timestampString} */}
+//     </span>
+//     <span className="post-timestamp">
+//       {`${hours}:${minutes}`}
+//     </span>
+//     {/* <span>
+//       {idLabel}
+//     </span> */}
+//     <span style={{ border: '1px solid #dedede', margin: '0 5px' }}>
+//       <span style={{
+//         // marginRight: '5px',
+//         padding: '0 3px',
+//         backgroundColor: '#dedede',
+//         textAlign: 'center',
+//       }}
+//       >
+//         {'Author'}
+//       </span>
+//       <a
+//         style={{ padding: '0 5px' }}
+//         href={linkToUserPage}
+//         target="_blank"
+//       >
+//         {authorIdLabel}
+//       </a>
+//     </span>
+//   </div>
+// );
