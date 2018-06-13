@@ -8,15 +8,6 @@
 
 /* TODO: add permanent scrollbar ? */
 
-.wall-posts-search {
-  margin-top: 58px;
-
-  /* width: 70%;
-  height: 100%;
-  margin: 10px;
-  border: 1px solid rgb(111, 201, 55); */
-}
-
 @media (max-width: 767px) {
   /* NOTE: bootstrap classes */
   .navbar-collapse .dropdown a {

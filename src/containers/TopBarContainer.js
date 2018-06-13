@@ -27,7 +27,7 @@ class TopBarContainer extends React.Component {
       fetchUserName(userId, accessToken);
     }
   }
-  handleNavSelect = (eventKey, event) => {
+  handleNavSelect = (eventKey) => { // (eventKey, event) => {
     const {
       accessToken, isSearchActive, signOut, terminateSearch, redirectToAuth,
     } = this.props;

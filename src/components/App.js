@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { hot, setConfig } from 'react-hot-loader';
 
 // import Home from 'containers/Home';
-import WallPostsSearch from 'containers/WallPostsSearch';
+import WallPostsPageContainer from 'containers/WallPostsPageContainer';
 import NotFoundPage from 'components/NotFoundPage';
 
 setConfig({ logLevel: 'error' }); // ['debug', 'log', 'warn', 'error'(default)]
@@ -18,8 +18,8 @@ const App = ({ store }) => (
     <Router>
       <Switch>
         {/* <Route path="/" exact component={Home} /> */}
-        {/* <Route path="/wall-posts" component={WallPostsSearch} /> */}
-        <Route path="/" exact component={WallPostsSearch} />
+        {/* <Route path="/wall-posts" component={WallPostsPageContainer} /> */}
+        <Route path="/" exact component={WallPostsPageContainer} />
         <Route component={NotFoundPage} />
       </Switch>
     </Router>

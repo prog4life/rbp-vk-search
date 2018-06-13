@@ -2,7 +2,7 @@ import React from 'react';
 import { FormControl } from 'react-bootstrap';
 // import FormInputGroup from 'components/common/FormInputGroup';
 
-function SearchResultsFilter(props) {
+function SearchInResultsFilter(props) {
   return (
     <div>
       {/* <span>
@@ -21,4 +21,4 @@ function SearchResultsFilter(props) {
   );
 }
 
-export default SearchResultsFilter;
+export default SearchInResultsFilter;

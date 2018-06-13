@@ -5,18 +5,10 @@ import PropTypes from 'prop-types';
 
 import * as actionCreators from 'actions';
 import { getSortedPosts, getSearchIsActive, getAccessToken } from 'selectors';
-import TopBarContainer from 'containers/TopBarContainer';
-import PostsSearchForm from 'components/PostsSearchForm';
-import ResultsPanel from 'components/ResultsPanel';
-import FoundPostsList from 'components/FoundPostsList';
-import ResultsFilter from 'components/SearchResultsFilter';
-import DelayedRender from 'components/common/DelayedRender';
-import ErrorBoundary from 'components/common/ErrorBoundary';
-import RedirectToAuthModal from 'components/RedirectToAuthModal';
 
-// import ResultsListContainer from 'containers/ResultsListContainer';
+import WallPostsPage from 'components/WallPostsPage';
 
-class WallPostsSearch extends React.Component {
+class WallPostsPageContainer extends React.Component {
   constructor(props) {
     super(props);
 
@@ -77,44 +69,25 @@ class WallPostsSearch extends React.Component {
     }
   }
   render() {
-    const {
-      isSearchActive,
-      isRedirecting,
-      hasAuthOffer,
-      posts,
-      redirectToAuth,
-      cancelAuthRedirect,
-    } = this.props;
+    // const {
+    //   isSearchActive,
+    //   isRedirecting,
+    //   hasAuthOffer,
+    //   posts,
+    //   redirectToAuth,
+    //   cancelAuthRedirect,
+    // } = this.props;
 
     return (
-      <div className="wall-posts-search">
-        <TopBarContainer />
-        {(hasAuthOffer || isRedirecting) &&
-          <ErrorBoundary>
-            <DelayedRender delay={3000}>
-              <RedirectToAuthModal
-                isRedirecting={isRedirecting}
-                onRedirectClick={redirectToAuth}
-                onCancelRedirect={cancelAuthRedirect}
-              />
-            </DelayedRender>
-          </ErrorBoundary>
-        }
-        <PostsSearchForm
-          isSearchActive={isSearchActive}
-          onStartSearch={this.handleSearchStart}
-        />
-        <ResultsPanel heading={<ResultsFilter />}>
-          <FoundPostsList posts={posts} />
-        </ResultsPanel>
-      </div>
+      <WallPostsPage
+        onStartSearch={this.handleSearchStart}
+        {...this.props}
+      />
     );
   }
 }
 
 const mapStateToProps = state => ({
-  userId: state.auth.userId,
-  userName: state.auth.userName,
   accessToken: getAccessToken(state),
   tokenExpiresAt: state.auth.tokenExpiresAt,
   isRedirecting: state.auth.isRedirecting,
@@ -127,25 +100,21 @@ const mapDispatchToProps = dispatch => (
   bindActionCreators(actionCreators, dispatch)
 );
 
-WallPostsSearch.propTypes = {
+WallPostsPageContainer.propTypes = {
   accessToken: PropTypes.string,
-  cancelAuthRedirect: PropTypes.func.isRequired,
   extractAuthData: PropTypes.func.isRequired,
-  hasAuthOffer: PropTypes.bool.isRequired,
-  isRedirecting: PropTypes.bool.isRequired,
   isSearchActive: PropTypes.bool.isRequired,
   location: PropTypes.shape({}).isRequired,
   offerAuthRedirect: PropTypes.func.isRequired,
-  posts: PropTypes.arrayOf(PropTypes.object),
-  redirectToAuth: PropTypes.func.isRequired,
-  // signOut: PropTypes.func.isRequired,
   startWallPostsSearch: PropTypes.func.isRequired,
   terminateSearch: PropTypes.func.isRequired,
 };
 
-WallPostsSearch.defaultProps = {
+WallPostsPageContainer.defaultProps = {
   accessToken: null,
-  posts: null,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WallPostsSearch);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(WallPostsPageContainer);
