@@ -5,3 +5,17 @@
 .topbar__sign-in-item {
   margin-right: 15px;
 }
+
+@media (max-width: 767px) {
+  .topbar__nav-auth,
+  .topbar__sign-in-item {
+    a {
+      text-align: right;
+    }
+
+    /* NOTE: bootstrap classes that were used previously:
+    .navbar-collapse .dropdown a {
+    .navbar-collapse a {
+    */
+  }
+}

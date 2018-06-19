@@ -7,10 +7,3 @@
 }
 
 /* TODO: add permanent scrollbar ? */
-
-@media (max-width: 767px) {
-  /* NOTE: bootstrap classes */
-  .navbar-collapse .dropdown a {
-    text-align: right;
-  }
-}
