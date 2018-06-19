@@ -8,7 +8,7 @@ import AuthErrorBoundary from 'components/common/AuthErrorBoundary';
 import AuthOfferModal from 'components/AuthOfferModal';
 import AuthRedirectModal from 'components/AuthRedirectModal';
 import PostsResultContainer from 'containers/PostsResultContainer';
-import { AUTH_MODAL_DELAY } from 'constants/ui';
+import { AUTH_OFFER_DELAY } from 'constants/ui';
 
 import './style.scss';
 
@@ -16,8 +16,8 @@ const WallPostsPage = (props) => {
   const {
     isSearchActive,
     isRedirecting,
-    hasAuthOffer,
-    hasDelayedAuthOffer,
+    isAuthOfferVisible,
+    isAuthOfferDelayed,
     redirectToAuth,
     rejectAuthRedirect,
     onStartSearch,
@@ -35,12 +35,12 @@ const WallPostsPage = (props) => {
       <TopBarContainer />
       <AuthErrorBoundary>
         <Fragment>
-          {hasDelayedAuthOffer &&
-            <DelayedRender delay={AUTH_MODAL_DELAY}>
+          {isAuthOfferDelayed &&
+            <DelayedRender delay={AUTH_OFFER_DELAY}>
               {authOfferModal}
             </DelayedRender>
           }
-          {hasAuthOffer && authOfferModal}
+          {isAuthOfferVisible && authOfferModal}
         </Fragment>
       </AuthErrorBoundary>
       {isRedirecting && <AuthRedirectModal />}
@@ -54,8 +54,8 @@ const WallPostsPage = (props) => {
 };
 
 WallPostsPage.propTypes = {
-  hasAuthOffer: PropTypes.bool.isRequired,
-  hasDelayedAuthOffer: PropTypes.bool.isRequired,
+  isAuthOfferDelayed: PropTypes.bool.isRequired,
+  isAuthOfferVisible: PropTypes.bool.isRequired,
   isRedirecting: PropTypes.bool.isRequired,
   isSearchActive: PropTypes.bool.isRequired,
   onStartSearch: PropTypes.func.isRequired,

@@ -4,7 +4,10 @@ import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 
 import * as actionCreators from 'actions';
-import { getSearchIsActive, getAccessToken } from 'selectors';
+import {
+  getSearchIsActive, getAccessToken, getAuthOfferFlag, getDelayedAuthOfferFlag,
+  getIsRedirecting,
+} from 'selectors';
 
 import WallPostsPage from 'components/WallPostsPage';
 
@@ -58,7 +61,7 @@ class WallPostsPageContainer extends React.Component {
       startWallPostsSearch(inputData);
       return;
     }
-    // TODO: save input values to localStorage; show redirection notification
+    // TODO: save input values to localStorage
     offerAuthRedirect({ hasDelay: false });
   }
   handleSearchStop() {
@@ -72,7 +75,7 @@ class WallPostsPageContainer extends React.Component {
     // const {
     //   isSearchActive,
     //   isRedirecting,
-    //   hasAuthOffer,
+    //   isAuthOfferVisible,
     //   posts,
     //   redirectToAuth,
     //   rejectAuthRedirect,
@@ -89,10 +92,9 @@ class WallPostsPageContainer extends React.Component {
 
 const mapStateToProps = state => ({
   accessToken: getAccessToken(state),
-  tokenExpiresAt: state.auth.tokenExpiresAt,
-  isRedirecting: state.auth.isRedirecting,
-  hasAuthOffer: state.auth.hasAuthOffer,
-  hasDelayedAuthOffer: state.auth.hasDelayedAuthOffer,
+  isRedirecting: getIsRedirecting(state),
+  isAuthOfferVisible: getAuthOfferFlag(state),
+  isAuthOfferDelayed: getDelayedAuthOfferFlag(state),
   isSearchActive: getSearchIsActive(state),
 });
 

@@ -13,8 +13,8 @@ import { addIfNotExist, createReducer } from './reducerUtils';
 
 // const initialState = {
 //   byOffset: {},
-//   pendingList: [],
-//   failedList: [],
+//   pending: [],
+//   failed: [],
 //   IDEA:
 //   errors: [
 //     {
@@ -26,6 +26,7 @@ import { addIfNotExist, createReducer } from './reducerUtils';
 //   ],
 // };
 
+// contains pending and failed requests objects with offsets as keys
 const byOffset = createReducer({}, {
   [SEARCH_REQUEST]: (state, { offset, startTime }) => ({
     ...state,
@@ -46,6 +47,7 @@ const byOffset = createReducer({}, {
 
 const removeOffset = (state, action) => state.filter(o => action.offset !== o);
 
+// list of pending requests offsets
 const pending = createReducer([], {
   [SEARCH_REQUEST]: (state, { offset }) => addIfNotExist(state, offset),
   [SEARCH_REQUEST_SUCCESS]: removeOffset,
@@ -54,6 +56,7 @@ const pending = createReducer([], {
   [TERMINATE_SEARCH]: () => ([]), // NOTE: remove ???
 });
 
+// list of failed requests offsets
 const failed = createReducer([], {
   [SEARCH_REQUEST]: removeOffset,
   [SEARCH_REQUEST_SUCCESS]: removeOffset,

@@ -1,6 +1,6 @@
 // import moment from 'moment';
 import { getAccessToken } from 'selectors';
-import { redirectToTokenRequestUrl, parseAccessTokenHash } from 'utils/accessToken';
+import { parseAccessTokenHash } from 'utils/accessToken';
 import requestUserName from 'utils/userName';
 
 import {
@@ -10,27 +10,7 @@ import {
   SIGN_OUT,
   NO_VALID_TOKEN,
   RECEIVE_TOKEN_ERROR,
-  REDIRECT_TO_AUTH,
-  REJECT_AUTH_REDIRECT,
-  OFFER_AUTH_REDIRECT,
 } from 'constants/actionTypes';
-
-// TODO: split into 2 distinct actions ?
-// export const saveAccessToken = (accessToken, tokenExpiresAt) => ({
-//   type: 'SAVE_ACCESS_TOKEN',
-//   accessToken,
-//   tokenExpiresAt,
-// });
-
-// export const setTokenExpiry = expiresAt => ({
-//   type: 'SET_TOKEN_EXPIRY',
-//   expiresAt,
-// });
-
-// export const setUserId = userId => ({
-//   type: 'SET_USER_ID',
-//   userId,
-// });
 
 // TODO: terminate search on sign out
 export const signOut = () => ({ type: SIGN_OUT });
@@ -38,17 +18,6 @@ export const signOut = () => ({ type: SIGN_OUT });
 // TODO: dispatch it where it is reasonable
 export const noValidToken = () => ({ type: NO_VALID_TOKEN });
 export const fetchUserNameFail = () => ({ type: FETCH_USER_NAME_FAIL });
-export const rejectAuthRedirect = () => ({ type: REJECT_AUTH_REDIRECT });
-
-export const offerAuthRedirect = ({ hasDelay = false }) => ({
-  type: OFFER_AUTH_REDIRECT,
-  hasDelay,
-});
-
-export const redirectToAuth = () => {
-  redirectToTokenRequestUrl();
-  return { type: REDIRECT_TO_AUTH };
-};
 
 export const setUserName = userName => ({
   type: SET_USER_NAME,
@@ -86,6 +55,7 @@ export const extractAuthData = (hash, pathname) => (dispatch) => {
   const { accessToken, tokenExpiresAt, userId, error } = parsedHash;
 
   // TODO: remove next line to parseAccessTokenHash ?
+  // to clear URL hash
   window.history.replaceState(null, document.title, pathname);
 
   if (error) {

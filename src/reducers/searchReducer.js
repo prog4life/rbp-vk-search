@@ -68,7 +68,7 @@ const search = (state = initialState, action) => {
     //     total: action.total !== null ? action.total : state.total,
     //     processed: action.processed || state.processed,
     //   };
-    case TERMINATE_SEARCH:
+    case TERMINATE_SEARCH: // TODO: return initialState ???
       return {
         isActive: false,
         isCompleted: false,

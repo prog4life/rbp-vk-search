@@ -2,16 +2,19 @@ import { createSelector } from 'reselect';
 import sortBy from 'lodash-es/sortBy';
 // import { sortItemsByNumField } from 'utils/sorting';
 import * as fromAuth from 'reducers/authReducer';
+import * as fromRedirect from 'reducers/redirectReducer';
 import * as fromSearch from 'reducers/searchReducer';
 import * as fromPosts from 'reducers/postsReducer';
 
 // const state = {
 //   auth,
+//   redirect,
 //   posts,
 //   search,
 //   form,
 // };
 
+// ------------------------------ AUTH ----------------------------------------
 export const getAuthData = state => state.auth;
 export const getUserId = state => fromAuth.getUserId(state.auth);
 export const getUserName = state => fromAuth.getUserName(state.auth);
@@ -31,7 +34,15 @@ export const getAccessToken = createSelector(
     return accessToken;
   },
 );
-
+// ------------------------------ REDIRECT ------------------------------------
+export const getIsRedirecting = state => (
+  fromRedirect.getIsRedirecting(state.redirect)
+);
+export const getDelayedAuthOfferFlag = state => (
+  fromRedirect.getDelayedAuthOffer(state.redirect)
+);
+export const getAuthOfferFlag = state => fromRedirect.getAuthOffer(state.redirect);
+// ------------------------------ SEARCH --------------------------------------
 export const getSearchIsActive = state => fromSearch.getIsActive(state.search);
 export const getIsCompleted = state => fromSearch.getIsCompleted(state.search);
 export const getSearchOffset = state => fromSearch.getOffset(state.search);
@@ -62,7 +73,7 @@ export const getSearchProgress = createSelector(
     return null;
   },
 );
-
+// ------------------------------ POSTS ---------------------------------------
 export const getPostsById = state => fromPosts.getById(state.posts);
 export const getIdsOfPosts = state => fromPosts.getIds(state.posts);
 
