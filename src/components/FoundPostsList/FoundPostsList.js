@@ -1,33 +1,34 @@
 import React from 'react';
 import pt from 'prop-types';
 import { ListGroup, ListGroupItem } from 'react-bootstrap';
-// import uuidv1 from 'uuid/v1';
 import FoundPost from './FoundPost';
 
-const renderResultsList = results => (
-  results.map((result, index) => (
-    // TODO: replace key by post_id
-    <ListGroupItem key={result.id}>
-      <FoundPost
-        number={index + 1}
-        result={result}
-      />
-    </ListGroupItem>
-  ))
-);
-
 function FoundPostsList({ posts }) {
-  const noResultsItem = (
-    <ListGroupItem style={{ textAlign: 'center' }}>
-      {'No results yet'}
-    </ListGroupItem>
-  );
+  if (!posts || posts.length === 0) {
+    return (
+      <ListGroup>
+        <ListGroupItem style={{ textAlign: 'center' }}>
+          {
+            posts && posts.length === 0
+              ? 'Nothing found'
+              : 'No results yet' // posts === null
+          }
+        </ListGroupItem>
+      </ListGroup>
+    );
+  }
 
   return (
     <ListGroup>
-      {posts && posts.length // TODO: show different message on null and []
-        ? renderResultsList(posts)
-        : noResultsItem
+      {
+        posts.map((post, index) => (
+          <ListGroupItem key={post.id}>
+            <FoundPost
+              number={index + 1}
+              post={post}
+            />
+          </ListGroupItem>
+        ))
       }
     </ListGroup>
   );

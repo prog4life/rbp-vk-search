@@ -12,7 +12,6 @@ const mapStateToProps = state => ({
   isSearchCompleted: getIsCompleted(state),
   processed: getSearchProcessed(state),
   total: getSearchTotal(state),
-  // progress: countSearchProgressInPercents(search)
   progress: getSearchProgress(state),
 });
 

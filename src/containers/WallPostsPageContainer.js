@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 
 import * as actionCreators from 'actions';
-import { getSortedPosts, getSearchIsActive, getAccessToken } from 'selectors';
+import { getSearchIsActive, getAccessToken } from 'selectors';
 
 import WallPostsPage from 'components/WallPostsPage';
 
@@ -92,7 +92,6 @@ const mapStateToProps = state => ({
   tokenExpiresAt: state.auth.tokenExpiresAt,
   isRedirecting: state.auth.isRedirecting,
   hasAuthOffer: state.auth.hasAuthOffer,
-  posts: getSortedPosts(state),
   isSearchActive: getSearchIsActive(state),
 });
 

@@ -3,13 +3,10 @@ import PropTypes from 'prop-types';
 
 import TopBarContainer from 'containers/TopBarContainer';
 import PostsSearchForm from 'components/PostsSearchForm';
-import ResultsPanel from 'components/ResultsPanel';
-import FoundPostsList from 'components/FoundPostsList';
-import SearchInResultsFilter from 'components/SearchInResultsFilter';
 import DelayedRender from 'components/common/DelayedRender';
 import ErrorBoundary from 'components/common/ErrorBoundary';
 import RedirectToAuthModal from 'components/RedirectToAuthModal';
-// import PostsResultContainer from 'containers/PostsResultContainer';
+import PostsResultContainer from 'containers/PostsResultContainer';
 
 import './style.scss';
 
@@ -18,7 +15,6 @@ const WallPostsPage = (props) => {
     isSearchActive,
     isRedirecting,
     hasAuthOffer,
-    posts,
     redirectToAuth,
     cancelAuthRedirect,
     onStartSearch,
@@ -42,9 +38,7 @@ const WallPostsPage = (props) => {
         isSearchActive={isSearchActive}
         onStartSearch={onStartSearch}
       />
-      <ResultsPanel heading={<SearchInResultsFilter />}>
-        <FoundPostsList posts={posts} />
-      </ResultsPanel>
+      <PostsResultContainer />
     </div>
   );
 };
@@ -54,12 +48,8 @@ WallPostsPage.propTypes = {
   hasAuthOffer: PropTypes.bool.isRequired,
   isRedirecting: PropTypes.bool.isRequired,
   isSearchActive: PropTypes.bool.isRequired,
-  posts: PropTypes.arrayOf(PropTypes.object),
+  onStartSearch: PropTypes.func.isRequired,
   redirectToAuth: PropTypes.func.isRequired,
-};
-
-WallPostsPage.defaultProps = {
-  posts: null,
 };
 
 export default WallPostsPage;

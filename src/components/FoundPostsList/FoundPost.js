@@ -8,10 +8,10 @@ import './style.scss';
 
 // TODO: rename to SearchedPostResult or FoundPost
 
-function FoundPost({ result, number }) {
+function FoundPost({ post, number }) {
   const {
     timestamp, authorId, id, text, link,
-  } = result;
+  } = post;
 
   const resultNumber = `${number}`;
   const linkText = 'Open at wall';
@@ -109,11 +109,9 @@ function FoundPost({ result, number }) {
   );
 }
 
-export default FoundPost;
-
 FoundPost.propTypes = {
   number: PropTypes.number.isRequired,
-  result: PropTypes.shape({
+  post: PropTypes.shape({
     timestamp: PropTypes.number.isRequired,
     authorId: PropTypes.number.isRequired,
     id: PropTypes.number.isRequired,
@@ -122,46 +120,4 @@ FoundPost.propTypes = {
   }).isRequired,
 };
 
-// const searchResultsTitle = (
-//   <div className="found-post__title">
-//     <span style={{
-//       marginRight: '5px',
-//       padding: '0 4px',
-//       backgroundColor: '#dedede',
-//       textAlign: 'center',
-//       fontWeight: '600',
-//     }}
-//     >
-//       {resultNumber}
-//     </span>
-//     <span className="found-post__timestamp">
-//       {/* {moment.unix(timestamp).format('D MMM YYYY  H:mm')} */}
-//       {`${dayOfMonth} ${month} ${year}`}
-//       {/* {timestampString} */}
-//     </span>
-//     <span className="found-post__timestamp">
-//       {`${hours}:${minutes}`}
-//     </span>
-//     {/* <span>
-//       {idLabel}
-//     </span> */}
-//     <span style={{ border: '1px solid #dedede', margin: '0 5px' }}>
-//       <span style={{
-//         // marginRight: '5px',
-//         padding: '0 3px',
-//         backgroundColor: '#dedede',
-//         textAlign: 'center',
-//       }}
-//       >
-//         {'Author'}
-//       </span>
-//       <a
-//         style={{ padding: '0 5px' }}
-//         href={linkToUserPage}
-//         target="_blank"
-//       >
-//         {authorIdLabel}
-//       </a>
-//     </span>
-//   </div>
-// );
+export default FoundPost;
