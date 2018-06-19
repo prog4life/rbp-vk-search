@@ -11,7 +11,7 @@ import {
   NO_VALID_TOKEN,
   RECEIVE_TOKEN_ERROR,
   REDIRECT_TO_AUTH,
-  CANCEL_AUTH_REDIRECT,
+  REJECT_AUTH_REDIRECT,
   OFFER_AUTH_REDIRECT,
 } from 'constants/actionTypes';
 
@@ -37,9 +37,13 @@ export const signOut = () => ({ type: SIGN_OUT });
 
 // TODO: dispatch it where it is reasonable
 export const noValidToken = () => ({ type: NO_VALID_TOKEN });
-export const offerAuthRedirect = () => ({ type: OFFER_AUTH_REDIRECT });
-export const cancelAuthRedirect = () => ({ type: CANCEL_AUTH_REDIRECT });
 export const fetchUserNameFail = () => ({ type: FETCH_USER_NAME_FAIL });
+export const rejectAuthRedirect = () => ({ type: REJECT_AUTH_REDIRECT });
+
+export const offerAuthRedirect = ({ hasDelay = false }) => ({
+  type: OFFER_AUTH_REDIRECT,
+  hasDelay,
+});
 
 export const redirectToAuth = () => {
   redirectToTokenRequestUrl();
@@ -81,6 +85,7 @@ export const extractAuthData = (hash, pathname) => (dispatch) => {
   }
   const { accessToken, tokenExpiresAt, userId, error } = parsedHash;
 
+  // TODO: remove next line to parseAccessTokenHash ?
   window.history.replaceState(null, document.title, pathname);
 
   if (error) {

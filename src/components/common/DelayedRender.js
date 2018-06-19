@@ -14,15 +14,21 @@ class DelayedRender extends React.Component {
     };
   }
   componentDidMount() {
+    this.makeVisibleAfterTimeout();
+  }
+  componentDidUpdate() {
+    this.makeVisibleAfterTimeout();
+  }
+  componentWillUnmount() {
+    clearTimeout(this.timeout);
+  }
+  makeVisibleAfterTimeout() {
     const { delay } = this.props;
 
     if (!Number.isInteger(delay)) {
       throw new Error('Expected delay to be an integer');
     }
     this.timeout = setTimeout(() => this.setState({ isVisible: true }), delay);
-  }
-  componentWillUnmount() {
-    clearTimeout(this.timeout);
   }
   render() {
     const { children } = this.props;

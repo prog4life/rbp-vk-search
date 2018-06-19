@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-class ErrorBoundary extends React.Component {
+class AuthErrorBoundary extends React.Component {
   static propTypes = {
     children: PropTypes.element.isRequired,
   }
@@ -16,10 +16,10 @@ class ErrorBoundary extends React.Component {
     const { children } = this.props;
 
     if (hasError) {
-      return null;
+      return null; // TODO: render some error message
     }
     return children;
   }
 }
 
-export default ErrorBoundary;
+export default AuthErrorBoundary;

@@ -2,7 +2,7 @@ import {
   SAVE_AUTH_DATA,
   SET_USER_NAME,
   REDIRECT_TO_AUTH,
-  CANCEL_AUTH_REDIRECT,
+  REJECT_AUTH_REDIRECT,
   OFFER_AUTH_REDIRECT,
   SIGN_OUT,
 } from 'constants/actionTypes';
@@ -14,6 +14,7 @@ const defaultState = {
   userName: '',
   isRedirecting: false,
   hasAuthOffer: false,
+  hasDelayedAuthOffer: false,
 };
 
 const authReducer = (state = defaultState, action) => {
@@ -35,26 +36,22 @@ const authReducer = (state = defaultState, action) => {
         ...state,
         isRedirecting: true,
         hasAuthOffer: false,
+        hasDelayedAuthOffer: false,
       };
     case OFFER_AUTH_REDIRECT:
       return {
         ...state,
-        hasAuthOffer: true,
+        hasAuthOffer: !action.hasDelay,
+        hasDelayedAuthOffer: action.hasDelay,
       };
-    case CANCEL_AUTH_REDIRECT:
+    case REJECT_AUTH_REDIRECT:
       return {
         ...state,
         hasAuthOffer: false,
+        hasDelayedAuthOffer: false,
       };
-    case SIGN_OUT: // change to defaultState?
-      return {
-        accessToken: '',
-        tokenExpiresAt: null,
-        userId: '',
-        userName: '',
-        isRedirecting: false,
-        hasAuthOffer: false,
-      };
+    case SIGN_OUT: // is returning of defaultState correct?
+      return defaultState;
     default:
       return state;
   }
@@ -64,47 +61,3 @@ export default authReducer;
 
 export const getUserId = state => state.userId;
 export const getUserName = state => state.userName;
-
-// export function accessToken(state = '', action) {
-//   switch (action.type) {
-//     case 'SAVE_ACCESS_TOKEN':
-//       return action.accessToken;
-//     case 'SIGN_OUT':
-//       return '';
-//     default:
-//       return state;
-//   }
-// }
-
-// export function tokenExpiry(state = null, action) {
-//   switch (action.type) {
-//     case 'SAVE_ACCESS_TOKEN':
-//       return action.tokenExpiresAt;
-//     case 'SIGN_OUT':
-//       return null;
-//     default:
-//       return state;
-//   }
-// }
-
-// export function userId(state = '', action) {
-//   switch (action.type) {
-//     case 'SET_USER_ID':
-//       return action.userId;
-//     case 'SIGN_OUT':
-//       return '';
-//     default:
-//       return state;
-//   }
-// }
-
-// export function userName(state = '', action) {
-//   switch (action.type) {
-//     case 'SET_USER_NAME':
-//       return action.userName;
-//     case 'SIGN_OUT':
-//       return '';
-//     default:
-//       return state;
-//   }
-// }

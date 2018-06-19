@@ -29,14 +29,14 @@ class WallPostsPageContainer extends React.Component {
     // also prevent repeated auth offer ?
 
     if (parsedData) {
-      if (parsedData.accessToken) {
+      if (parsedData.accessToken) { // TEMP:
         console.info('new accessToken was retrieved: ', parsedData.accessToken);
       }
       return;
     }
 
     if (!accessToken) {
-      offerAuthRedirect();
+      offerAuthRedirect({ hasDelay: true });
       return;
     }
     console.info('accessToken is already present: ', accessToken);
@@ -59,7 +59,7 @@ class WallPostsPageContainer extends React.Component {
       return;
     }
     // TODO: save input values to localStorage; show redirection notification
-    offerAuthRedirect();
+    offerAuthRedirect({ hasDelay: false });
   }
   handleSearchStop() {
     const { isSearchActive, terminateSearch } = this.props;
@@ -75,7 +75,7 @@ class WallPostsPageContainer extends React.Component {
     //   hasAuthOffer,
     //   posts,
     //   redirectToAuth,
-    //   cancelAuthRedirect,
+    //   rejectAuthRedirect,
     // } = this.props;
 
     return (
@@ -92,6 +92,7 @@ const mapStateToProps = state => ({
   tokenExpiresAt: state.auth.tokenExpiresAt,
   isRedirecting: state.auth.isRedirecting,
   hasAuthOffer: state.auth.hasAuthOffer,
+  hasDelayedAuthOffer: state.auth.hasDelayedAuthOffer,
   isSearchActive: getSearchIsActive(state),
 });
 
