@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { getSortedPosts } from 'selectors';
+import { changePostsOrder } from 'actions';
+import { getPosts, getSortOrder } from 'selectors';
 
 import ResultsPanel from 'components/ResultsPanel';
 import SearchInResultsFilter from 'components/SearchInResultsFilter';
@@ -14,7 +15,10 @@ const PostsSearchResults = props => (
 );
 
 const mapStateToProps = state => ({
-  posts: getSortedPosts(state),
+  posts: getPosts(state),
+  order: getSortOrder(state),
 });
 
-export default connect(mapStateToProps)(PostsSearchResults);
+const mapDispatchToProps = { changePostsOrder };
+
+export default connect(mapStateToProps, mapDispatchToProps)(PostsSearchResults);

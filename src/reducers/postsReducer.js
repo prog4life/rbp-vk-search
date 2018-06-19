@@ -1,5 +1,7 @@
 import { combineReducers } from 'redux';
-import { POSTS_RECEIVED, SEARCH_START } from 'constants/actionTypes.js';
+import {
+  POSTS_RECEIVED, SEARCH_START, CHANGE_POSTS_ORDER,
+} from 'constants/actionTypes.js';
 import { createReducer, makeUnion } from './reducerUtils';
 
 // export default function posts(state = {}, action) {
@@ -43,11 +45,17 @@ const limit = createReducer(null, {
   [SEARCH_START]: (state, action) => action.limit,
 });
 
+const order = createReducer('descend', {
+  [CHANGE_POSTS_ORDER]: (state, action) => action.order,
+});
+
 export default combineReducers({
   byId,
   ids,
   limit,
+  order,
 });
 
 export const getById = state => state.byId;
 export const getIds = state => state.ids;
+export const getOrder = state => state.order;

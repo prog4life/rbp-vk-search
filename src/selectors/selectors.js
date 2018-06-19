@@ -76,20 +76,47 @@ export const getSearchProgress = createSelector(
 // ------------------------------ POSTS ---------------------------------------
 export const getPostsById = state => fromPosts.getById(state.posts);
 export const getIdsOfPosts = state => fromPosts.getIds(state.posts);
+export const getSortOrder = state => fromPosts.getOrder(state.posts);
 
-export const getSortedPosts = createSelector(
+// export const getSortedPosts = createSelector(
+//   getPostsById,
+//   (state, filter = 'timestamp') => filter,
+//   // TODO: rename order to reverse ?
+//   (state, filter, order = 'desc') => order,
+//   (postsById, filter, order) => {
+//     if (!postsById) {
+//       return null;
+//     }
+//     const arrayOfPosts = Object.values(postsById);
+//     const sorted = sortBy(arrayOfPosts, [filter]);
+//
+//     return order === 'desc' ? sorted.reverse() : sorted;
+//   },
+// );
+
+export const getSortedByTimestampPosts = createSelector(
   getPostsById,
-  (state, filter = 'timestamp') => filter,
-  // TODO: rename order to reverse ?
-  (state, filter, order = 'desc') => order,
-  (postsById, filter, order) => {
+  (postsById) => {
     if (!postsById) {
       return null;
     }
     const arrayOfPosts = Object.values(postsById);
-    const sorted = sortBy(arrayOfPosts, [filter]);
+    const sorted = sortBy(arrayOfPosts, ['timestamp']); // => new array
 
-    return order === 'desc' ? sorted.reverse() : sorted;
+    return sorted;
+  },
+);
+
+export const getPosts = createSelector(
+  [getSortedByTimestampPosts, getSortOrder],
+  // (state, order = 'descend') => order,
+  (sortedPosts, order) => {
+    if (!sortedPosts) {
+      return null;
+    }
+    return order === 'descend'
+      ? [].concat(sortedPosts).reverse()
+      : sortedPosts;
   },
 );
 
