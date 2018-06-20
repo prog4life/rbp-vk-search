@@ -16,17 +16,17 @@ const WallPostsPage = (props) => {
   const {
     isSearchActive,
     isRedirecting,
-    isAuthOfferVisible,
-    isAuthOfferDelayed,
+    hasAuthOffer,
+    hasDelayedAuthOffer,
     redirectToAuth,
-    rejectAuthRedirect,
+    rejectAuthOffer,
     onStartSearch,
   } = props;
 
   const authOfferModal = (
     <AuthOfferModal
       onRedirect={redirectToAuth}
-      onClose={rejectAuthRedirect}
+      onClose={rejectAuthOffer}
     />
   );
 
@@ -35,12 +35,12 @@ const WallPostsPage = (props) => {
       <TopBarContainer />
       <AuthErrorBoundary>
         <Fragment>
-          {isAuthOfferDelayed &&
+          {hasDelayedAuthOffer &&
             <DelayedRender delay={AUTH_OFFER_DELAY}>
               {authOfferModal}
             </DelayedRender>
           }
-          {isAuthOfferVisible && authOfferModal}
+          {hasAuthOffer && authOfferModal}
         </Fragment>
       </AuthErrorBoundary>
       {isRedirecting && <AuthRedirectModal />}
@@ -54,13 +54,13 @@ const WallPostsPage = (props) => {
 };
 
 WallPostsPage.propTypes = {
-  isAuthOfferDelayed: PropTypes.bool.isRequired,
-  isAuthOfferVisible: PropTypes.bool.isRequired,
+  hasAuthOffer: PropTypes.bool.isRequired,
+  hasDelayedAuthOffer: PropTypes.bool.isRequired,
   isRedirecting: PropTypes.bool.isRequired,
   isSearchActive: PropTypes.bool.isRequired,
   onStartSearch: PropTypes.func.isRequired,
   redirectToAuth: PropTypes.func.isRequired,
-  rejectAuthRedirect: PropTypes.func.isRequired,
+  rejectAuthOffer: PropTypes.func.isRequired,
 };
 
 export default WallPostsPage;

@@ -1,10 +1,16 @@
-// eslint-disable-next-line import/prefer-default-export
-export const changePostsOrder = (order = 'descend') => {
+import { SET_POSTS_SORT_ORDER, SET_POSTS_FILTER_TEXT } from 'constants/actionTypes';
+
+export const setPostsSortOrder = (order = 'descend') => {
   if (order !== 'descend' && order !== 'ascend') {
     throw new Error('Expected order to be "descend" or "ascend"');
   }
   return {
-    type: 'CHANGE_POSTS_ORDER',
+    type: SET_POSTS_SORT_ORDER,
     order,
   };
 };
+
+export const setPostsFilterText = (filterText = '') => ({
+  type: SET_POSTS_FILTER_TEXT,
+  filterText,
+});

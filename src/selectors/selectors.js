@@ -34,6 +34,7 @@ export const getAccessToken = createSelector(
     return accessToken;
   },
 );
+
 // ------------------------------ REDIRECT ------------------------------------
 export const getIsRedirecting = state => (
   fromRedirect.getIsRedirecting(state.redirect)
@@ -42,6 +43,7 @@ export const getDelayedAuthOfferFlag = state => (
   fromRedirect.getDelayedAuthOffer(state.redirect)
 );
 export const getAuthOfferFlag = state => fromRedirect.getAuthOffer(state.redirect);
+
 // ------------------------------ SEARCH --------------------------------------
 export const getSearchIsActive = state => fromSearch.getIsActive(state.search);
 export const getIsCompleted = state => fromSearch.getIsCompleted(state.search);
@@ -73,57 +75,51 @@ export const getSearchProgress = createSelector(
     return null;
   },
 );
+
 // ------------------------------ POSTS ---------------------------------------
 export const getPostsById = state => fromPosts.getById(state.posts);
 export const getIdsOfPosts = state => fromPosts.getIds(state.posts);
-export const getSortOrder = state => fromPosts.getOrder(state.posts);
+export const getPostsSortOrder = state => fromPosts.getSortOrder(state.posts);
+export const getPostsFilterText = state => fromPosts.getFilterText(state.posts);
 
-// export const getSortedPosts = createSelector(
-//   getPostsById,
-//   (state, filter = 'timestamp') => filter,
-//   // TODO: rename order to reverse ?
-//   (state, filter, order = 'desc') => order,
-//   (postsById, filter, order) => {
-//     if (!postsById) {
-//       return null;
-//     }
-//     const arrayOfPosts = Object.values(postsById);
-//     const sorted = sortBy(arrayOfPosts, [filter]);
-//
-//     return order === 'desc' ? sorted.reverse() : sorted;
-//   },
-// );
+// NOTE: consider alternative: sorting by timestamp before filtering by text
 
-export const getSortedByTimestampPosts = createSelector(
-  getPostsById,
-  (postsById) => {
+export const getFilteredByTextPosts = createSelector(
+  [getPostsById, getPostsFilterText],
+  (postsById, filterText) => {
     if (!postsById) {
       return null;
     }
     const arrayOfPosts = Object.values(postsById);
-    const sorted = sortBy(arrayOfPosts, ['timestamp']); // => new array
+
+    if (filterText === '') {
+      return arrayOfPosts;
+    }
+    return arrayOfPosts.filter(post => post.text.includes(filterText));
+  },
+);
+
+export const getSortedByTimestampPosts = createSelector(
+  getFilteredByTextPosts,
+  (filteredPosts) => {
+    if (!filteredPosts) {
+      return null;
+    }
+    const sorted = sortBy(filteredPosts, ['timestamp']); // => new array
 
     return sorted;
   },
 );
 
-export const getPosts = createSelector(
-  [getSortedByTimestampPosts, getSortOrder],
-  // (state, order = 'descend') => order,
-  (sortedPosts, order) => {
+export const getVisiblePosts = createSelector(
+  [getSortedByTimestampPosts, getPostsSortOrder],
+  // (state, sortOrder = 'descend') => sortOrder,
+  (sortedPosts, sortOrder) => {
     if (!sortedPosts) {
       return null;
     }
-    return order === 'descend'
+    return sortOrder === 'descend'
       ? [].concat(sortedPosts).reverse()
       : sortedPosts;
   },
 );
-
-// export const getSortedPosts = (state) => {
-//   // add getLimit
-//   // const allPosts = fromPosts.getPosts(state.posts);
-//   // return sortItemsByNumField(allPosts, 'timestamp');
-//   const postsById = getPostsById(state);
-//   return sortBy(postsById, ['timestamp']).reverse();
-// };

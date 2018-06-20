@@ -1,24 +1,26 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { changePostsOrder } from 'actions';
-import { getPosts, getSortOrder } from 'selectors';
+import * as actionCreators from 'actions';
+import { getVisiblePosts, getPostsSortOrder } from 'selectors';
 
 import ResultsPanel from 'components/ResultsPanel';
-import SearchInResultsFilter from 'components/SearchInResultsFilter';
+import SearchResultsFilter from 'components/SearchResultsFilter';
 import FoundPostsList from 'components/FoundPostsList';
 
 const PostsSearchResults = props => (
-  <ResultsPanel heading={<SearchInResultsFilter {...props} />}>
+  <ResultsPanel heading={<SearchResultsFilter {...props} />}>
     <FoundPostsList {...props} />
   </ResultsPanel>
 );
 
 const mapStateToProps = state => ({
-  posts: getPosts(state),
-  order: getSortOrder(state),
+  posts: getVisiblePosts(state),
+  sortOrder: getPostsSortOrder(state),
 });
 
-const mapDispatchToProps = { changePostsOrder };
+const { setPostsSortOrder, setPostsFilterText } = actionCreators;
 
-export default connect(mapStateToProps, mapDispatchToProps)(PostsSearchResults);
+const propsToDispatch = { setPostsSortOrder, setPostsFilterText };
+
+export default connect(mapStateToProps, propsToDispatch)(PostsSearchResults);

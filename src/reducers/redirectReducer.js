@@ -1,6 +1,6 @@
 import {
   REDIRECT_TO_AUTH,
-  REJECT_AUTH_REDIRECT,
+  REJECT_AUTH_OFFER,
   OFFER_AUTH_REDIRECT,
 } from 'constants/actionTypes';
 
@@ -9,6 +9,9 @@ const initialState = {
   hasAuthOffer: false,
   hasDelayedAuthOffer: false,
 };
+
+// Reducer for vk.com authentication redirection
+// Related modals are displayed
 
 const redirectReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -24,7 +27,7 @@ const redirectReducer = (state = initialState, action) => {
         hasAuthOffer: !action.hasDelay,
         hasDelayedAuthOffer: action.hasDelay,
       };
-    case REJECT_AUTH_REDIRECT:
+    case REJECT_AUTH_OFFER:
       return {
         ...state,
         hasAuthOffer: false,

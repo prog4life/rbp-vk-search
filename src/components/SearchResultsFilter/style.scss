@@ -1,0 +1,18 @@
+.search-results-filter {
+  display: flex;
+  justify-content: space-between;
+}
+
+.search-results-filter__text-input {
+  flex: 0 1 50%;
+}
+
+.search-results-filter__sort-order {
+  flex: 0 1 20%;
+}
+
+@media (max-width: 767px) {
+  .search-results-filter__sort-order {
+    flex-basis: 35%;
+  }
+}

@@ -38,6 +38,9 @@ class WallPostsPageContainer extends React.Component {
       return;
     }
 
+    // TODO: enable initial delayed offer for auth redirection and do not
+    // enable it on another mount, REJECT_AUTH_OFFER if token present instead
+
     if (!accessToken) {
       offerAuthRedirect({ hasDelay: true });
       return;
@@ -75,10 +78,10 @@ class WallPostsPageContainer extends React.Component {
     // const {
     //   isSearchActive,
     //   isRedirecting,
-    //   isAuthOfferVisible,
+    //   hasAuthOffer,
     //   posts,
     //   redirectToAuth,
-    //   rejectAuthRedirect,
+    //   rejectAuthOffer,
     // } = this.props;
 
     return (
@@ -93,8 +96,8 @@ class WallPostsPageContainer extends React.Component {
 const mapStateToProps = state => ({
   accessToken: getAccessToken(state),
   isRedirecting: getIsRedirecting(state),
-  isAuthOfferVisible: getAuthOfferFlag(state),
-  isAuthOfferDelayed: getDelayedAuthOfferFlag(state),
+  hasAuthOffer: getAuthOfferFlag(state),
+  hasDelayedAuthOffer: getDelayedAuthOfferFlag(state),
   isSearchActive: getSearchIsActive(state),
 });
 

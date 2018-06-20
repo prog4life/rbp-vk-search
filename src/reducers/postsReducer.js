@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import {
-  POSTS_RECEIVED, SEARCH_START, CHANGE_POSTS_ORDER,
+  POSTS_RECEIVED, SEARCH_START, SET_POSTS_SORT_ORDER, SET_POSTS_FILTER_TEXT,
 } from 'constants/actionTypes.js';
 import { createReducer, makeUnion } from './reducerUtils';
 
@@ -22,6 +22,8 @@ import { createReducer, makeUnion } from './reducerUtils';
 
 // TODO: cut excess results at SEARCH_END
 // TODO: add flag to check to show or not intermediate results during search
+
+// Reducer for found by search posts at wall
 
 const byId = createReducer(null, {
   [POSTS_RECEIVED]: (state, action) => (
@@ -45,17 +47,23 @@ const limit = createReducer(null, {
   [SEARCH_START]: (state, action) => action.limit,
 });
 
-const order = createReducer('descend', {
-  [CHANGE_POSTS_ORDER]: (state, action) => action.order,
+const sortOrder = createReducer('descend', {
+  [SET_POSTS_SORT_ORDER]: (state, action) => action.order,
+});
+
+const filterText = createReducer('', {
+  [SET_POSTS_FILTER_TEXT]: (state, action) => action.filterText,
 });
 
 export default combineReducers({
   byId,
   ids,
   limit,
-  order,
+  sortOrder,
+  filterText,
 });
 
 export const getById = state => state.byId;
 export const getIds = state => state.ids;
-export const getOrder = state => state.order;
+export const getSortOrder = state => state.sortOrder;
+export const getFilterText = state => state.filterText;
