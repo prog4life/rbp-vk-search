@@ -10,7 +10,7 @@ import {
 // import fetchJSONP from 'utils/fetchJSONP';
 import jsonpPromise from 'utils/jsonpPromise';
 import { onSuccess, onFail } from './requestHandlers';
-import transformResponse from './transformResponse';
+import handleResponse from './handleResponse';
 // TODO: pass with action
 // import { API_CALL_PARAMS } from 'middleware/callAPI';
 
@@ -93,8 +93,9 @@ const searchProcessor = ({ dispatch, getState }) => {
     // from common config and set as defaults here
     const {
       // TODO: not destructure authorId here and pass whole searchConfig obj to
-      // handleResponse(transformResponse)
+      // handleResponse(handleResponse)
       authorId,
+      sex = 1,
       baseAPIReqUrl,
       searchResultsLimit,
       // TODO: retrieve defaults of next 3 from options passed to middleware factory
@@ -110,6 +111,8 @@ const searchProcessor = ({ dispatch, getState }) => {
     // to notify reducers about search start
     // will also clear "requests" in store
     next({ type: SEARCH_START, limit: searchResultsLimit });
+
+    // TODO: cache posts and not search if amount and last id is the same
 
     // let checkpoint = performance.now(); // TEMP:
     // let checkpoint2 = performance.now(); // TEMP:
@@ -132,7 +135,10 @@ const searchProcessor = ({ dispatch, getState }) => {
           onSuccess({ next, getState, offset }),
           onFail(next, getState, offset),
         )
-        .then(response => transformResponse(response, 'wall-posts', authorId))
+        .then(response => handleResponse(response, 'wall-posts', {
+          authorId,
+          sex,
+        }))
         .then(
           results => next({ type: resultsType, ...results }),
           error => console.warn(error), // TODO: try error.message and next()

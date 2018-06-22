@@ -3,7 +3,7 @@ import {
 } from 'selectors';
 // import fetchJSONP from 'utils/fetchJSONP';
 import jsonpPromise from 'utils/jsonpPromise';
-import transformResponse from './transformResponse';
+import handleResponse from './handleResponse';
 
 export const API_CALL_PARAMS = 'CallAPI::Parameters';
 
@@ -169,7 +169,7 @@ export default ({ getState }) => next => (action) => {
       amount: response.items ? response.items.length : null,
     });
 
-    // return transformResponse('wall-posts', authorId)(response);
+    // return handleResponse('wall-posts', authorId)(response);
 
     // next({ type: resultsType, ...results });
     return response;
@@ -181,7 +181,7 @@ export default ({ getState }) => next => (action) => {
       onSuccess,
       onRequestFail(next, getState, offset, failType),
     )
-    .then(response => transformResponse(response, 'wall-posts', authorId))
+    .then(response => handleResponse(response, 'wall-posts', authorId))
     .then(
       results => next({ type: resultsType, ...results }),
       error => console.warn(error), // TODO: try error.message and next()
@@ -191,8 +191,8 @@ export default ({ getState }) => next => (action) => {
   //   getState,
   //   type: resultsType,
   // }));
-  // TODO: change to more generic then(transformResponse(schema))
-  // .then(transformResponse('wall-posts', authorId))
+  // TODO: change to more generic then(handleResponse(schema))
+  // .then(handleResponse('wall-posts', authorId))
   // .then(savePartOfResults(next, resultsLimit, addResultsType))
   // .catch(e => console.warn(e));
 };

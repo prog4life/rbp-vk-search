@@ -122,7 +122,7 @@ export const getVisiblePosts = createSelector(
       return null;
     }
     return sortOrder === 'descend'
-      ? [].concat(sortedPosts).reverse()
+      ? [].concat(sortedPosts).reverse() // NOTE: think over lodash's "orderBy"
       : sortedPosts;
   },
 );

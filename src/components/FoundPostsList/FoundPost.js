@@ -10,8 +10,10 @@ import './style.scss';
 
 function FoundPost({ post, number }) {
   const {
-    timestamp, authorId, id, text, link,
+    timestamp, authorId, id, text, link, photo50, photo100,
   } = post;
+
+  // TODO: add displayAvatar flag that will be false if post author id input present
 
   const resultNumber = `${number}`;
   const linkText = 'Open at wall';
@@ -89,7 +91,14 @@ function FoundPost({ post, number }) {
         </div>
       </div>
       <div className="found-post__content">
-        <p style={{ flex: 9, paddingRight: '8px' }}>
+        {photo50 &&
+          <div style={{ marginTop: '5px' }}>
+            <a href={linkToUserPage} target="_blank">
+              <img src={photo50} alt="user-avatar" />
+            </a>
+          </div>
+        }
+        <p style={{ flex: 9, padding: '0 8px' }}>
           {text}
         </p>
         {/* TODO: add minWidth and change textAlign to right at xxl braekpoint */}

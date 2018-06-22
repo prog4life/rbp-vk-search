@@ -22,15 +22,16 @@ export const startWallPostsSearch = (inputData) => {
   const { wallOwnerType, wallOwnerShortName = '' } = inputData;
   const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
   const wallOwnerId = inputData.wallOwnerId || '';
-  const postAuthorId = Number(inputData.postAuthorId) || postAuthorIdDef;
-  const searchResultsLimit = Number(inputData.searchResultsLimit) || undefined;
+  const postAuthorId = Number(inputData.postAuthorId) || ''; // || postAuthorIdDef;
+  const searchResultsLimit = Number(inputData.searchResultsLimit) || null;
 
   // TODO: use encodeURIComponent ?
+
   const baseAPIReqUrl = 'https://api.vk.com/method/wall.get?' +
     `owner_id=${wallOwnerTypePrefix}${wallOwnerId}` +
     `&domain=${wallOwnerShortName}` +
     // TODO: make next 2 optional
-    `&count=${count}&v=${apiVersion}&extended=0`;
+    `&count=${count}&v=${apiVersion}&extended=1`;
 
   return {
     types: [
@@ -89,7 +90,7 @@ export const startWallPostsSearch = (inputData) => {
 //   return {
 //     type: SEARCH_START,
 //     searchConfig: {
-//       // replaced by in place "transformResponse" call below
+//       // replaced by in place "handleResponse" call below
 //       // authorId: postAuthorId,
 //       baseAPIReqUrl,
 //       searchResultsLimit,
@@ -98,7 +99,7 @@ export const startWallPostsSearch = (inputData) => {
 //     },
 //     // callAPI: fetchJSONP,
 //     callAPI: fetchJSONP,
-//     handleResponse: transformResponse(postAuthorId),
+//     handleResponse: handleResponse(postAuthorId),
 //     addResults,
 //     requestStart,
 //     requestSuccess,
