@@ -4,6 +4,9 @@ import { ListGroup, ListGroupItem } from 'react-bootstrap';
 import FoundPost from './FoundPost';
 
 function FoundPostsList({ posts }) {
+
+  // TODO: No match with / Nothing found for "..." query
+
   if (!posts || posts.length === 0) {
     return (
       <ListGroup>

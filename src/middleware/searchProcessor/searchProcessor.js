@@ -129,7 +129,7 @@ const searchProcessor = ({ dispatch, getState }) => {
 
       return jsonpPromise(currentAPICallUrl)
         .then(
-          onSuccess(next, getState, offset),
+          onSuccess({ next, getState, offset }),
           onFail(next, getState, offset),
         )
         .then(response => transformResponse(response, 'wall-posts', authorId))

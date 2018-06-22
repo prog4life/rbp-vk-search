@@ -26,7 +26,9 @@ export const setUserName = userName => ({
 
 export const fetchUserName = (userId, token) => (dispatch, getState) => {
   const accessToken = token || getAccessToken(getState());
-  // TODO: replace by selector
+
+  // TODO: add request and success actions
+
   requestUserName(userId, accessToken).then(
     userName => dispatch(setUserName(userName)),
     () => dispatch(fetchUserNameFail()),

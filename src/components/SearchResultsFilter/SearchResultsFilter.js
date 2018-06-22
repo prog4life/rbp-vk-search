@@ -6,21 +6,21 @@ import { FormControl } from 'react-bootstrap';
 import './style.scss';
 
 class SearchResultsFilter extends React.Component {
-  state = {
-    filterText: '',
-  }
+  // state = {
+  //   filterText: '',
+  // }
   setFilterTextThrottled = throttle(
     this.props.setPostsFilterText, // eslint-disable-line react/destructuring-assignment
-    1000,
+    500,
     { leading: true, trailing: true },
   )
   handleFilterTextChange = (event) => {
     const inputValue = event.target.value;
 
     this.setFilterTextThrottled(inputValue);
-    this.setState({
-      filterText: inputValue,
-    });
+    // this.setState({
+    //   filterText: inputValue,
+    // });
   }
   handleOrderChange = (event) => {
     const { setPostsSortOrder } = this.props;
@@ -28,8 +28,8 @@ class SearchResultsFilter extends React.Component {
     setPostsSortOrder(event.target.value);
   }
   render() {
-    const { sortOrder } = this.props;
-    const { filterText } = this.state;
+    // const { sortOrder } = this.props;
+    // const { filterText } = this.state;
 
     return (
       <div className="search-results-filter">
@@ -38,13 +38,13 @@ class SearchResultsFilter extends React.Component {
           type="text"
           placeholder="Write to search in results"
           onChange={this.handleFilterTextChange}
-          value={filterText}
+          // value={filterText}
         />
         <FormControl
           className="search-results-filter__sort-order"
           componentClass="select"
           onChange={this.handleOrderChange}
-          value={sortOrder}
+          // value={sortOrder}
         >
           <option value="descend">
             {'Recent First'}
@@ -61,7 +61,7 @@ class SearchResultsFilter extends React.Component {
 SearchResultsFilter.propTypes = {
   setPostsFilterText: pT.func.isRequired,
   setPostsSortOrder: pT.func.isRequired,
-  sortOrder: pT.string.isRequired,
+  // sortOrder: pT.string.isRequired,
 };
 
 export default SearchResultsFilter;

@@ -91,11 +91,14 @@ export const getFilteredByTextPosts = createSelector(
       return null;
     }
     const arrayOfPosts = Object.values(postsById);
+    const updFilterText = filterText.trim().toLowerCase();
 
-    if (filterText === '') {
+    if (updFilterText === '') {
       return arrayOfPosts;
     }
-    return arrayOfPosts.filter(post => post.text.includes(filterText));
+    return arrayOfPosts.filter(post => (
+      post.text.toLowerCase().includes(updFilterText)
+    ));
   },
 );
 
