@@ -18,8 +18,8 @@ const WallOwnerIdField = ({
   input: { value, onChange }, isDisabled, onIdTypeSwitch,
 }) => (
   <FormInputGroup
-    id="wall-owner-id"
-    label="Wall owner id"
+    id="wall-owner-usual-id"
+    label="Wall owner usual id"
     validationState={null}
   >
     <InputGroup>
@@ -33,7 +33,7 @@ const WallOwnerIdField = ({
         />
       </InputGroup.Addon>
       <FormControl
-        name="wallOwnerId"
+        name="wallOwnerUsualId"
         onChange={onChange}
         placeholder="123456789"
         // required // TODO: this or short name must be entered, look below

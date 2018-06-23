@@ -1,5 +1,3 @@
-// TODO: replace next dependency to configureStore
-import { maxAttempts as maxAttemptsDefault } from 'config/common';
 import {
   TERMINATE_SEARCH, SEARCH_START, SEARCH_SET_OFFSET, SEARCH_END, SEARCH_REQUEST,
 } from 'constants/actionTypes';
@@ -11,16 +9,9 @@ import {
 import jsonpPromise from 'utils/jsonpPromise';
 import { onSuccess, onFail } from './requestHandlers';
 import handleResponse from './handleResponse';
-// TODO: pass with action
-// import { API_CALL_PARAMS } from 'middleware/callAPI';
+import { validateAction, validateOptions, validateParams } from './validation';
 
-export const SEARCH_CONFIG = 'SEARCH::Config'; // TODO: rename to search parameters
-
-// IDEA
-export const kindsOfData = {
-  wallPosts: 'WALL_POSTS',
-  // wallComments: 'WALL_COMMENTS'
-};
+export const SEARCH_PARAMETERS = 'SEARCH::Parameters';
 
 // const determineNextActionOnIntervalTick = () => {}; // TODO:
 
@@ -50,9 +41,9 @@ const searchProcessor = ({ dispatch, getState }) => {
     // TODO: destructure from action callAPI and handleResponse functions with
     // imported defaults
     const { type, types, getNumberOfResults } = action;
-    const searchConfig = action[SEARCH_CONFIG];
+    const searchParams = action[SEARCH_PARAMETERS];
 
-    if (typeof searchConfig === 'undefined' && type !== TERMINATE_SEARCH) {
+    if (typeof searchParams === 'undefined' && type !== TERMINATE_SEARCH) {
       return next(action);
     }
     if (!types && type !== TERMINATE_SEARCH) {
@@ -62,55 +53,38 @@ const searchProcessor = ({ dispatch, getState }) => {
       clearInterval(searchIntervalId);
       return next(action); // TODO: pass limit to cut extra results ?
     }
+    validateAction(action);
 
-    if (!Array.isArray(types) || types.length !== 1) {
-      throw new Error('Expected an array of 1 action types.');
-    }
-    if (typeof searchConfig !== 'object') {
-      throw new Error('Expected an object with search config params');
-    }
-    if (typeof getNumberOfResults !== 'function') {
-      throw new Error('Expected "getNumberOfResults" to be function');
-    }
-    if (!types.every(t => typeof t === 'string')) {
-      throw new Error('Expected action types to be strings');
-    }
     const accessToken = getAccessToken(getState());
 
     // TODO: consider to dispatch action with error message instead
     if (typeof accessToken !== 'string' || !accessToken.length) {
       throw new Error('Expected access token to be not empty string');
     }
+    const { meta = {} } = action;
 
-    const [
-      // requestType,
-      // successType,
-      // failType, // TODO: make it interval const
-      resultsType,
-    ] = types;
+    validateOptions(meta);
+    validateParams(searchParams);
 
-    // TODO: import offsetModifier, requestInterval
-    // from common config and set as defaults here
+    const [resultsType] = types;
+    // TODO: not destructure postAuthorId here and pass whole searchParams obj
+    // to handleResponse(handleResponse)
+    const { baseRequestURL, mode, filters, resultsLimit } = searchParams;
+    const { postAuthorId, postAuthorSex } = filters;
     const {
-      // TODO: not destructure authorId here and pass whole searchConfig obj to
-      // handleResponse(handleResponse)
-      authorId,
-      sex = 1,
-      baseAPIReqUrl,
-      searchResultsLimit,
       // TODO: retrieve defaults of next 3 from options passed to middleware factory
       offsetModifier, // should be equal to request url "count" param value
       requestInterval,
-      maxAttempts = maxAttemptsDefault,
-    } = searchConfig;
+      maxAttempts,
+    } = meta;
 
-    // TODO: validate authorId, baseAPIReqUrl
+    // TODO: validate postAuthorId, baseRequestURL
 
     // doublecheck
     clearInterval(searchIntervalId);
     // to notify reducers about search start
     // will also clear "requests" in store
-    next({ type: SEARCH_START, limit: searchResultsLimit });
+    next({ type: SEARCH_START, limit: resultsLimit });
 
     // TODO: cache posts and not search if amount and last id is the same
 
@@ -127,17 +101,17 @@ const searchProcessor = ({ dispatch, getState }) => {
       // add request obj with isPending: true to "requests"
       next({ type: SEARCH_REQUEST, offset, startTime: Date.now() });
 
-      const currentAPICallUrl = `${baseAPIReqUrl}&offset=${offset}` +
+      const currentRequestURL = `${baseRequestURL}&offset=${offset}` +
         `&access_token=${accessToken}`;
 
-      return jsonpPromise(currentAPICallUrl)
+      return jsonpPromise(currentRequestURL)
         .then(
           onSuccess({ next, getState, offset }),
           onFail(next, getState, offset),
         )
         .then(response => handleResponse(response, 'wall-posts', {
-          authorId,
-          sex,
+          authorId: postAuthorId,
+          sex: postAuthorSex,
         }))
         .then(
           results => next({ type: resultsType, ...results }),
@@ -185,7 +159,7 @@ const searchProcessor = ({ dispatch, getState }) => {
 
       // request next portion of items using increased offset
       if (
-        (!searchResultsLimit || resultsCount < searchResultsLimit) &&
+        (!resultsLimit || resultsCount < resultsLimit) &&
         (!total || nextOffset <= total)
       ) {
         next({ type: SEARCH_SET_OFFSET, offset: nextOffset });

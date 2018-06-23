@@ -3,25 +3,13 @@ import PropTypes from 'prop-types';
 import { InputGroup, FormControl } from 'react-bootstrap';
 import FormInputGroup from './FormInputGroup';
 
-function getValidationState(value, isDisabled, validate) {
-  if (isDisabled || !validate) {
-    return undefined;
-  }
-  if (value.length < 1) {
-    validate('postAuthorId', 'error');
-    return 'error';
-  }
-  return undefined;
-}
-
-const PostAuthorIdField = ({ input, isDisabled, onSearchTypeSwitch }) => {
+const PostAuthorSexSelect = ({ input, isDisabled, onSearchTypeSwitch }) => {
   const { value, onChange } = input;
 
   return (
     <FormInputGroup
-      id="post-author-id"
-      label="Post author id"
-      validationState={null}
+      id="post-author-sex"
+      label="Post author sex"
     >
       <InputGroup>
         <InputGroup.Addon>
@@ -30,23 +18,29 @@ const PostAuthorIdField = ({ input, isDisabled, onSearchTypeSwitch }) => {
             onChange={onSearchTypeSwitch}
             type="radio"
             name="searchType"
-            value="byAuthorId"
+            value="bySex"
           />
         </InputGroup.Addon>
         <FormControl
-          // name="postAuthorId"
-          placeholder="123456789"
-          type="text"
+          // name="postAuthorSex"
+          componentClass="select"
           disabled={isDisabled}
           onChange={onChange}
           value={value}
-        />
+        >
+          <option value="2">
+            {'Man'}
+          </option>
+          <option value="1">
+            {'Woman'}
+          </option>
+        </FormControl>
       </InputGroup>
     </FormInputGroup>
   );
 };
 
-PostAuthorIdField.propTypes = {
+PostAuthorSexSelect.propTypes = {
   input: PropTypes.shape({
     onChange: PropTypes.func.isRequired,
     value: PropTypes.string.isRequired,
@@ -55,4 +49,4 @@ PostAuthorIdField.propTypes = {
   onSearchTypeSwitch: PropTypes.func.isRequired,
 };
 
-export default PostAuthorIdField;
+export default PostAuthorSexSelect;

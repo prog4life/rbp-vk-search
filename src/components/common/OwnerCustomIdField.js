@@ -8,18 +8,18 @@ function getValidationState(value, isDisabled, validate) {
     return undefined;
   }
   if (value.length < 1 || value.length > 32) { // numbers, letters and _
-    validate('wallOwnerShortName', 'error');
+    validate('wallOwnerCustomId', 'error');
     return 'error';
   }
   return undefined;
 }
 
-const OwnerShortNameField = ({
+const OwnerCustomIdField = ({
   input: { value, onChange }, isDisabled, onIdTypeSwitch,
 }) => (
   <FormInputGroup
-    id="wall-owner-short-name"
-    label="Short name of wall owner"
+    id="wall-owner-custom-id"
+    label="Wall owner custom id"
     validationState={null}
   >
     <InputGroup>
@@ -29,13 +29,13 @@ const OwnerShortNameField = ({
           onChange={onIdTypeSwitch}
           type="radio"
           name="wallOwnerIdType"
-          value="shortName"
+          value="customId"
         />
       </InputGroup.Addon>
       <FormControl
-        name="wallOwnerShortName"
+        name="wallOwnerCustomId"
         onChange={onChange}
-        placeholder="short textual id (instead of numeric id)"
+        placeholder="modified user id from url"
         disabled={isDisabled}
         type="text"
         value={value}
@@ -44,7 +44,7 @@ const OwnerShortNameField = ({
   </FormInputGroup>
 );
 
-OwnerShortNameField.propTypes = {
+OwnerCustomIdField.propTypes = {
   input: PropTypes.shape({
     onChange: PropTypes.func.isRequired,
     value: PropTypes.string.isRequired,
@@ -53,4 +53,4 @@ OwnerShortNameField.propTypes = {
   onIdTypeSwitch: PropTypes.func.isRequired,
 };
 
-export default OwnerShortNameField;
+export default OwnerCustomIdField;

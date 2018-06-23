@@ -7,8 +7,9 @@ import { Grid, Row, Col } from 'react-bootstrap';
 import ControlsContainer from 'containers/ControlsContainer';
 import PostAuthorIdField from 'components/common/PostAuthorIdField';
 import WallOwnerIdField from 'components/common/WallOwnerIdField';
-import OwnerShortNameField from 'components/common/OwnerShortNameField';
+import OwnerCustomIdField from 'components/common/OwnerCustomIdField';
 import WallOwnerTypeSelect from 'components/common/WallOwnerTypeSelect';
+import PostAuthorSexSelect from 'components/common/PostAuthorSexSelect';
 import SearchResultsLimitField from 'components/common/SearchResultsLimitField';
 
 import './style.scss';
@@ -24,11 +25,13 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
     super(props);
 
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleInputValueChange = this.handleInputValueChange.bind(this);
+    this.handleIdTypeSwitch = this.handleIdTypeSwitch.bind(this);
+    this.handleSearchTypeSwitch = this.handleSearchTypeSwitch.bind(this);
 
     this.state = {
       isSubmitted: false,
-      isShortNameUsed: false,
+      isCustomIdUsed: false,
+      searchType: 'byAuthorId',
     };
     this.renderCount = 0;
   }
@@ -45,7 +48,7 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
     }
   }
   componentDidUpdate() {
-    const { isSubmitted, isShortNameUsed, ...rest } = this.state;
+    const { isSubmitted, isCustomIdUsed, ...rest } = this.state;
     const { onStartSearch } = this.props;
 
     console.log('cDU, render #', this.renderCount);
@@ -58,28 +61,48 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
   handleSubmit(values) {
     // event.preventDefault();
     const { isSearchActive, onStartSearch } = this.props;
+    const { isCustomIdUsed, searchType } = this.state;
 
     if (isSearchActive) {
       return;
     }
 
+    // TODO: looks like throttling is no more needed
+
     console.log('SUBMITTED values: ', values);
+    const {
+      wallOwnerUsualId, wallOwnerCustomId, postAuthorId, postAuthorSex,
+    } = values;
     // NOTE: will be executed once component is re-rendered
     // setState callbacks (second argument) now fire immediately after
     // componentDidMount / componentDidUpdate instead of after all components have rendered
-    onStartSearch(values);
+    onStartSearch({
+      ...values,
+      wallOwnerUsualId: isCustomIdUsed ? null : Number(wallOwnerUsualId),
+      wallOwnerCustomId: isCustomIdUsed ? wallOwnerCustomId : null,
+      postAuthorId: searchType === 'byAuthorId' ? Number(postAuthorId) : null,
+      postAuthorSex: searchType === 'byAuthorId' ? null : Number(postAuthorSex),
+    });
   }
-  // TODO: looks like throttling is no more needed
-  handleInputValueChange(event) {
-    if (event.target.type === 'radio') {
+  handleIdTypeSwitch(event) {
+    const { target } = event;
+
+    if (target.type === 'radio' && target.name === 'wallOwnerIdType') {
       this.setState({
-        isShortNameUsed: event.target.value === 'shortName',
+        isCustomIdUsed: target.value === 'customId',
+      });
+    }
+  }
+  handleSearchTypeSwitch(event) {
+    if (event.target.type === 'radio' && event.target.name === 'searchType') {
+      this.setState({
+        searchType: event.target.value,
       });
     }
   }
   render() {
     const { isSearchActive, handleSubmit } = this.props;
-    const { isShortNameUsed } = this.state;
+    const { isCustomIdUsed, searchType } = this.state;
 
     this.renderCount = this.renderCount + 1;
 
@@ -94,18 +117,18 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
               {/* TODO: check id or shortname is used for validation by
                 isDisabled prop */}
               <Field
-                name="wallOwnerId"
+                name="wallOwnerUsualId"
                 component={WallOwnerIdField}
-                onIdTypeSwitch={this.handleInputValueChange}
-                isDisabled={isSearchActive || isShortNameUsed}
+                onIdTypeSwitch={this.handleIdTypeSwitch}
+                isDisabled={isSearchActive || isCustomIdUsed}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
               <Field
-                name="wallOwnerShortName"
-                component={OwnerShortNameField}
-                onIdTypeSwitch={this.handleInputValueChange}
-                isDisabled={isSearchActive || !isShortNameUsed}
+                name="wallOwnerCustomId"
+                component={OwnerCustomIdField}
+                onIdTypeSwitch={this.handleIdTypeSwitch}
+                isDisabled={isSearchActive || !isCustomIdUsed}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
@@ -119,7 +142,16 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
               <Field
                 name="postAuthorId"
                 component={PostAuthorIdField}
-                isDisabled={isSearchActive}
+                onSearchTypeSwitch={this.handleSearchTypeSwitch}
+                isDisabled={isSearchActive || searchType !== 'byAuthorId'}
+              />
+            </Col>
+            <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
+              <Field
+                name="postAuthorSex"
+                component={PostAuthorSexSelect}
+                onSearchTypeSwitch={this.handleSearchTypeSwitch}
+                isDisabled={isSearchActive || searchType !== 'bySex'}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
@@ -129,7 +161,12 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
                 isDisabled={isSearchActive}
               />
             </Col>
-            <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4} >
+            {/* <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4} >
+              <ControlsContainer itemsName="posts" />
+            </Col> */}
+          </Row>
+          <Row>
+            <Col xsOffset={1} smOffset={0} xs={10} >
               <ControlsContainer itemsName="posts" />
             </Col>
           </Row>

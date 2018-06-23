@@ -1,8 +1,8 @@
 import { POSTS_RECEIVED, TERMINATE_SEARCH } from 'constants/actionTypes';
-import {
-  apiVersion, count, offsetModifier, requestInterval, inputDefaults,
-} from 'config/common';
-import { SEARCH_CONFIG } from 'middleware/searchProcessor';
+import { WALL_POSTS_BY_SEX, WALL_POSTS_BY_AUTHOR_ID } from 'constants/searchModes';
+import { WALL_GET_BASE_URL } from 'constants/api';
+import { apiVersion, count, offsetModifier, requestInterval } from 'config/common';
+import { SEARCH_PARAMETERS } from 'middleware/searchProcessor';
 import { getIdsOfPosts } from 'selectors';
 
 export const terminateSearch = () => ({
@@ -14,24 +14,23 @@ export const terminateSearch = () => ({
 // addition to "user_id" field also includes first_name, last_name, sex, online,
 // 2 avatar fields, so can search using corresponding queries
 
+// NOTE: or create separate action creators: findWallPostsBySex/AuthorId
 // will be utilized by searchProcessor middleware
 export const startWallPostsSearch = (inputData) => {
-  // TEMP: for testing
-  const { postAuthorIdDef } = inputDefaults;
-
-  const { wallOwnerType, wallOwnerShortName = '' } = inputData;
+  const { wallOwnerType, wallOwnerUsualId, wallOwnerCustomId } = inputData;
   const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
-  const wallOwnerId = inputData.wallOwnerId || '';
-  const postAuthorId = Number(inputData.postAuthorId) || ''; // || postAuthorIdDef;
-  const searchResultsLimit = Number(inputData.searchResultsLimit) || null;
+  const postAuthorId = Number(inputData.postAuthorId) || null;
+  const postAuthorSex = Number(inputData.postAuthorSex) || null;
+  const resultsLimit = Number(inputData.searchResultsLimit) || null;
+  const ownerId = wallOwnerUsualId
+    ? `owner_id=${wallOwnerTypePrefix}${wallOwnerUsualId}`
+    : '';
+  const domain = wallOwnerCustomId ? `&domain=${wallOwnerCustomId}` : '';
 
   // TODO: use encodeURIComponent ?
 
-  const baseAPIReqUrl = 'https://api.vk.com/method/wall.get?' +
-    `owner_id=${wallOwnerTypePrefix}${wallOwnerId}` +
-    `&domain=${wallOwnerShortName}` +
-    // TODO: make next 2 optional
-    `&count=${count}&v=${apiVersion}&extended=1`;
+  const baseRequestURL = `${WALL_GET_BASE_URL}?` +
+    `${ownerId}${domain}&count=${count}&v=${apiVersion}&extended=1`;
 
   return {
     types: [
@@ -50,14 +49,17 @@ export const startWallPostsSearch = (inputData) => {
     getNumberOfResults: state => getIdsOfPosts(state).length, // OR:
     // IDEA:
     // pass searchTarget/itemsName/searchedItems ('WallPosts' || 'WALL_POSTS')
-    [SEARCH_CONFIG]: {
-      searchResultsLimit,
-      authorId: postAuthorId,
-      baseAPIReqUrl,
-      // TODO: schema: 'wall-posts',
-      // next 2 is optional, defaults should be passed to middleware factory
-      offsetModifier, // should be equal to request url "count" param value
+    [SEARCH_PARAMETERS]: {
+      baseRequestURL,
+      mode: postAuthorId ? WALL_POSTS_BY_AUTHOR_ID : WALL_POSTS_BY_SEX,
+      filters: { postAuthorId, postAuthorSex },
+      resultsLimit,
+    },
+    meta: {
+      // NOTE: next 3 is optional, defaults should be passed to middleware factory
+      offsetModifier, // must be equal to request url "count" param value !!!
       requestInterval,
+      maxAttempts: 5,
     },
   };
 };
@@ -74,26 +76,26 @@ export const startWallPostsSearch = (inputData) => {
 //   // TEMP:
 //   const { postAuthorIdDef, ownerIdDef } = inputDefaults;
 
-//   const { wallOwnerType, wallOwnerShortName } = inputData;
+//   const { wallOwnerType, wallOwnerCustomId } = inputData;
 //   const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
 //   const wallOwnerId = inputData.wallOwnerId || ownerIdDef;
 //   const postAuthorId = Number(inputData.postAuthorId) || postAuthorIdDef;
-//   const searchResultsLimit = Number(inputData.searchResultsLimit);
+//   const resultsLimit = Number(inputData.searchResultsLimit);
 
 //   // TODO: add "&access_token=${accessToken}" here ?
 //   // TODO: use encodeURIComponent ?
-//   const baseAPIReqUrl = 'https://api.vk.com/method/wall.get?' +
+//   const baseRequestURL = 'https://api.vk.com/method/wall.get?' +
 //     `owner_id=${wallOwnerTypePrefix}${wallOwnerId}` +
-//     `&domain=${wallOwnerShortName}` +
+//     `&domain=${wallOwnerCustomId}` +
 //     `&count=${count}&v=${apiVersion}&extended=0`;
 
 //   return {
 //     type: SEARCH_START,
-//     searchConfig: {
+//     searchParams: {
 //       // replaced by in place "handleResponse" call below
 //       // authorId: postAuthorId,
-//       baseAPIReqUrl,
-//       searchResultsLimit,
+//       baseRequestURL,
+//       resultsLimit,
 //       offsetModifier, // should be equal to request url "count" param value
 //       requestInterval,
 //     },
