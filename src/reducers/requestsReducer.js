@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import {
   SEARCH_REQUEST, SEARCH_REQUEST_SUCCESS, SEARCH_REQUEST_FAIL,
-  SEARCH_START, TERMINATE_SEARCH,
+  SEARCH_REQUEST_REFUSE, SEARCH_START, TERMINATE_SEARCH,
 } from 'constants/actionTypes';
 import { addIfNotExist, createReducer } from './reducerUtils';
 
@@ -65,6 +65,16 @@ const failed = createReducer([], {
   [TERMINATE_SEARCH]: () => ([]), // NOTE: remove ???
 });
 
+const errors = createReducer([], {
+  [SEARCH_REQUEST_FAIL]: (state, { code, offset, message, callbackId }) => (
+    [...state, { code, offset, message, callbackId }]
+  ),
+  [SEARCH_REQUEST_REFUSE]: (state, { offset, reason, callbackId }) => (
+    [...state, { offset, reason, callbackId }]
+  ),
+  [SEARCH_START]: () => ([]),
+});
+
 // NOTE: is unnecessary, check for presence in entities
 // const succeededIds = (state = [], action) => {
 //   switch (action.type) {
@@ -82,6 +92,7 @@ export default combineReducers({
   byOffset,
   pending,
   failed,
+  errors,
 });
 
 export const getAllByOffset = state => state.byOffset;

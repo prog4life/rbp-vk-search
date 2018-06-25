@@ -50,10 +50,12 @@ export const getIsCompleted = state => fromSearch.getIsCompleted(state.search);
 export const getSearchOffset = state => fromSearch.getOffset(state.search);
 export const getSearchTotal = state => fromSearch.getTotal(state.search);
 export const getSearchProcessed = state => fromSearch.getProcessed(state.search);
+export const getSearchErrorCode = state => fromSearch.getErrorCode(state.search);
 
 export const getRequestsByOffset = state => (
   fromSearch.getRequestsByOffset(state.search)
 );
+// single request obj
 export const getRequestByOffset = (state, offset) => (
   getRequestsByOffset(state)[offset]
 );

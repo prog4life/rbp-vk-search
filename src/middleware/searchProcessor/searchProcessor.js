@@ -1,15 +1,18 @@
 import {
   TERMINATE_SEARCH, SEARCH_START, SEARCH_SET_OFFSET, SEARCH_END, SEARCH_REQUEST,
 } from 'constants/actionTypes';
+import { AUTH_FAILED } from 'constants/api'; // TODO: pass with options ?
 import {
-  getAccessToken, getSearchTotal, getSearchOffset,
+  getAccessToken, getSearchTotal, getSearchOffset, getSearchErrorCode,
   getRequestsByOffset, getFailedList, getPendingList,
 } from 'selectors';
 // import fetchJSONP from 'utils/fetchJSONP';
 import jsonpPromise from 'utils/jsonpPromise';
 import { onSuccess, onFail } from './requestHandlers';
-import handleResponse from './handleResponse';
-import { validateAction, validateOptions, validateParams } from './validation';
+import transformResponse from './transformResponse';
+import {
+  validateAction, validateOffsetModifier, validateOptions, validateParams
+} from './validation';
 
 export const SEARCH_PARAMETERS = 'SEARCH::Parameters';
 
@@ -18,8 +21,17 @@ export const SEARCH_PARAMETERS = 'SEARCH::Parameters';
 // TODO: not repeat pending, just make them failed instead; Belated Overdue
 // const checkAndRepeatFailed = () => {}
 
+// TODO: middleware factory
+// export default function createSearchProcessorMiddleware(apiClient, options) {
+//   const { offsetModifier, requestInterval = 350, maxAttempts = 5 } = options;
+//
+//   validateOffsetModifier(offsetModifier);
+//
+//   return searchProcessor;
+// }
+
 const searchProcessor = ({ dispatch, getState }) => {
-  let searchIntervalId;
+  let intervalId; // TODO: replace to top
   // const search = {
   //   isActive: false,
   //   offset: 0
@@ -38,7 +50,7 @@ const searchProcessor = ({ dispatch, getState }) => {
   // };
 
   return next => (action) => {
-    // TODO: destructure from action callAPI and handleResponse functions with
+    // TODO: destructure from action callAPI and transformResponse functions with
     // imported defaults
     const { type, types, getNumberOfResults } = action;
     const searchParams = action[SEARCH_PARAMETERS];
@@ -50,48 +62,46 @@ const searchProcessor = ({ dispatch, getState }) => {
       return next(action);
     }
     if (type === TERMINATE_SEARCH) {
-      clearInterval(searchIntervalId);
+      clearInterval(intervalId);
       return next(action); // TODO: pass limit to cut extra results ?
-    }
-    validateAction(action);
-
-    const accessToken = getAccessToken(getState());
-
-    // TODO: consider to dispatch action with error message instead
-    if (typeof accessToken !== 'string' || !accessToken.length) {
-      throw new Error('Expected access token to be not empty string');
     }
     const { meta = {} } = action;
 
+    validateAction(action);
     validateOptions(meta);
     validateParams(searchParams);
 
     const [resultsType] = types;
+    const accessToken = getAccessToken(getState());
+    // const accessToken = 'dwad123231uhhuh13uh13';
+
+    if (typeof accessToken !== 'string' || !accessToken.length) {
+      throw new Error('No valid access token');
+    }
+
     // TODO: not destructure postAuthorId here and pass whole searchParams obj
-    // to handleResponse(handleResponse)
+    // to transformResponse(transformResponse)
     const { baseRequestURL, mode, filters, resultsLimit } = searchParams;
-    const { postAuthorId, postAuthorSex } = filters;
+    const { postAuthorId, postAuthorSex } = filters; // TEMP: pass entire obj further
     const {
-      // TODO: retrieve defaults of next 3 from options passed to middleware factory
+      // TODO: retrieve next 3 from options passed to middleware factory
       offsetModifier, // should be equal to request url "count" param value
       requestInterval,
       maxAttempts,
     } = meta;
 
-    // TODO: validate postAuthorId, baseRequestURL
-
     // doublecheck
-    clearInterval(searchIntervalId);
-    // to notify reducers about search start
+    clearInterval(intervalId);
     // will also clear "requests" in store
     next({ type: SEARCH_START, limit: resultsLimit });
 
-    // TODO: cache posts and not search if amount and last id is the same
+    // TODO: cache posts and not search in cache first if amount and last id
+    // is the same
 
     // let checkpoint = performance.now(); // TEMP:
     // let checkpoint2 = performance.now(); // TEMP:
 
-    // TODO: replace to top level
+    // TODO: replace to top level ?
     const makeCallToAPI = (offset = 0) => {
       // const tempCheckpoint2 = checkpoint2;
       // checkpoint2 = performance.now();
@@ -107,21 +117,23 @@ const searchProcessor = ({ dispatch, getState }) => {
       return jsonpPromise(currentRequestURL)
         .then(
           onSuccess({ next, getState, offset }),
-          onFail(next, getState, offset),
+          onFail({ next, getState, offset }),
         )
-        .then(response => handleResponse(response, 'wall-posts', {
+        .then(response => transformResponse(response, 'wall-posts', {
           authorId: postAuthorId,
           sex: postAuthorSex,
         }))
         .then(
           results => next({ type: resultsType, ...results }),
-          error => console.warn(error), // TODO: try error.message and next()
+          // TODO: consider if (eror.code === AUTH_FAILED) clearInterval() with
+          // replacing first makeCallToAPI() after setInterval
+          err => (err.isRefuse ? console.warn(err) : console.error(err)),
         );
     };
     // first request before timer tick
     makeCallToAPI();
 
-    searchIntervalId = setInterval(() => {
+    intervalId = setInterval(() => {
       // const tempCheckpoint = checkpoint;
       // checkpoint = performance.now();
       // console.warn(`NEW interval TICK: ${checkpoint - tempCheckpoint}`);
@@ -134,6 +146,12 @@ const searchProcessor = ({ dispatch, getState }) => {
       const reqs = getRequestsByOffset(state);
       const failed = getFailedList(state);
       const pending = getPendingList(state);
+      const errorCode = getSearchErrorCode(state);
+
+      if (errorCode === AUTH_FAILED) {
+        clearInterval(intervalId);
+        return;
+      }
 
       // NOTE: max number of parallel requests/connections ~ 6-8 / 17
       // TODO: maxPendingCount ~ 6
@@ -169,7 +187,7 @@ const searchProcessor = ({ dispatch, getState }) => {
 
       // end search
       if (pending.length === 0) {
-        clearInterval(searchIntervalId);
+        clearInterval(intervalId);
         next({ type: SEARCH_END });
       }
     }, requestInterval);

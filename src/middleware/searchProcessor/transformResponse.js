@@ -59,6 +59,8 @@ const formatPosts = (posts, profiles) => (
   })
 );
 
+// TODO: use "normalize" pkg instead
+
 export const normalizeShallowly = (items) => {
   const result = {
     itemsById: {},
@@ -103,8 +105,8 @@ export const transformWallPosts = (response, filters) => {
   // )(response, authorId);
 };
 
-// const handleResponse = (schema, authorId) => (response) => {
-const handleResponse = (response, schema, filters) => {
+// const transformResponse = (schema, authorId) => (response) => {
+const transformResponse = (response, schema, filters) => {
   switch (schema) {
     case 'wall-posts':
       return transformWallPosts(response, filters);
@@ -113,4 +115,4 @@ const handleResponse = (response, schema, filters) => {
   }
 };
 
-export default handleResponse;
+export default transformResponse;

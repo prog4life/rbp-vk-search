@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import FormInputGroup from './FormInputGroup';
 
-const SearchResultsLimitField = ({ input: { value, onChange }, isDisabled }) => (
+const ResultsLimitField = ({ input: { value, onChange }, isDisabled }) => (
   <FormInputGroup
     id="search-results-limit"
-    name="searchResultsLimit"
+    name="resultsLimit"
     label="Max number of search results"
     onChange={onChange}
     placeholder="number of results"
@@ -15,7 +15,7 @@ const SearchResultsLimitField = ({ input: { value, onChange }, isDisabled }) => 
   />
 );
 
-SearchResultsLimitField.propTypes = {
+ResultsLimitField.propTypes = {
   input: PropTypes.shape({
     onChange: PropTypes.func.isRequired,
     value: PropTypes.string.isRequired,
@@ -23,4 +23,4 @@ SearchResultsLimitField.propTypes = {
   isDisabled: PropTypes.bool.isRequired,
 };
 
-export default SearchResultsLimitField;
+export default ResultsLimitField;

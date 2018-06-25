@@ -1,21 +1,36 @@
 import {
-  SEARCH_REQUEST_SUCCESS, SEARCH_REQUEST_FAIL,
+  SEARCH_REQUEST_SUCCESS, SEARCH_REQUEST_FAIL, SEARCH_REQUEST_REFUSE, SEARCH_ERROR,
 } from 'constants/actionTypes';
+import { AUTH_FAILED } from 'constants/api'; // TODO: pass from <- mw <- options ?
 import {
   getSearchIsActive, getRequestByOffset, getPendingList,
 } from 'selectors';
 
-const throwIfSearchIsOver = (isActive, offset) => {
-  if (!isActive) {
-    throw Error(`Needless request (offset: ${offset}), search is over already`);
-  }
-};
+const refuseSearchRequest = (next, reason, { offset, callbackId = null }) => {
+  let msg = 'Request was refused by unknown reason';
 
-// if request with such offset was completed and removed from store already
-const throwIfRequestIsExcess = (request, offset) => {
-  if (!request) {
-    throw new Error(`Request (offset: ${offset}) has been succeeded already`);
+  switch (reason) {
+    case 'request-succeeded':
+      msg = `Request with ${offset} offset has been succeeded already`;
+      break;
+    case 'request-processed':
+      msg = `Offset ${offset} has been processed already`;
+      break;
+    case 'search-is-over':
+      msg = `Needless request (offset: ${offset}), search is over already`;
+      break;
+    default:
   }
+  next({
+    type: SEARCH_REQUEST_REFUSE,
+    offset,
+    reason: msg,
+    callbackId,
+  });
+  const error = new Error(msg);
+
+  error.isRefuse = true;
+  throw error;
 };
 
 // remove successful request obj from "requests"
@@ -24,8 +39,14 @@ export const onSuccess = ({ next, getState, offset }) => (response) => {
   const isActive = getSearchIsActive(state);
   const requestByOffset = getRequestByOffset(state, offset);
 
-  throwIfSearchIsOver(isActive, offset);
-  throwIfRequestIsExcess(requestByOffset, offset);
+  if (!isActive) {
+    refuseSearchRequest(next, 'search-is-over', { offset });
+  }
+  // if another request with such offset was completed and therefore removed
+  // from store already
+  if (!requestByOffset) {
+    refuseSearchRequest(next, 'request-succeeded', { offset });
+  }
   next({
     type: SEARCH_REQUEST_SUCCESS,
     offset,
@@ -38,22 +59,67 @@ export const onSuccess = ({ next, getState, offset }) => (response) => {
 };
 
 // add failed request obj to "requests"
-export const onFail = (next, getState, offset) => (e) => {
+export const onFail = ({ next, getState, offset }) => (error) => {
   const state = getState();
   const isActive = getSearchIsActive(state);
   const pending = getPendingList(state);
 
-  // TODO: think over case when belated failed but pending repeated exists
-  throwIfSearchIsOver(isActive, offset);
-  // TODO: replace by specific memoized selector or check in reducer
+  // NOTE: in case when prev attempt request will fail but next
+  // attempt pending exists: if pending succeeds later - it will rewrite failed
+  if (!isActive) {
+    refuseSearchRequest(next, 'search-is-over', { offset });
+  }
+  const { code = null, message = null, requestParams } = error;
+  const callbackId = Array.isArray(requestParams) // OPTIONAL
+    ? requestParams.find(param => param.key === 'callback').value
+    : null;
+
+  // if another request with such offset has succeeded or failed earlier
   if (!pending.includes(offset)) {
-    throw new Error(`Offset "${offset}" has been processed already`);
+    refuseSearchRequest(next, 'request-processed', { offset, callbackId });
   }
 
+  if (code === AUTH_FAILED) { // invalid access_token
+    next({ type: SEARCH_ERROR, error: { code, message, requestParams } });
+    throw error;
+  }
   next({
     type: SEARCH_REQUEST_FAIL,
     offset,
-  }); // TODO: refused: true flag for processed offsets
-
-  throw new Error(`Request with ${offset} offset failed, ${e.message}`);
+    code,
+    message,
+    callbackId,
+  });
+  throw error; // maybe add offset prop
 };
+
+// ----------------- PRIOR HELPERS -------------------------------------------
+// const denyIfSearchIsOver = (isActive, next, offset) => {
+//   if (!isActive) {
+//     const msg = `Needless request (offset: ${offset}), search is over already`;
+//
+//     next({
+//       type: SEARCH_REQUEST_REFUSE,
+//       reason: msg,
+//     });
+//     const error = new Error(msg);
+//
+//     error.isRefuse = true;
+//     throw error;
+//   }
+// };
+
+// if another request with such offset was completed and therefore removed
+// from store already
+// const throwIfRequestIsExcess = (request, offset) => {
+//   if (!request) {
+//     throw new Error(`Request (offset: ${offset}) has been succeeded already`);
+//   }
+// };
+
+// if another request with such offset has succeeded or failed earlier
+// const throwIfOffsetIsProcessed = (pendingRequests, offset) => {
+//   if (!pendingRequests.includes(offset)) {
+//     throw new Error(`Offset "${offset}" has been processed already`);
+//   }
+// };

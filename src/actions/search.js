@@ -16,12 +16,22 @@ export const terminateSearch = () => ({
 
 // NOTE: or create separate action creators: findWallPostsBySex/AuthorId
 // will be utilized by searchProcessor middleware
-export const startWallPostsSearch = (inputData) => {
-  const { wallOwnerType, wallOwnerUsualId, wallOwnerCustomId } = inputData;
+export const startWallPostsSearch = (inputData) => { // pass accessToken here ?
+  const nodeEnv = process.env.NODE_ENV;
+  const {
+    wallOwnerType, wallOwnerUsualId, wallOwnerCustomId,
+    postAuthorId, postAuthorSex, resultsLimit,
+  } = inputData;
+
+  // TODO: validate wallOwnerId with additional preceding request to API
+
+  if (nodeEnv !== 'production' && !wallOwnerUsualId && !wallOwnerCustomId) {
+    throw new Error('One of wallOwnerUsualId or wallOwnerCustomId is required');
+  }
+  if (nodeEnv !== 'production' && !postAuthorId && !postAuthorSex) {
+    throw new Error('One of postAuthorId or postAuthorSex is required');
+  }
   const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
-  const postAuthorId = Number(inputData.postAuthorId) || null;
-  const postAuthorSex = Number(inputData.postAuthorSex) || null;
-  const resultsLimit = Number(inputData.searchResultsLimit) || null;
   const ownerId = wallOwnerUsualId
     ? `owner_id=${wallOwnerTypePrefix}${wallOwnerUsualId}`
     : '';
@@ -29,20 +39,14 @@ export const startWallPostsSearch = (inputData) => {
 
   // TODO: use encodeURIComponent ?
 
+  // with extended=1 can also set specific fields to be returned by API
   const baseRequestURL = `${WALL_GET_BASE_URL}?` +
     `${ownerId}${domain}&count=${count}&v=${apiVersion}&extended=1`;
 
   return {
     types: [
-      // SEARCH_START,
-      // FETCH_WALL_POSTS_REQUEST,
-      // POSTS_RECEIVED,
-      // FETCH_WALL_POSTS_FAIL,
-      // 'SEARCH_REQUEST',
-      // 'SEARCH_REQUEST_SUCCESS',
-      // 'SEARCH_REQUEST_FAIL',
+      // SEARCH_START, FETCH_WALL_POSTS_REQUEST, FETCH_WALL_POSTS_FAIL,
       POSTS_RECEIVED,
-      // SEARCH_END,
     ],
     // TODO: getEndpoint() or getToken() instead of endpoint
     // state => number of searched items
@@ -80,7 +84,7 @@ export const startWallPostsSearch = (inputData) => {
 //   const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
 //   const wallOwnerId = inputData.wallOwnerId || ownerIdDef;
 //   const postAuthorId = Number(inputData.postAuthorId) || postAuthorIdDef;
-//   const resultsLimit = Number(inputData.searchResultsLimit);
+//   const resultsLimit = Number(inputData.resultsLimit);
 
 //   // TODO: add "&access_token=${accessToken}" here ?
 //   // TODO: use encodeURIComponent ?
@@ -92,7 +96,7 @@ export const startWallPostsSearch = (inputData) => {
 //   return {
 //     type: SEARCH_START,
 //     searchParams: {
-//       // replaced by in place "handleResponse" call below
+//       // replaced by in place "transformResponse" call below
 //       // authorId: postAuthorId,
 //       baseRequestURL,
 //       resultsLimit,
@@ -101,7 +105,7 @@ export const startWallPostsSearch = (inputData) => {
 //     },
 //     // callAPI: fetchJSONP,
 //     callAPI: fetchJSONP,
-//     handleResponse: handleResponse(postAuthorId),
+//     transformResponse: transformResponse(postAuthorId),
 //     addResults,
 //     requestStart,
 //     requestSuccess,

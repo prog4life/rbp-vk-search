@@ -10,7 +10,7 @@ import WallOwnerIdField from 'components/common/WallOwnerIdField';
 import OwnerCustomIdField from 'components/common/OwnerCustomIdField';
 import WallOwnerTypeSelect from 'components/common/WallOwnerTypeSelect';
 import PostAuthorSexSelect from 'components/common/PostAuthorSexSelect';
-import SearchResultsLimitField from 'components/common/SearchResultsLimitField';
+import ResultsLimitField from 'components/common/ResultsLimitField';
 
 import './style.scss';
 
@@ -67,6 +67,9 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
       return;
     }
 
+    // TODO: validate that either wallOwnerUsualId or wallOwnerCustomId is
+    // entered, same for postAuthorId and postAuthorSex
+
     // TODO: looks like throttling is no more needed
 
     console.log('SUBMITTED values: ', values);
@@ -82,6 +85,7 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
       wallOwnerCustomId: isCustomIdUsed ? wallOwnerCustomId : null,
       postAuthorId: searchType === 'byAuthorId' ? Number(postAuthorId) : null,
       postAuthorSex: searchType === 'byAuthorId' ? null : Number(postAuthorSex),
+      resultsLimit: Number(values.resultsLimit) || null,
     });
   }
   handleIdTypeSwitch(event) {
@@ -114,8 +118,6 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
         >
           <Row>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
-              {/* TODO: check id or shortname is used for validation by
-                isDisabled prop */}
               <Field
                 name="wallOwnerUsualId"
                 component={WallOwnerIdField}
@@ -156,8 +158,8 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
               <Field
-                name="searchResultsLimit"
-                component={SearchResultsLimitField}
+                name="resultsLimit"
+                component={ResultsLimitField}
                 isDisabled={isSearchActive}
               />
             </Col>
@@ -182,6 +184,7 @@ export default reduxForm({
   form: 'wall-posts',
   initialValues: {
     wallOwnerType: 'group',
+    postAuthorSex: '1',
   },
   // onSubmit: component.handleSubmit,
 })(PostsSearchForm);

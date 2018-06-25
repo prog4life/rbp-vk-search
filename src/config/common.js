@@ -24,7 +24,7 @@ const resultsSortOrder = 'asc'; // OR 'desc'
 
 // TEMP:
 const inputDefaults = {
-  searchResultsLimitDef: 10,
+  resultsLimitDef: 10,
   ownerIdDef: '75465366',
   ownerDomainDef: '',
   postAuthorIdDef: 372045306,

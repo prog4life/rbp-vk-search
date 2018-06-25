@@ -2,6 +2,7 @@ import {
   REDIRECT_TO_AUTH,
   REJECT_AUTH_OFFER,
   OFFER_AUTH_REDIRECT,
+  // AUTH_FAILED,
 } from 'constants/actionTypes';
 
 const initialState = {
@@ -33,6 +34,11 @@ const redirectReducer = (state = initialState, action) => {
         hasAuthOffer: false,
         hasDelayedAuthOffer: false,
       };
+    // case AUTH_FAILED:
+    //   return {
+    //     ...state,
+    //     isAuthFailed: true,
+    //   };
     default:
       return state;
   }

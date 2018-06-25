@@ -3,10 +3,10 @@ node_modules/
 
 # production:
 build/
-public/
 dist/
 
 # src/assets/
+# public/
 
 # config/
 **/.env

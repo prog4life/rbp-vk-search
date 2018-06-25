@@ -8,15 +8,11 @@ import {
   SET_USER_NAME,
   FETCH_USER_NAME_FAIL,
   SIGN_OUT,
-  NO_VALID_TOKEN,
-  RECEIVE_TOKEN_ERROR,
+  ACCESS_TOKEN_ERROR,
 } from 'constants/actionTypes';
 
 // TODO: terminate search on sign out
 export const signOut = () => ({ type: SIGN_OUT });
-
-// TODO: dispatch it where it is reasonable
-export const noValidToken = () => ({ type: NO_VALID_TOKEN });
 export const fetchUserNameFail = () => ({ type: FETCH_USER_NAME_FAIL });
 
 export const setUserName = userName => ({
@@ -35,8 +31,8 @@ export const fetchUserName = (userId, token) => (dispatch, getState) => {
   );
 };
 
-export const receiveTokenError = (error = null, description) => ({
-  type: RECEIVE_TOKEN_ERROR,
+export const accessTokenError = (error = null, description) => ({
+  type: ACCESS_TOKEN_ERROR,
   error,
   description: description || 'Failed to retrieve auth data or error details',
 });
@@ -61,7 +57,7 @@ export const extractAuthData = (hash, pathname) => (dispatch) => {
   window.history.replaceState(null, document.title, pathname);
 
   if (error) {
-    dispatch(receiveTokenError(error, parsedHash.errorDescription));
+    dispatch(accessTokenError(error, parsedHash.errorDescription));
   }
   if (accessToken) {
     dispatch(saveAuthData(accessToken, tokenExpiresAt, userId));

@@ -2,6 +2,7 @@
 export const SEARCH_SET_OFFSET = 'SEARCH::Set-Offset';
 export const SEARCH_START = 'SEARCH::Start';
 export const SEARCH_END = 'SEARCH::End';
+export const SEARCH_ERROR = 'SEARCH::Error';
 export const TERMINATE_SEARCH = 'SEARCH::Terminate';
 
 export const FETCH_WALL_POSTS_REQUEST = 'FETCH_WALL_POSTS_REQUEST';
@@ -16,6 +17,7 @@ export const SET_POSTS_FILTER_TEXT = 'SET_POSTS_FILTER_TEXT';
 export const SEARCH_REQUEST = 'SEARCH_REQUEST';
 export const SEARCH_REQUEST_SUCCESS = 'SEARCH_REQUEST_SUCCESS';
 export const SEARCH_REQUEST_FAIL = 'SEARCH_REQUEST_FAIL';
+export const SEARCH_REQUEST_REFUSE = 'SEARCH_REQUEST_REFUSE';
 
 // auth
 export const SAVE_AUTH_DATA = 'SAVE_AUTH_DATA';
@@ -23,7 +25,7 @@ export const SET_USER_NAME = 'SET_USER_NAME';
 export const FETCH_USER_NAME_FAIL = 'FETCH_USER_NAME_FAIL';
 export const SIGN_OUT = 'SIGN_OUT';
 export const NO_VALID_TOKEN = 'NO_VALID_TOKEN';
-export const RECEIVE_TOKEN_ERROR = 'RECEIVE_TOKEN_ERROR';
+export const ACCESS_TOKEN_ERROR = 'ACCESS_TOKEN_ERROR';
 
 // redirect
 export const REDIRECT_TO_AUTH = 'REDIRECT_TO_AUTH';

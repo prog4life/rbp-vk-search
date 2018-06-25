@@ -6,7 +6,7 @@ export const validateAction = (action) => {
   } = action;
 
   if (!Array.isArray(types) || types.length !== 1) {
-    throw new Error('Expected an array of 1 action types.');
+    throw new Error('Expected an array of 1 action type(s)');
   }
   if (!types.every(t => typeof t === 'string')) {
     throw new Error('Expected action types to be strings');
@@ -19,12 +19,17 @@ export const validateAction = (action) => {
   }
 };
 
+export const validateOffsetModifier = (offMod) => {
+  if (!Number.isInteger(offMod) || offMod > 100 || offMod < 1) {
+    throw new Error('Expected offsetModifier to be integer number > 0 and < 101');
+  }
+};
+
 export const validateOptions = (meta) => {
   const { offsetModifier, requestInterval, maxAttempts } = meta;
 
-  if (!Number.isInteger(offsetModifier) || offsetModifier > 100 || offsetModifier < 1) {
-    throw new Error('Expected offsetModifier to be integer number > 0 and < 101');
-  }
+  validateOffsetModifier(offsetModifier);
+
   if (!Number.isInteger(requestInterval) || requestInterval < 350) {
     throw new Error(`Expected requestInterval to be integer number > 350
       (not more than 3 requests per second)`);
@@ -42,7 +47,7 @@ export const validateParams = (params) => {
     throw new Error('Expected baseRequestURL to be not empty string');
   }
   if (typeof mode !== 'string' || !mode.length) {
-    throw new Error('Expected searchMode to be not empty string');
+    throw new Error('Expected search mode to be not empty string');
   }
   if (typeof filters !== 'object') {
     throw new Error('Expected response filters to be object');
