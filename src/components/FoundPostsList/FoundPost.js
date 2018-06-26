@@ -10,16 +10,16 @@ import './style.scss';
 
 function FoundPost({ post, number }) {
   const {
-    timestamp, authorId, id, text, link, photo50, photo100,
+    timestamp, authorId, authorName, id, text, link, photo50, photo100,
+    comments, likes, screenName, online,
   } = post;
 
   // TODO: add displayAvatar flag that will be false if post author id input present
 
   const resultNumber = `${number}`;
   const linkText = 'Open at wall';
-  const linkToUserPage = `https://vk.com/id${authorId}`;
-  // const idLabel = `[post id: ${id}]`;
   const authorIdLabel = `id${authorId}`;
+  const linkToUserPage = `https://vk.com/${screenName || authorIdLabel}`;
   const postDate = new Date((timestamp * 1000) + (1000 * 60 * 418));
   // const postDate = new Date(1487830000000 + (1000 * 60 * 60 * 18));
   // postDate.setMonth(8);
@@ -36,57 +36,48 @@ function FoundPost({ post, number }) {
   return (
     <Fragment>
       <div className="found-post__title">
-        <div style={{
-          marginRight: '5px',
-          // padding: '0 4px',
-          // backgroundColor: '#dedede',
-          textAlign: 'center',
-          // fontWeight: '600',
-          // flex: '1',
-        }}
-        >
-          <span style={{
-            padding: '0 4px',
-            backgroundColor: '#dedede',
-            // textAlign: 'center',
-            fontWeight: '600',
-          }}
-          >
+        <div className="found-post__number-wrapper">
+          <span className="found-post__number">
             {resultNumber}
           </span>
         </div>
-        <div style={{ minWidth: '180px' }}>
-          <span className="found-post__timestamp">
+        <div className="found-post__timestamp">
+          <span className="found-post__date">
             {/* {moment.unix(timestamp).format('D MMM YYYY  H:mm')} */}
             {`${dayOfMonth} ${month} ${year}`}
             {/* {timestampString} */}
           </span>
-          <span className="found-post__timestamp">
+          <span className="found-post__time">
             {`${hours}:${minutes}`}
           </span>
         </div>
-        {/* <span>
-          {idLabel}
-        </span> */}
         {/* TODO: Remove left auto margin when > xs */}
-        <div style={{ marginLeft: 'auto' }}>
-          <span style={{ border: '1px solid #dedede' }}>
-            <span style={{
-              // marginRight: '5px',
-              padding: '0 3px',
-              backgroundColor: '#dedede',
-              textAlign: 'center',
-            }}
-            >
-              {'Author'}
-            </span>
-            <a
-              style={{ padding: '0 10px' }}
-              href={linkToUserPage}
-              target="_blank"
-            >
-              {authorIdLabel}
-            </a>
+        <div className="found-post__label">
+          <span className="found-post__label-name">
+            {'Author'}
+          </span>
+          <a
+            className="found-post__label-info"
+            href={linkToUserPage}
+            target="_blank"
+          >
+            {authorName || authorIdLabel}
+          </a>
+        </div>
+        <div className="found-post__label">
+          <span className="found-post__label-name">
+            {'Comments'}
+          </span>
+          <span className="found-post__label-info">
+            {comments}
+          </span>
+        </div>
+        <div className="found-post__label">
+          <span className="found-post__label-name">
+            {'Likes'}
+          </span>
+          <span className="found-post__label-info">
+            {likes}
           </span>
         </div>
       </div>

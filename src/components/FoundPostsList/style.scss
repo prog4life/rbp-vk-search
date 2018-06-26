@@ -1,15 +1,59 @@
 .found-post__title {
   display: flex;
+  flex-wrap: wrap;
   padding-bottom: 4px;
+}
+
+.found-post__number-wrapper {
+  // margin-right: 5px;
+  // text-align: center;
+  // padding: 0 4px,
+  // background-color: #dedede,
+  // font-weight: '600',
+  // flex: '1',
+}
+
+.found-post__number {
+  padding: 0 4px;
+  background-color: #dedede;
+  font-weight: 600;
+  text-align: center;
+}
+
+.found-post__timestamp {
+  margin: 0 5px;
+  min-width: 180px;
+}
+
+.found-post__date,
+.found-post__time {
+  background-color: #d9edf7;
+  margin: 0 3px;
+  padding: 0 2px;
+}
+
+.found-posts__time {
+  margin-left: auto;
+}
+
+.found-post__label {
+  margin-right: 5px;
+}
+
+.found-post__label-name {
+  background-color: #dedede;
+  border: 1px solid #dedede;
+  padding: 0 3px;
+  text-align: center;
+}
+
+.found-post__label-info {
+  background-color: #fff;
+  border: 1px solid #dedede;
+  padding: 0 4px;
 }
 
 .found-post__content {
   display: flex;
   justify-content: space-between;
-}
-
-.found-post__timestamp {
-  background-color: #d9edf7;
-  margin: 0 3px;
-  padding: 0 2px;
 }

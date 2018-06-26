@@ -45,16 +45,29 @@ function extractPostsBySex(posts, profiles, sex) {
 const formatPosts = (posts, profiles) => (
   posts.map((post) => {
     const authorId = post.signer_id || post.from_id;
+    // profile: {
+    //   first_name, last_name, screen_name, online,
+    //   online_mobile, deactivated: 'deleted',
+    // }
     const profile = profiles.find(p => p.id === authorId);
+    const { first_name: first, last_name: last } = profile;
+    const authorName = `${first || ''} ${last || ''}`;
 
     return {
       authorId,
+      authorName: !first || !last ? authorName.trim() : authorName,
+      screenName: profile.screen_name,
+      online: profile.online, // 0 || 1    rename to isOnline later
+      onlineMobile: profile.online_mobile,
       timestamp: post.date,
       id: post.id,
       text: post.text,
       link: `https://vk.com/wall${post.owner_id}_${post.id}`,
       photo50: profile.photo_50,
       photo100: profile.photo_100,
+      comments: post.comments.count,
+      likes: post.likes.count,
+      deactivated: post.deactivated,
     };
   })
 );
