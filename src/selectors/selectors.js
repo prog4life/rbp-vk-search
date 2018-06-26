@@ -4,6 +4,7 @@ import sortBy from 'lodash-es/sortBy';
 import * as fromAuth from 'reducers/authReducer';
 import * as fromRedirect from 'reducers/redirectReducer';
 import * as fromSearch from 'reducers/searchReducer';
+import * as fromRequests from 'reducers/requestsReducer';
 import * as fromPosts from 'reducers/postsReducer';
 
 // const state = {
@@ -11,6 +12,7 @@ import * as fromPosts from 'reducers/postsReducer';
 //   redirect,
 //   posts,
 //   search,
+//   requests,
 //   form,
 // };
 
@@ -52,16 +54,6 @@ export const getSearchTotal = state => fromSearch.getTotal(state.search);
 export const getSearchProcessed = state => fromSearch.getProcessed(state.search);
 export const getSearchErrorCode = state => fromSearch.getErrorCode(state.search);
 
-export const getRequestsByOffset = state => (
-  fromSearch.getRequestsByOffset(state.search)
-);
-// single request obj
-export const getRequestByOffset = (state, offset) => (
-  getRequestsByOffset(state)[offset]
-);
-export const getPendingList = state => fromSearch.getPendingList(state.search);
-export const getFailedList = state => fromSearch.getFailedList(state.search);
-
 export const getSearchProgress = createSelector(
   getSearchTotal,
   getSearchProcessed,
@@ -77,6 +69,17 @@ export const getSearchProgress = createSelector(
     return null;
   },
 );
+
+// ------------------------------ REQUESTS ---------------------------------------
+export const getRequestsByOffset = state => (
+  fromRequests.getAllByOffset(state.requests)
+);
+// single request obj
+export const getRequestByOffset = (state, offset) => (
+  getRequestsByOffset(state)[offset]
+);
+export const getPendingList = state => fromRequests.getPending(state.requests);
+export const getFailedList = state => fromRequests.getFailed(state.requests);
 
 // ------------------------------ POSTS ---------------------------------------
 export const getPostsById = state => fromPosts.getById(state.posts);

@@ -1,23 +1,23 @@
-// search middleware NOTE: maybe place next to middleware
-export const SEARCH_SET_OFFSET = 'SEARCH::Set-Offset';
-export const SEARCH_START = 'SEARCH::Start';
-export const SEARCH_END = 'SEARCH::End';
-export const SEARCH_ERROR = 'SEARCH::Error';
-export const TERMINATE_SEARCH = 'SEARCH::Terminate';
+// TODO: try to place next to middleware
+// search middleware
+export const SEARCH_SET_OFFSET = 'SEARCH_SET_OFFSET';
+export const SEARCH_START = 'SEARCH_START';
+export const SEARCH_END = 'SEARCH_END';
+export const SEARCH_ERROR = 'SEARCH_ERROR';
+export const TERMINATE_SEARCH = 'TERMINATE_SEARCH';
 
-export const FETCH_WALL_POSTS_REQUEST = 'FETCH_WALL_POSTS_REQUEST';
-export const FETCH_WALL_POSTS_FAIL = 'FETCH_WALL_POSTS_FAIL';
+export const SEARCH_REQUEST = 'SEARCH_REQUEST';
+export const SEARCH_REQUEST_SUCCESS = 'SEARC_REQUEST_SUCCESS';
+export const SEARCH_REQUEST_FAIL = 'SEARCH_REQUEST_FAIL';
+export const SEARCH_REQUEST_REFUSE = 'SEARCH_REQUEST_REFUSE';
 
 // posts
 export const POSTS_RECEIVED = 'POSTS_RECEIVED';
 export const SET_POSTS_SORT_ORDER = 'SET_POSTS_SORT_ORDER';
 export const SET_POSTS_FILTER_TEXT = 'SET_POSTS_FILTER_TEXT';
 
-// requests
-export const SEARCH_REQUEST = 'SEARCH_REQUEST';
-export const SEARCH_REQUEST_SUCCESS = 'SEARCH_REQUEST_SUCCESS';
-export const SEARCH_REQUEST_FAIL = 'SEARCH_REQUEST_FAIL';
-export const SEARCH_REQUEST_REFUSE = 'SEARCH_REQUEST_REFUSE';
+export const FETCH_WALL_POSTS_REQUEST = 'FETCH_WALL_POSTS_REQUEST';
+export const FETCH_WALL_POSTS_FAIL = 'FETCH_WALL_POSTS_FAIL';
 
 // auth
 export const SAVE_AUTH_DATA = 'SAVE_AUTH_DATA';

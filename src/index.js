@@ -65,11 +65,12 @@ store.subscribe(() => console.log(
 const saveStateDebounced = debounce(() => {
   const { auth } = store.getState();
   const stateToStore = {
-    auth: { ...auth, isRedirecting: false, hasAuthOffer: false },
+    auth,
   };
 
   console.log(
-    'save state debounced ',
+    'Saved state with debounce ',
+    stateToStore,
     (new Date()).toLocaleTimeString('en-Gb'),
   );
 

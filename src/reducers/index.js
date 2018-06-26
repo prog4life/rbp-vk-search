@@ -5,6 +5,7 @@ import auth from './authReducer';
 import redirect from './redirectReducer';
 import posts from './postsReducer';
 import search from './searchReducer';
+import requests from './requestsReducer';
 
 // root reducer
 export default combineReducers({
@@ -14,8 +15,10 @@ export default combineReducers({
   redirect,
   // found posts from wall
   posts,
-  // state of multiple search requests and overall search progress
+  // search status and overall progress
   search,
+  // state of multiple search requests
+  requests,
   form: formReducer,
 });
 

@@ -5,23 +5,12 @@ import {
 } from 'constants/actionTypes';
 import { addIfNotExist, createReducer } from './reducerUtils';
 
-// alternatively (if not passed from action): req.attempt + 1
-// attempt: action.attempt,
-
-// alternatively (if not passing from action): attempt: 1,
-// attempt: action.attempt,
-
 // const initialState = {
 //   byOffset: {},
 //   pending: [],
 //   failed: [],
-//   IDEA:
 //   errors: [
-//     {
-//       offset: 300,
-//       attempt: 2,
-//       message: 'Description of error',
-//     },
+//     { offset: 300, code: 6, attempt: 2 ?, message: 'Description of error' },
 //     ...
 //   ],
 // };
@@ -65,7 +54,7 @@ const failed = createReducer([], {
   [TERMINATE_SEARCH]: () => ([]), // NOTE: remove ???
 });
 
-const errors = createReducer([], {
+const errors = createReducer([], { // TODO: { type, ...rest } -> { ...rest }
   [SEARCH_REQUEST_FAIL]: (state, { code, offset, message, callbackId }) => (
     [...state, { code, offset, message, callbackId }]
   ),
