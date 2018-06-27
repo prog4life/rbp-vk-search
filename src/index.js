@@ -13,6 +13,28 @@ import App from 'components/App';
 
 import 'styles/main.css';
 
+import * as selectors from 'selectors'; // for reselect-tools
+
+if (process.env.NODE_ENV === 'development') {
+  const { registerObserver } = require('react-perf-devtool');
+
+  registerObserver({ // both options for logging to console with additional lib
+    // shouldLog: true,
+    // port: 8080,
+    // components: ['ControlButtons'],
+  }, (measures) => {
+    const componentsToCollect = [
+      'Connect(FoundPostOptim)', 'FoundPostEncaps', 'FoundPostOptim',
+      'Connect(FoundPostEncaps)', 'FoundPostsListById', 'FoundPostsListOptim',
+    ];
+    const result = !componentsToCollect.length
+      ? measures
+      : measures.filter(m => componentsToCollect.includes(m.componentName));
+
+    console.log(result); // can log "measures" right to console
+  });
+}
+
 console.log('process.env.NODE_ENV: ', process.env.NODE_ENV);
 
 // TEMP
@@ -84,5 +106,12 @@ const saveStateDebounced = debounce(() => {
 }, 500, { leading: true, trailing: true });
 
 store.subscribe(saveStateDebounced);
+
+// if (process.env.NIDE_ENV === 'development') {
+//   const { registerSelectors, getStateWith } = require('reselect-tools');
+//
+//   registerSelectors(selectors);
+//   getStateWith(() => store.getState());
+// }
 
 ReactDOM.render(<App store={store} />, document.getElementById('app'));

@@ -1,10 +1,10 @@
 import React from 'react';
 import pt from 'prop-types';
 import { ListGroup, ListGroupItem } from 'react-bootstrap';
-import FoundPost from './FoundPost';
+// import FoundPost from './FoundPost';
+import FoundPostOptim from './FoundPostOptim';
 
 function FoundPostsList({ posts }) {
-
   // TODO: No match with / Nothing found for "..." query
 
   if (!posts || posts.length === 0) {
@@ -21,12 +21,15 @@ function FoundPostsList({ posts }) {
     );
   }
 
+  console.log('FPL, post ids: ', posts.map(post => post.id));
+
   return (
     <ListGroup>
       {
         posts.map((post, index) => (
           <ListGroupItem key={post.id}>
-            <FoundPost
+            {/* <FoundPost */}
+            <FoundPostOptim
               number={index + 1}
               post={post}
             />

@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+// import { createSelectorWithDependencies as createSelector } from 'reselect-tools';
 import sortBy from 'lodash-es/sortBy';
 // import { sortItemsByNumField } from 'utils/sorting';
 import * as fromAuth from 'reducers/authReducer';
@@ -82,7 +83,9 @@ export const getPendingList = state => fromRequests.getPending(state.requests);
 export const getFailedList = state => fromRequests.getFailed(state.requests);
 
 // ------------------------------ POSTS ---------------------------------------
-export const getPostsById = state => fromPosts.getById(state.posts);
+export const getPostsById = state => fromPosts.getAllById(state.posts);
+// single post
+export const getPostById = (state, id) => getPostsById(state)[id];
 export const getIdsOfPosts = state => fromPosts.getIds(state.posts);
 export const getPostsSortOrder = state => fromPosts.getSortOrder(state.posts);
 export const getPostsFilterText = state => fromPosts.getFilterText(state.posts);
@@ -130,4 +133,9 @@ export const getVisiblePosts = createSelector(
       ? [].concat(sortedPosts).reverse() // NOTE: think over lodash's "orderBy"
       : sortedPosts;
   },
+);
+
+export const getVisiblePostsIds = createSelector(
+  getVisiblePosts,
+  visiblePosts => visiblePosts.map(post => post.id),
 );

@@ -6,17 +6,16 @@ import { makeTextualMonth, makeZeroedMinutes } from 'utils/dateFormat';
 
 import './style.scss';
 
-// TODO: rename to SearchedPostResult or FoundPost
-
-function FoundPost({ post, number }) {
+function FoundPost({ post, number: resultNumber }) {
   const {
     timestamp, authorId, authorName, id, text, link, photo50, photo100,
     comments, likes, screenName, online,
   } = post;
 
+  // TODO: make all date and time formatting/computation in formatPosts or selectors
+
   // TODO: add displayAvatar flag that will be false if post author id input present
 
-  const resultNumber = `${number}`;
   const linkText = 'Open at wall';
   const authorIdLabel = `id${authorId}`;
   const linkToUserPage = `https://vk.com/${screenName || authorIdLabel}`;
@@ -32,6 +31,8 @@ function FoundPost({ post, number }) {
   const hours = postDate.getHours();
   const minutes = makeZeroedMinutes(postDate);
   // const timestampString = postDate.toLocaleString('en-GB').slice(0, -3);
+
+  console.log(`FoundPost number: ${resultNumber}, id: ${id}`);
 
   return (
     <Fragment>
