@@ -47,7 +47,7 @@ const formatPosts = (posts, profiles) => (
     const authorId = post.signer_id || post.from_id;
     // profile: {
     //   first_name, last_name, screen_name, online,
-    //   online_mobile, deactivated: 'deleted',
+    //   online_mobile, deactivated: 'deleted' || 'banned',
     // }
     const profile = profiles.find(p => p.id === authorId);
     const { first_name: first, last_name: last } = profile;
@@ -67,7 +67,7 @@ const formatPosts = (posts, profiles) => (
       photo100: profile.photo_100,
       comments: post.comments.count,
       likes: post.likes.count,
-      deactivated: post.deactivated,
+      deactivated: profile.deactivated,
     };
   })
 );

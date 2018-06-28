@@ -8,4 +8,4 @@ export const FEMALE = 1;
 export const MALE = 2;
 // user profile "online" field
 export const ONLINE = 1;
-export const OFFLINE = 1;
+export const OFFLINE = 0;

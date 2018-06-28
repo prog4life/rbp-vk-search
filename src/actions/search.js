@@ -10,9 +10,9 @@ export const terminateSearch = () => ({
 });
 
 // NOTE: can retrieve info about author of posts at wall using wall.get with
-// extended param set to 1 from additional "profiles" field, profile objects in
-// addition to "user_id" field also includes first_name, last_name, sex, online,
-// 2 avatar fields, so can search using corresponding queries
+// extended param set to 1 from additional "profiles" field, profile objects
+// includes: user_id, first_name, last_name, sex, online, online_mobile,
+// phot_50, photo_100, deactivated: "deleted", screen_name
 
 // NOTE: or create separate action creators: findWallPostsBySex/AuthorId
 // will be utilized by searchProcessor middleware

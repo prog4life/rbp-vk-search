@@ -9,7 +9,7 @@ import './style.scss';
 function FoundPost({ post, number: resultNumber }) {
   const {
     timestamp, authorId, authorName, id, text, link, photo50, photo100,
-    comments, likes, screenName, online,
+    comments, likes, screenName, online, deactivated,
   } = post;
 
   // TODO: make all date and time formatting/computation in formatPosts or selectors

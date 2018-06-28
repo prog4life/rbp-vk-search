@@ -13,7 +13,7 @@ import App from 'components/App';
 
 import 'styles/main.css';
 
-import * as selectors from 'selectors'; // for reselect-tools
+// import * as selectors from 'selectors'; // for reselect-tools
 
 if (process.env.NODE_ENV === 'development') {
   const { registerObserver } = require('react-perf-devtool');
@@ -24,8 +24,8 @@ if (process.env.NODE_ENV === 'development') {
     // components: ['ControlButtons'],
   }, (measures) => {
     const componentsToCollect = [
-      'Connect(FoundPostOptim)', 'FoundPostEncaps', 'FoundPostOptim',
-      'Connect(FoundPostEncaps)', 'FoundPostsListById', 'FoundPostsListOptim',
+      'Connect(FoundPostOptim)', 'FoundPost', 'FoundPostOptim',
+      'FoundPostsList', 'FoundPostsListOptim',
     ];
     const result = !componentsToCollect.length
       ? measures

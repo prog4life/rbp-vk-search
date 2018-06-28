@@ -95,28 +95,40 @@ export const getPostsFilterText = state => fromPosts.getFilterText(state.posts);
 export const getFilteredByTextPosts = createSelector(
   [getPostsById, getPostsFilterText],
   (postsById, filterText) => {
+    const num = Math.random().toFixed(4);
+    console.time(`--- FILTER BY TEXT ${num} ---`);
     if (!postsById) {
+      console.timeEnd(`--- FILTER BY TEXT ${num} ---`);
       return null;
     }
     const arrayOfPosts = Object.values(postsById);
     const updFilterText = filterText.trim().toLowerCase();
 
     if (updFilterText === '') {
+      console.timeEnd(`--- FILTER BY TEXT ${num} ---`);
       return arrayOfPosts;
     }
-    return arrayOfPosts.filter(post => (
+    const result = arrayOfPosts.filter(post => (
       post.text.toLowerCase().includes(updFilterText)
     ));
+
+    console.timeEnd(`--- FILTER BY TEXT ${num} ---`);
+
+    return result;
   },
 );
 
 export const getSortedByTimestampPosts = createSelector(
   getFilteredByTextPosts,
   (filteredPosts) => {
+    console.time('--- SORT ---');
     if (!filteredPosts) {
+      console.timeEnd('--- SORT ---');
       return null;
     }
     const sorted = sortBy(filteredPosts, ['timestamp']); // => new array
+
+    console.timeEnd('--- SORT ---');
 
     return sorted;
   },
@@ -126,12 +138,19 @@ export const getVisiblePosts = createSelector(
   [getSortedByTimestampPosts, getPostsSortOrder],
   // (state, sortOrder = 'descend') => sortOrder,
   (sortedPosts, sortOrder) => {
+    console.time('--- REVERSE ---');
+
     if (!sortedPosts) {
+      console.timeEnd('--- REVERSE ---');
       return null;
     }
-    return sortOrder === 'descend'
+    const result = sortOrder === 'descend'
       ? [].concat(sortedPosts).reverse() // NOTE: think over lodash's "orderBy"
       : sortedPosts;
+
+    console.timeEnd('--- REVERSE ---');
+
+    return result;
   },
 );
 

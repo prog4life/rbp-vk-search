@@ -1,7 +1,7 @@
 import React from 'react';
 import pt from 'prop-types';
 import { ListGroup, ListGroupItem } from 'react-bootstrap';
-import FoundPostOptimContainer from 'containers/FoundPostOptimContainer';
+import FoundPostContainer from 'containers/FoundPostContainer';
 
 function FoundPostsListOptim({ postIds }) {
   // TODO: No match with / Nothing found for "..." query
@@ -20,14 +20,14 @@ function FoundPostsListOptim({ postIds }) {
     );
   }
 
-  console.log('FPL Optim, postIds: ', postIds);
+  // console.log('FPL Optim, postIds: ', postIds);
 
   return (
     <ListGroup>
       {
         postIds.map((postId, index) => (
           <ListGroupItem key={postId}>
-            <FoundPostOptimContainer
+            <FoundPostContainer
               number={index + 1}
               postId={postId}
             />

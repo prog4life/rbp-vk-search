@@ -8,10 +8,10 @@ import './style.scss';
 
 class FoundPostOptim extends React.Component {
   componentDidMount() {
-    this.notify('MOUNTED');
+    // this.notify('MOUNTED');
   }
   componentDidUpdate() {
-    this.notify('UPDATED');
+    // this.notify('UPDATED');
   }
   notify(op) {
     const { post: { id }, number: resultNumber } = this.props;
@@ -22,12 +22,15 @@ class FoundPostOptim extends React.Component {
     const { post, number: resultNumber } = this.props;
     const {
       timestamp, authorId, authorName, id, text, link, photo50, photo100,
-      comments, likes, screenName, online,
+      comments, likes, screenName, online, deactivated,
     } = post;
+
+    // TODO: make all date and time formatting/computation in formatPosts or selectors
 
     // TODO: add displayAvatar flag that will be false if post author id input present
 
     const linkText = 'Open at wall';
+
     const authorIdLabel = `id${authorId}`;
     const linkToUserPage = `https://vk.com/${screenName || authorIdLabel}`;
     const postDate = new Date((timestamp * 1000) + (1000 * 60 * 418));

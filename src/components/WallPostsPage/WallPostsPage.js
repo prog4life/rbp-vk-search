@@ -7,7 +7,7 @@ import DelayedRender from 'components/common/DelayedRender';
 import AuthErrorBoundary from 'components/common/AuthErrorBoundary';
 import AuthOfferModal from 'components/AuthOfferModal';
 import AuthRedirectModal from 'components/AuthRedirectModal';
-import PostsResultContainer from 'containers/PostsResultContainer';
+import PostsPanelContainer from 'containers/PostsPanelContainer';
 import { AUTH_OFFER_DELAY } from 'constants/ui';
 
 import './style.scss';
@@ -48,7 +48,7 @@ const WallPostsPage = (props) => {
         isSearchActive={isSearchActive}
         onStartSearch={onStartSearch}
       />
-      <PostsResultContainer />
+      <PostsPanelContainer />
     </div>
   );
 };
