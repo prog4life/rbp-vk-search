@@ -69,7 +69,7 @@ const searchProcessor = ({ dispatch, getState }) => {
 
     validateAction(action);
     validateOptions(meta);
-    validateParams(searchParams);
+    validateParams(searchParams); // TODO: validate filter names with constants
 
     const [resultsType] = types;
     const accessToken = getAccessToken(getState());
@@ -81,8 +81,7 @@ const searchProcessor = ({ dispatch, getState }) => {
 
     // TODO: not destructure postAuthorId here and pass whole searchParams obj
     // to transformResponse(transformResponse)
-    const { baseRequestURL, mode, filters, resultsLimit } = searchParams;
-    const { postAuthorId, postAuthorSex } = filters; // TEMP: pass entire obj further
+    const { baseRequestURL, target, filters, resultsLimit } = searchParams;
     const {
       // TODO: retrieve next 3 from options passed to middleware factory
       offsetModifier, // should be equal to request url "count" param value
@@ -119,10 +118,7 @@ const searchProcessor = ({ dispatch, getState }) => {
           onSuccess({ next, getState, offset }),
           onFail({ next, getState, offset }),
         )
-        .then(response => transformResponse(response, 'wall-posts', {
-          authorId: postAuthorId,
-          sex: postAuthorSex,
-        }))
+        .then(response => transformResponse(response, target, filters))
         .then(
           results => next({ type: resultsType, ...results }),
           // TODO: consider if (eror.code === AUTH_FAILED) clearInterval() with

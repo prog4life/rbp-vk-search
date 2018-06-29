@@ -41,13 +41,13 @@ export const validateOptions = (meta) => {
 };
 
 export const validateParams = (params) => {
-  const { baseRequestURL, mode, filters, resultsLimit } = params;
+  const { baseRequestURL, target, filters, resultsLimit } = params;
 
   if (typeof baseRequestURL !== 'string' || !baseRequestURL.length) {
     throw new Error('Expected baseRequestURL to be not empty string');
   }
-  if (typeof mode !== 'string' || !mode.length) {
-    throw new Error('Expected search mode to be not empty string');
+  if (typeof target !== 'string' || !target.length) {
+    throw new Error('Expected target to be not empty string');
   }
   if (typeof filters !== 'object') {
     throw new Error('Expected response filters to be object');

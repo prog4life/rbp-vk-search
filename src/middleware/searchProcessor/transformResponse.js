@@ -1,78 +1,73 @@
-import { compose } from 'redux';
+// import { compose } from 'redux';
+import { normalize } from 'normalizr';
+import schemas, { targets } from './schemas';
 
-function extractPostsFromResponse(response) {
-  let posts;
-  try {
-    ({ items: posts } = response);
-  } catch (e) {
-    throw Error('Unable to extract posts from response');
-  }
+const { WALL_POSTS } = targets;
 
-  if (!Array.isArray(posts)) { // NOTE: is this check unnecessary ?
-    throw Error('Posts from response is not an array');
-  }
-  return posts;
-}
+const formatPosts = ({ items: posts, profiles }) => (
+  // omit anonymous posts without author id or with group id (negative)
+  // it is not possible to get sex of author of anonymous posts too
+  posts.filter((post) => {
+    const authorId = post.signer_id || post.from_id;
+    // return authorId > 0 && profiles.some(p => p.id === authorId);
+    return authorId && authorId > 0;
+  })
+    .map((post) => {
+      const authorId = post.signer_id || post.from_id;
+      // profile: {
+      //   first_name, last_name, screen_name, online,
+      //   online_mobile, deactivated: 'deleted' || 'banned',
+      // }
+      const profile = profiles.find(p => p.id === authorId); // TODO: || {} ???
+      if (!profile) {
+        console.log('NO PROFILE AUTHOR ID: ', authorId);
+      }
+      const { first_name: first = '', last_name: last = '' } = profile;
+      const authorName = `${first} ${last}`;
+
+      return {
+        authorId,
+        authorName: !first || !last ? authorName.trim() : authorName,
+        authorSex: profile.sex,
+        screenName: profile.screen_name || null,
+        online: profile.online, // 0 || 1    rename to isOnline later
+        onlineMobile: profile.online_mobile,
+        timestamp: post.date,
+        id: post.id,
+        text: post.text,
+        link: `https://vk.com/wall${post.owner_id}_${post.id}`,
+        photo50: profile.photo_50,
+        photo100: profile.photo_100,
+        comments: post.comments.count,
+        likes: post.likes.count,
+        deactivated: profile.deactivated || null,
+      };
+    })
+);
 
 function extractPostsByAuthorId(posts, authorId) {
-  // const posts = extractPostsFromResponse(response);
-  // const { items: posts } = response;
-
   return posts.filter(post => (
     post.from_id === authorId || post.signer_id === authorId
   ));
 }
 
-function extractPostsBySex(posts, profiles, sex) {
-  // const posts = extractPostsFromResponse(response);
-  // const { items: posts } = response;
-  // const { profiles } = response;
+function extractPostsBySex(posts, authorSex) {
+  return posts.filter(post => post.authorSex === authorSex);
 
-  return posts.filter((post) => {
-    const authorId = post.signer_id || post.from_id;
-
-    return authorId && authorId > 0 && profiles.some(profile => (
-      profile.id === authorId && profile.sex === sex
-    ));
-  });
+  // return posts.filter((post) => {
+  //   const authorId = post.signer_id || post.from_id;
+  //
+  //   // return authorId && authorId > 0 && profiles.some(profile => (
+  //   return profiles.some(profile => (
+  //     profile.id === authorId && profile.sex === authorSex
+  //   ));
+  // });
 }
 
 // const responseParsers = {
 //   authorId: extractPostsByAuthorId,
 //   sex: extractPostsBySex,
 // };
-
-const formatPosts = (posts, profiles) => (
-  posts.map((post) => {
-    const authorId = post.signer_id || post.from_id;
-    // profile: {
-    //   first_name, last_name, screen_name, online,
-    //   online_mobile, deactivated: 'deleted' || 'banned',
-    // }
-    const profile = profiles.find(p => p.id === authorId);
-    const { first_name: first, last_name: last } = profile;
-    const authorName = `${first || ''} ${last || ''}`;
-
-    return {
-      authorId,
-      authorName: !first || !last ? authorName.trim() : authorName,
-      screenName: profile.screen_name,
-      online: profile.online, // 0 || 1    rename to isOnline later
-      onlineMobile: profile.online_mobile,
-      timestamp: post.date,
-      id: post.id,
-      text: post.text,
-      link: `https://vk.com/wall${post.owner_id}_${post.id}`,
-      photo50: profile.photo_50,
-      photo100: profile.photo_100,
-      comments: post.comments.count,
-      likes: post.likes.count,
-      deactivated: profile.deactivated,
-    };
-  })
-);
-
-// TODO: use "normalize" pkg instead
 
 export const normalizeShallowly = (items) => {
   const result = {
@@ -87,11 +82,12 @@ export const normalizeShallowly = (items) => {
   return result;
 };
 
-export const transformWallPosts = (response, filters) => {
-  // const formatted = formatPosts(extractPostsByAuthorId(response, authorId));
-  // return normalizeShallowly(formatted);
-  const posts = response.items;
+const POST_AUTHOR_ID = 'Post-Author-Id';
+const POST_AUTHOR_SEX = 'Post-Author-Sex';
 
+export const responseFilters = { POST_AUTHOR_ID, POST_AUTHOR_SEX };
+
+export const filterWallPosts = (posts, filters) => {
   const parsedPosts = Object.keys(filters).reduce((acc, filterName) => {
     const filterValue = filters[filterName];
 
@@ -99,33 +95,93 @@ export const transformWallPosts = (response, filters) => {
       return acc;
     }
     switch (filterName) {
-      case 'sex':
-        return extractPostsBySex(acc, response.profiles, filterValue);
-      case 'authorId':
+      case 'postAuthorSex':
+        return extractPostsBySex(acc, filterValue);
+      case 'postAuthorId':
         return extractPostsByAuthorId(acc, filterValue);
       default:
         return acc;
     }
   }, posts);
 
-  return normalizeShallowly(formatPosts(parsedPosts, response.profiles));
+  return parsedPosts;
+};
+
+const transformResponse = (response, target, filters) => {
+  let processed;
 
   // TODO: try redux.compose
   // return compose(
-  //   normalizeShallowly,
+  //   filterWallPosts,
   //   formatPosts,
-  //   extractPostsByAuthorId
-  // )(response, authorId);
+  //   omitAnonymous
+  // )(response, filters);
+
+  switch (target) {
+    case WALL_POSTS:
+      processed = filterWallPosts(formatPosts(response), filters);
+      break;
+    default:
+      processed = response;
+  }
+  const normalized = normalize(processed, schemas[target]);
+  console.log('NORMALIZED ', normalized);
+  // TEMP:
+  return { itemsById: normalized.entities.posts, ids: normalized.result };
 };
 
-// const transformResponse = (schema, authorId) => (response) => {
-const transformResponse = (response, schema, filters) => {
-  switch (schema) {
-    case 'wall-posts':
-      return transformWallPosts(response, filters);
-    default:
-      return response;
-  }
-};
+// const transformResponse = (target, authorId) => (response) => {
+// const transformResponse = (response, target, filters) => {
+//   switch (target) {
+//     case 'wall-posts':
+//       return transformWallPosts(response, filters);
+//     default:
+//       return response;
+//   }
+// };
 
 export default transformResponse;
+
+// function extractPostsFromResponse(response) {
+//   let posts;
+//   try {
+//     ({ items: posts } = response);
+//   } catch (e) {
+//     throw Error('Unable to extract posts from response');
+//   }
+//
+//   if (!Array.isArray(posts)) { // NOTE: is this check unnecessary ?
+//     throw Error('Posts from response is not an array');
+//   }
+//   return posts;
+// }
+
+// const formatPosts = (posts, profiles) => (
+//   posts.map((post) => {
+//     const authorId = post.signer_id || post.from_id;
+//     // profile: {
+//     //   first_name, last_name, screen_name, online,
+//     //   online_mobile, deactivated: 'deleted' || 'banned',
+//     // }
+//     const profile = profiles.find(p => p.id === authorId);
+//     const { first_name: first, last_name: last } = profile;
+//     const authorName = `${first || ''} ${last || ''}`;
+//
+//     return {
+//       authorId,
+//       authorName: !first || !last ? authorName.trim() : authorName,
+//       screenName: profile.screen_name,
+//       online: profile.online, // 0 || 1    rename to isOnline later
+//       onlineMobile: profile.online_mobile,
+//       timestamp: post.date,
+//       id: post.id,
+//       text: post.text,
+//       link: `https://vk.com/wall${post.owner_id}_${post.id}`,
+//       photo50: profile.photo_50,
+//       photo100: profile.photo_100,
+//       comments: post.comments.count,
+//       likes: post.likes.count,
+//       deactivated: profile.deactivated,
+//     };
+//   })
+// );

@@ -2,7 +2,7 @@ import { POSTS_RECEIVED, TERMINATE_SEARCH } from 'constants/actionTypes';
 import { WALL_POSTS_BY_SEX, WALL_POSTS_BY_AUTHOR_ID } from 'constants/searchModes';
 import { WALL_GET_BASE_URL } from 'constants/api';
 import { apiVersion, count, offsetModifier, requestInterval } from 'config/common';
-import { SEARCH_PARAMETERS } from 'middleware/searchProcessor';
+import { targets, SEARCH_PARAMETERS } from 'middleware/searchProcessor';
 import { getIdsOfPosts } from 'selectors';
 
 export const terminateSearch = () => ({
@@ -39,6 +39,8 @@ export const startWallPostsSearch = (inputData) => { // pass accessToken here ?
 
   // TODO: use encodeURIComponent ?
 
+  // TODO: get value of count from offsetModifier and apply it internally        !!!
+
   // with extended=1 can also set specific fields to be returned by API
   const baseRequestURL = `${WALL_GET_BASE_URL}?` +
     `${ownerId}${domain}&count=${count}&v=${apiVersion}&extended=1`;
@@ -55,7 +57,8 @@ export const startWallPostsSearch = (inputData) => { // pass accessToken here ?
     // pass searchTarget/itemsName/searchedItems ('WallPosts' || 'WALL_POSTS')
     [SEARCH_PARAMETERS]: {
       baseRequestURL,
-      mode: postAuthorId ? WALL_POSTS_BY_AUTHOR_ID : WALL_POSTS_BY_SEX,
+      // mode: postAuthorId ? WALL_POSTS_BY_AUTHOR_ID : WALL_POSTS_BY_SEX,
+      target: targets.WALL_POSTS,
       filters: { postAuthorId, postAuthorSex },
       resultsLimit,
     },
