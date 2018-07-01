@@ -7,6 +7,9 @@ import posts from './postsReducer';
 import search from './searchReducer';
 import requests from './requestsReducer';
 
+import searchByItems from './searchByItemsReducer';
+import requestsById from './requestsByIdReducer';
+
 // root reducer
 export default combineReducers({
   // access token, token expiry and user id returned by vk API
@@ -20,6 +23,8 @@ export default combineReducers({
   // state of multiple search requests
   requests,
   form: formReducer,
+  searchByItems,
+  requestsById,
 });
 
 // TODO: export mainReducer from './mainReducer';

@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Nav, NavDropdown, MenuItem } from 'react-bootstrap';
+import { NavLink, Link } from 'react-router-dom';
 
 import './style.scss';
 
@@ -29,6 +30,11 @@ const NavAuth = ({ userId, userName }) => (
           <MenuItem divider />
         </Fragment>
       }
+      <MenuItem eventKey={1.3}>
+        <NavLink to="/user-data">
+          {'User Data'}
+        </NavLink>
+      </MenuItem>
       <MenuItem eventKey={1.2}>
         {'Sign out'}
       </MenuItem>

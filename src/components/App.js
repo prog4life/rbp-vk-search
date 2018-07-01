@@ -6,6 +6,7 @@ import { hot, setConfig } from 'react-hot-loader';
 
 // import Home from 'containers/Home';
 import WallPostsPageContainer from 'containers/WallPostsPageContainer';
+import UserDataPageContainer from 'containers/UserDataPageContainer';
 import NotFoundPage from 'components/NotFoundPage';
 
 setConfig({ logLevel: 'error' }); // ['debug', 'log', 'warn', 'error'(default)]
@@ -20,6 +21,7 @@ const App = ({ store }) => (
         {/* <Route path="/" exact component={Home} /> */}
         {/* <Route path="/wall-posts" component={WallPostsPageContainer} /> */}
         <Route path="/" exact component={WallPostsPageContainer} />
+        <Route path="/user-data" component={UserDataPageContainer} />
         <Route component={NotFoundPage} />
       </Switch>
     </Router>

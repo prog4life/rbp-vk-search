@@ -1,20 +1,22 @@
+import uuid from 'uuid';
 import {
-  TERMINATE_SEARCH, SEARCH_START, SEARCH_SET_OFFSET, SEARCH_END, SEARCH_REQUEST,
+  SEARCH_BY_ITEMS_START, SEARCH_BY_ITEMS_SET_INDEX, SEARCH_BY_ITEMS_END,
+  SEARCH_BY_ITEMS_TERMINATE, SEARCH_BY_ITEMS_REQUEST,
 } from 'constants/actionTypes';
 import { AUTH_FAILED } from 'constants/api'; // TODO: pass with options ?
 import {
-  getAccessToken, getSearchTotal, getSearchOffset, getSearchErrorCode,
-  getRequestsByOffset, getFailedList, getPendingList,
+  getAccessToken, getCurrentItemIndex, getRequestsById,
+  getSearchByItemsFailed, getSearchByItemsPending, getSearchByItemsErrorCode,
 } from 'selectors';
 // import fetchJSONP from 'utils/fetchJSONP';
 import jsonpPromise from 'utils/jsonpPromise';
 import { onSuccess, onFail } from './requestHandlers';
-import transformResponse from './transformResponse';
-import {
-  validateAction, validateOffsetModifier, validateOptions, validateParams
-} from './validation';
+// import transformResponse from './transformResponse';
+// import {
+//   validateAction, validateOffsetModifier, validateOptions, validateParams
+// } from './validation';
 
-export const SEARCH_PARAMETERS = 'SEARCH::Parameters';
+export const SEARCH_BY_ITEMS = 'SEARCH::BY::ITEMS';
 
 // const determineNextActionOnIntervalTick = () => {}; // TODO:
 
@@ -22,15 +24,15 @@ export const SEARCH_PARAMETERS = 'SEARCH::Parameters';
 // const checkAndRepeatFailed = () => {}
 
 // TODO: middleware factory
-// export default function createSearchProcessorMiddleware(apiClient, options) {
+// export default function createSearchByItemsMiddleware(apiClient, options) {
 //   const { offsetModifier, requestInterval = 350, maxAttempts = 5 } = options;
 //
 //   validateOffsetModifier(offsetModifier);
 //
-//   return searchProcessor;
+//   return searchByItems;
 // }
 
-const searchProcessor = ({ dispatch, getState }) => {
+const searchByItems = ({ dispatch, getState }) => {
   let intervalId; // TODO: replace to top
   // const search = {
   //   isActive: false,
@@ -53,25 +55,27 @@ const searchProcessor = ({ dispatch, getState }) => {
     // TODO: destructure from action callAPI and transformResponse functions with
     // imported defaults
     const { type, types, getNumberOfResults } = action;
-    const searchParams = action[SEARCH_PARAMETERS];
+    const searchParams = action[SEARCH_BY_ITEMS];
 
-    if (typeof searchParams === 'undefined' && type !== TERMINATE_SEARCH) {
+    if (
+      typeof searchParams === 'undefined' && type !== SEARCH_BY_ITEMS_TERMINATE
+    ) {
       return next(action);
     }
-    if (!types && type !== TERMINATE_SEARCH) {
+    if (!types && type !== SEARCH_BY_ITEMS_TERMINATE) {
       return next(action);
     }
-    if (type === TERMINATE_SEARCH) {
+    if (type === SEARCH_BY_ITEMS_TERMINATE) {
       clearInterval(intervalId);
       return next(action); // TODO: pass limit to cut extra results ?
     }
     const { meta = {} } = action;
 
-    validateAction(action);
-    validateOptions(meta);
-    validateParams(searchParams); // TODO: validate filter names with constants
+    // validateAction(action);
+    // validateOptions(meta);
+    // validateParams(searchParams); // TODO: validate filter names with constants
 
-    const [resultsType] = types;
+    // const [resultsType] = types;
     const accessToken = getAccessToken(getState());
     // const accessToken = 'dwad123231uhhuh13uh13';
 
@@ -81,10 +85,12 @@ const searchProcessor = ({ dispatch, getState }) => {
 
     // TODO: not destructure postAuthorId here and pass whole searchParams obj
     // to transformResponse(transformResponse)
-    const { baseRequestURL, target, filters, resultsLimit } = searchParams;
     const {
-      // TODO: retrieve next 3 from options passed to middleware factory
-      offsetModifier, // should be equal to request url "count" param value
+      baseRequestURL, likerId, items, objectType, ownerId, target, filters,
+      resultsLimit, apiVersion,
+    } = searchParams;
+    const {
+      // TODO: retrieve next 2 from options passed to middleware factory
       requestInterval,
       maxAttempts,
     } = meta;
@@ -92,43 +98,45 @@ const searchProcessor = ({ dispatch, getState }) => {
     // doublecheck
     clearInterval(intervalId);
     // will also clear "requests" in store
-    next({ type: SEARCH_START, limit: resultsLimit });
+    next({ type: SEARCH_BY_ITEMS_START, limit: resultsLimit });
 
-    // TODO: cache posts and not search in cache first if amount and last id
-    // is the same
+    console.log('uuid.v4() ', uuid.v4());
 
-    // let checkpoint = performance.now(); // TEMP:
-    // let checkpoint2 = performance.now(); // TEMP:
+    const makeCallToAPI = (itemId) => {
+      console.log('ITEM ID ', itemId);
 
-    // TODO: replace to top level ?
-    const makeCallToAPI = (offset = 0) => {
-      // const tempCheckpoint2 = checkpoint2;
-      // checkpoint2 = performance.now();
-      // console.warn(`NEW REQUEST with ${offset} offset, ` +
-      //   `interval: ${checkpoint2 - tempCheckpoint2} and
-      //    shift: ${performance.now() - checkpoint}`);
-      // add request obj with isPending: true to "requests"
-      next({ type: SEARCH_REQUEST, offset, startTime: Date.now() });
+      // new requestHandler = new RequestHandler({
+      //   next, getState, id: itemId
+      // });
 
-      const currentRequestURL = `${baseRequestURL}&offset=${offset}` +
-        `&access_token=${accessToken}`;
+      next({
+        type: SEARCH_BY_ITEMS_REQUEST,
+        id: itemId,
+        startTime: Date.now(),
+      });
+
+      const currentRequestURL = `${baseRequestURL}?` +
+      `&item_id=${itemId}&user_id=${likerId}` +
+      `&owner_id=${ownerId}&type=${objectType}` +
+      `&access_token=${accessToken}&v=${apiVersion}`;
 
       return jsonpPromise(currentRequestURL)
         .then(
-          onSuccess({ next, getState, offset }),
-          onFail({ next, getState, offset }),
+          onSuccess({ next, getState, itemId }),
+          onFail({ next, getState, itemId }),
         )
         // TODO: filter response first here ?
-        .then(response => transformResponse(response, target, filters))
+        // .then(response => transformResponse(response, target, filters))
         .then(
-          results => next({ type: resultsType, ...results }),
+          // results => next({ type: resultsType, ...results }),
+          results => console.log('SEARCH BY ITEMS RESULTS: ', results),
           // TODO: consider if (eror.code === AUTH_FAILED) clearInterval() with
           // replacing first makeCallToAPI() after setInterval
           err => (err.isRefuse ? console.warn(err) : console.error(err)),
         );
     };
     // first request before timer tick
-    makeCallToAPI();
+    makeCallToAPI(items[0].id);
 
     intervalId = setInterval(() => {
       // const tempCheckpoint = checkpoint;
@@ -138,12 +146,11 @@ const searchProcessor = ({ dispatch, getState }) => {
       // total is equivalent of "count" field in response from vk API
       const state = getState();
       const resultsCount = getNumberOfResults(state);
-      const offset = getSearchOffset(state);
-      const total = getSearchTotal(state);
-      const reqs = getRequestsByOffset(state);
-      const failed = getFailedList(state);
-      const pending = getPendingList(state);
-      const errorCode = getSearchErrorCode(state);
+      const itemIndex = getCurrentItemIndex(state);
+      const reqs = getRequestsById(state);
+      const failed = getSearchByItemsFailed(state);
+      const pending = getSearchByItemsPending(state);
+      const errorCode = getSearchByItemsErrorCode(state);
 
       if (errorCode === AUTH_FAILED) {
         clearInterval(intervalId);
@@ -156,37 +163,37 @@ const searchProcessor = ({ dispatch, getState }) => {
       // requests that reach maxAttempts limit are considered completely failed
       // next failed requests should be sent again
       // TODO: req[o] -> getRequestByOffset(o)
-      const toSendAgain = failed.filter(o => reqs[o].attempt < maxAttempts);
+      const toSendAgain = failed.filter(id => reqs[id].attempt < maxAttempts);
 
       // repeat first of failed requests
       if (toSendAgain.length > 0) {
-        const [offsetToRepeat] = toSendAgain;
-        // const requestToRepeat = reqs[offsetToRepeat];
-        console.log(`Repeat FAILED with ${offsetToRepeat} ` +
-          `offset and attempt ${reqs[offsetToRepeat].attempt + 1} `);
+        const [idToRepeat] = toSendAgain;
+        // const requestToRepeat = reqs[idToRepeat];
+        console.log(`Repeat FAILED with ${idToRepeat} ` +
+          `offset and attempt ${reqs[idToRepeat].attempt + 1} `);
 
-        makeCallToAPI(offsetToRepeat);
+        makeCallToAPI(idToRepeat);
         return;
       }
 
-      const nextOffset = offset + offsetModifier;
+      const nextIndex = itemIndex + 1;
 
       // TODO: resolve case with count: 0
 
       // request next portion of items using increased offset
       if (
         (!resultsLimit || resultsCount < resultsLimit) &&
-        (!total || nextOffset <= total)
+        (items.length && nextIndex < items.length)
       ) {
-        next({ type: SEARCH_SET_OFFSET, offset: nextOffset });
-        makeCallToAPI(nextOffset);
+        next({ type: SEARCH_BY_ITEMS_SET_INDEX, nextIndex });
+        makeCallToAPI(items[nextIndex].id);
         return;
       }
 
       // end search
       if (pending.length === 0) {
         clearInterval(intervalId);
-        next({ type: SEARCH_END });
+        next({ type: SEARCH_BY_ITEMS_END });
       }
     }, requestInterval);
     // NOTE: return was added for eslint, maybe replace it with
@@ -195,4 +202,4 @@ const searchProcessor = ({ dispatch, getState }) => {
   };
 };
 
-export default searchProcessor;
+export default searchByItems;

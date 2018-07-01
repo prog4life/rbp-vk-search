@@ -87,6 +87,8 @@ const POST_AUTHOR_SEX = 'Post-Author-Sex';
 
 export const responseFilters = { POST_AUTHOR_ID, POST_AUTHOR_SEX };
 
+// TODO: change to more generic filterResponse ?
+
 export const filterWallPosts = (posts, filters) => {
   const parsedPosts = Object.keys(filters).reduce((acc, filterName) => {
     const filterValue = filters[filterName];
@@ -119,6 +121,9 @@ const transformResponse = (response, target, filters) => {
 
   switch (target) {
     case WALL_POSTS:
+
+      // TODO: filte posts first
+
       processed = filterWallPosts(formatPosts(response), filters);
       break;
     default:

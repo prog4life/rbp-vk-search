@@ -1,4 +1,4 @@
-// eslint-disable-next-line import/prefer-default-export
+// eslint-disable-next-line import/prefer-default-export // TODO: add v= here ?
 export const WALL_GET_BASE_URL = 'https://api.vk.com/method/wall.get';
 // error codes
 export const AUTH_FAILED = 5;

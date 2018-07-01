@@ -7,6 +7,8 @@ import * as fromRedirect from 'reducers/redirectReducer';
 import * as fromSearch from 'reducers/searchReducer';
 import * as fromRequests from 'reducers/requestsReducer';
 import * as fromPosts from 'reducers/postsReducer';
+import * as fromSearchByItems from 'reducers/searchByItemsReducer';
+import * as fromRequestsById from 'reducers/requestsByIdReducer';
 
 // const state = {
 //   auth,
@@ -71,7 +73,7 @@ export const getSearchProgress = createSelector(
   },
 );
 
-// ------------------------------ REQUESTS ---------------------------------------
+// ------------------------------ REQUESTS ------------------------------------
 export const getRequestsByOffset = state => (
   fromRequests.getAllByOffset(state.requests)
 );
@@ -81,6 +83,32 @@ export const getRequestByOffset = (state, offset) => (
 );
 export const getPendingList = state => fromRequests.getPending(state.requests);
 export const getFailedList = state => fromRequests.getFailed(state.requests);
+
+// ------------------------- SEARCH BY ITEMS ----------------------------------
+export const isSearchByItemsActive = state =>
+  fromSearchByItems.isActive(state.searchByItems);
+
+export const getCurrentItemIndex = state =>
+  fromSearchByItems.getItemIndex(state.searchByItems);
+
+export const getProcessedItems = state =>
+  fromSearchByItems.getProcessedItems(state.searchByItems);
+
+export const getSearchByItemsErrorCode = state =>
+  fromSearchByItems.getErrorCode(state.searchByItems);
+
+// ------------------------- REQUESTS BY ID -----------------------------------
+export const getRequestsById = state =>
+  fromRequestsById.getAllById(state.requestsById);
+// single request obj
+export const getRequestById = (state, id) =>
+  fromRequestsById.getAllById(state.requestsById)[id];
+
+export const getSearchByItemsPending = state =>
+  fromRequestsById.getPending(state.requestsById);
+
+export const getSearchByItemsFailed = state =>
+  fromRequestsById.getFailed(state.requestsById);
 
 // ------------------------------ POSTS ---------------------------------------
 export const getPostsById = state => fromPosts.getAllById(state.posts);
