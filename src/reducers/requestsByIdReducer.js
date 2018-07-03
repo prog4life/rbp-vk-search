@@ -17,12 +17,11 @@ import { addIfNotExist, createReducer } from './reducerUtils';
 
 // contains pending and failed requests objects with ids as keys
 const byId = createReducer({}, {
-  [SEARCH_BY_ITEMS_REQUEST]: (state, { id, startTime }) => ({
+  [SEARCH_BY_ITEMS_REQUEST]: (state, { id }) => ({
     ...state,
     [id]: {
       id,
       attempt: state[id] ? (state[id].attempt + 1) : 1,
-      startTime,
     },
   }),
   [SEARCH_BY_ITEMS_REQUEST_SUCCESS]: (state, { id }) => {

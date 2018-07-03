@@ -33,11 +33,17 @@ class UserDataPage extends React.Component {
 
     // fetchUserData(values);
     dispatch((dispatch, getState) => {
-      const posts = getVisiblePosts(getState()).slice(0, 10);
+      const posts = getVisiblePosts(getState());
+
       searchForLikesToPosts({
         posts, likerId: values.userId,
       });
     });
+  }
+  handleStopClick = () => {
+    const { dispatch } = this.props;
+
+    dispatch({ type: 'SEARCH_BY_ITEMS_TERMINATE' });
   }
   render() {
     const { handleSubmit } = this.props;
@@ -60,6 +66,13 @@ class UserDataPage extends React.Component {
             <Col xsOffset={1} smOffset={0} xs={10} >
               <Button type="submit" bsStyle="info">
                 {'Get User Data'}
+              </Button>
+            </Col>
+          </Row>
+          <Row>
+            <Col xsOffset={1} smOffset={0} xs={10} >
+              <Button type="button" onClick={this.handleStopClick}>
+                {'Stop Search'}
               </Button>
             </Col>
           </Row>

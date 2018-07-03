@@ -6,7 +6,11 @@ import {
   getSearchIsActive, getRequestByOffset, getPendingList,
 } from 'selectors';
 
+import shortId from 'shortid';
+
 const refuseSearchRequest = (next, reason, { offset, callbackId = null }) => {
+  const measureId = shortId.generate();
+  console.time(`--- REFUSE ${measureId} ---`);
   let msg = 'Request was refused by unknown reason';
 
   switch (reason) {
@@ -30,21 +34,28 @@ const refuseSearchRequest = (next, reason, { offset, callbackId = null }) => {
   const error = new Error(msg);
 
   error.isRefuse = true;
+  console.timeEnd(`--- REFUSE ${measureId} ---`);
   throw error;
 };
 
 // remove successful request obj from "requests"
 export const onSuccess = ({ next, getState, offset }) => (response) => {
+  const measureId = shortId.generate();
+  console.time(`--- ON SUCCESS SELECTORS ${measureId} ---`);
   const state = getState();
   const isActive = getSearchIsActive(state);
   const requestByOffset = getRequestByOffset(state, offset);
+  console.timeEnd(`--- ON SUCCESS SELECTORS ${measureId} ---`);
+  console.time(`--- ON SUCCESS ${measureId} ---`);
 
   if (!isActive) {
+    console.timeEnd(`--- ON SUCCESS ${measureId} ---`);
     refuseSearchRequest(next, 'search-is-over', { offset });
   }
   // if another request with such offset was completed and therefore removed
   // from store already
   if (!requestByOffset) {
+    console.timeEnd(`--- ON SUCCESS ${measureId} ---`);
     refuseSearchRequest(next, 'request-succeeded', { offset });
   }
   next({
@@ -55,18 +66,24 @@ export const onSuccess = ({ next, getState, offset }) => (response) => {
     amount: response.items ? response.items.length : null,
   });
 
+  console.timeEnd(`--- ON SUCCESS ${measureId} ---`);
   return response;
 };
 
 // add failed request obj to "requests"
 export const onFail = ({ next, getState, offset }) => (error) => {
+  const measureId = shortId.generate();
+  console.time(`--- ON FAIL SELECTORS ${measureId} ---`);
   const state = getState();
   const isActive = getSearchIsActive(state);
   const pending = getPendingList(state);
+  console.timeEnd(`--- ON FAIL SELECTORS ${measureId} ---`);
+  console.time(`--- ON FAIL ${measureId} ---`);
 
   // NOTE: in case when prev attempt request will fail but next
   // attempt pending exists: if pending succeeds later - it will rewrite failed
   if (!isActive) {
+    console.timeEnd(`--- ON FAIL ${measureId} ---`);
     refuseSearchRequest(next, 'search-is-over', { offset });
   }
   const { code = null, message = null, requestParams } = error;
@@ -76,11 +93,13 @@ export const onFail = ({ next, getState, offset }) => (error) => {
 
   // if another request with such offset has succeeded or failed earlier
   if (!pending.includes(offset)) {
+    console.timeEnd(`--- ON FAIL ${measureId} ---`);
     refuseSearchRequest(next, 'request-processed', { offset, callbackId });
   }
 
   if (code === AUTH_FAILED) { // invalid access_token
     next({ type: SEARCH_ERROR, error: { code, message, requestParams } });
+    console.timeEnd(`--- ON FAIL ${measureId} ---`);
     throw error;
   }
   next({
@@ -90,6 +109,7 @@ export const onFail = ({ next, getState, offset }) => (error) => {
     message,
     callbackId,
   });
+  console.timeEnd(`--- ON FAIL ${measureId} ---`);
   throw error; // maybe add offset prop
 };
 

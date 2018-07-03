@@ -30,7 +30,7 @@ const logger = createLogger({
 const watcher = immutabilityWatcher();
 
 const middleware = [
-  watcher, search, searchByItems, sagaMiddleware, thunk, logger,
+  watcher, searchByItems, sagaMiddleware, search, thunk, logger,
 ];
 
 const configureStore = (preloadedState) => {

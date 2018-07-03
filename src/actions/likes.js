@@ -9,16 +9,18 @@ export const searchForLikesToPosts = ({
   types: ['RECEIVE_LIKES'],
   getNumberOfResults: state => 1,
   [SEARCH_BY_ITEMS]: {
-    baseRequestURL: 'https://api.vk.com/method/likes.isLiked?',
     items: posts,
-    likerId,
-    objectType,
-    ownerId: wallOwnerId,
+    baseRequestURL: 'https://api.vk.com/method/likes.isLiked',
+    query: {
+      user_id: likerId,
+      type: objectType,
+      owner_id: wallOwnerId,
+      v: '5.80',
+    },
     // mode: postAuthorId ? WALL_POSTS_BY_AUTHOR_ID : WALL_POSTS_BY_SEX,
     // target: targets.LIKES_TO_POSTS,
     // filters: { postAuthorId, postAuthorSex },
     resultsLimit: null,
-    apiVersion: 5.80,
   },
   meta: {
     // next 2 is optional

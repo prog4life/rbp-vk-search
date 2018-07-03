@@ -17,12 +17,11 @@ import { addIfNotExist, createReducer } from './reducerUtils';
 
 // contains pending and failed requests objects with offsets as keys
 const byOffset = createReducer({}, {
-  [SEARCH_REQUEST]: (state, { offset, startTime }) => ({
+  [SEARCH_REQUEST]: (state, { offset }) => ({
     ...state,
     [offset]: {
       offset,
       attempt: state[offset] ? (state[offset].attempt + 1) : 1,
-      startTime,
     },
   }),
   [SEARCH_REQUEST_SUCCESS]: (state, { offset }) => {
@@ -88,7 +87,7 @@ export const getAllByOffset = state => state.byOffset;
 export const getPending = state => state.pending;
 export const getFailed = state => state.failed;
 
-// const byOffset = (state = {}, { type, id, offset, startTime }) => {
+// const byOffset = (state = {}, { type, id, offset }) => {
 //   switch (type) {
 //     case SEARCH_REQUEST:
 //       return {
@@ -97,7 +96,6 @@ export const getFailed = state => state.failed;
 //           id,
 //           attempt: state[id] ? (state[id].attempt + 1) : 1,
 //           offset,
-//           startTime,
 //         },
 //       };
 //     case SEARCH_REQUEST_SUCCESS: {
@@ -112,7 +110,6 @@ export const getFailed = state => state.failed;
 //     //       id,
 //     //       attempt: state[id].attempt,
 //     //       offset,
-//     //       startTime,
 //     //     },
 //     //   };
 //     case SEARCH_START:
@@ -193,7 +190,6 @@ export const getFailed = state => state.failed;
 //           isPending: true,
 //           // isDone: false,
 //           offset: action.offset,
-//           startTime: action.startTime,
 //         },
 //       };
 //     case 'SEARCH_REQUEST_SUCCESS': {
@@ -209,7 +205,6 @@ export const getFailed = state => state.failed;
 //           isPending: false,
 //           // isDone: false,
 //           offset: action.offset,
-//           startTime: action.startTime,
 //         },
 //       };
 //     case SEARCH_START:

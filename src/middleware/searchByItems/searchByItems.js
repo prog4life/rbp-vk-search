@@ -1,4 +1,4 @@
-import uuid from 'uuid';
+import shortId from 'shortid';
 import {
   SEARCH_BY_ITEMS_START, SEARCH_BY_ITEMS_SET_INDEX, SEARCH_BY_ITEMS_END,
   SEARCH_BY_ITEMS_TERMINATE, SEARCH_BY_ITEMS_REQUEST,
@@ -46,7 +46,6 @@ const searchByItems = ({ dispatch, getState }) => {
   //     id: 'offset_400'
   //     offset: 400,
   //     attempt: 1, // how many times request was sent/sent again
-  //     startTime: integer // Date.now() value
   //     isPending: true, // failed request will get "false" value here
   //   }
   // };
@@ -75,7 +74,7 @@ const searchByItems = ({ dispatch, getState }) => {
     // validateOptions(meta);
     // validateParams(searchParams); // TODO: validate filter names with constants
 
-    // const [resultsType] = types;
+    const [resultsType] = types;
     const accessToken = getAccessToken(getState());
     // const accessToken = 'dwad123231uhhuh13uh13';
 
@@ -86,8 +85,7 @@ const searchByItems = ({ dispatch, getState }) => {
     // TODO: not destructure postAuthorId here and pass whole searchParams obj
     // to transformResponse(transformResponse)
     const {
-      baseRequestURL, likerId, items, objectType, ownerId, target, filters,
-      resultsLimit, apiVersion,
+      baseRequestURL, query, items, target, filters, resultsLimit,
     } = searchParams;
     const {
       // TODO: retrieve next 2 from options passed to middleware factory
@@ -97,10 +95,20 @@ const searchByItems = ({ dispatch, getState }) => {
 
     // doublecheck
     clearInterval(intervalId);
-    // will also clear "requests" in store
+    // will also clear "requestsByIds" in store
     next({ type: SEARCH_BY_ITEMS_START, limit: resultsLimit });
 
-    console.log('uuid.v4() ', uuid.v4());
+    // console.log('uuid.v1() ', uuid.v1());
+    // console.log('uuid.v4() ', uuid.v4());
+
+    const queryString = Object.keys(query).reduce((acc, item) => (
+      `${acc === '' ? acc : `${acc}&`}` +
+      `${item}=${query[item]}`
+    ), '');
+
+    console.log('QUERYSTRING: ', queryString);
+
+    let results = [];
 
     const makeCallToAPI = (itemId) => {
       console.log('ITEM ID ', itemId);
@@ -109,31 +117,42 @@ const searchByItems = ({ dispatch, getState }) => {
       //   next, getState, id: itemId
       // });
 
-      next({
-        type: SEARCH_BY_ITEMS_REQUEST,
-        id: itemId,
-        startTime: Date.now(),
-      });
+      console.time('~~~ CALL API REQUEST ~~~');
+      next({ type: SEARCH_BY_ITEMS_REQUEST, id: itemId });
+      console.timeEnd('~~~ CALL API REQUEST ~~~');
+
+      console.time('::: CALL API :::');
 
       const currentRequestURL = `${baseRequestURL}?` +
-      `&item_id=${itemId}&user_id=${likerId}` +
-      `&owner_id=${ownerId}&type=${objectType}` +
-      `&access_token=${accessToken}&v=${apiVersion}`;
+      `${queryString}` +
+      `&item_id=${itemId}&access_token=${accessToken}`;
+      // const currentRequestURL = `${baseRequestURL}?` +
+      // `&item_id=${itemId}&user_id=${likerId}` +
+      // `&owner_id=${ownerId}&type=${objectType}` +
+      // `&access_token=${accessToken}&v=${apiVersion}`;
 
-      return jsonpPromise(currentRequestURL)
+      const promise = jsonpPromise(currentRequestURL)
         .then(
           onSuccess({ next, getState, itemId }),
           onFail({ next, getState, itemId }),
         )
         // TODO: filter response first here ?
         // .then(response => transformResponse(response, target, filters))
+        .then(response => response.liked > 0)
         .then(
-          // results => next({ type: resultsType, ...results }),
-          results => console.log('SEARCH BY ITEMS RESULTS: ', results),
+          isLiked => isLiked && next({ type: resultsType, itemId }),
           // TODO: consider if (eror.code === AUTH_FAILED) clearInterval() with
           // replacing first makeCallToAPI() after setInterval
           err => (err.isRefuse ? console.warn(err) : console.error(err)),
-        );
+        )
+        .then((isLiked) => {
+          if (isLiked) {
+            results.push(itemId);
+            console.log('SEARCH BY ITEMS resultS: ', results);
+          }
+        });
+      console.timeEnd('::: CALL API :::');
+      return promise;
     };
     // first request before timer tick
     makeCallToAPI(items[0].id);
@@ -142,6 +161,9 @@ const searchByItems = ({ dispatch, getState }) => {
       // const tempCheckpoint = checkpoint;
       // checkpoint = performance.now();
       // console.warn(`NEW interval TICK: ${checkpoint - tempCheckpoint}`);
+      const measureId = shortId.generate();
+
+      console.time(`*** INTERVAL SELECTORS *** ${measureId}`);
 
       // total is equivalent of "count" field in response from vk API
       const state = getState();
@@ -152,8 +174,13 @@ const searchByItems = ({ dispatch, getState }) => {
       const pending = getSearchByItemsPending(state);
       const errorCode = getSearchByItemsErrorCode(state);
 
+      console.timeEnd(`*** INTERVAL SELECTORS *** ${measureId}`);
+
+      console.time(`=== INTERVAL CONDITIONS === ${measureId}`);
+
       if (errorCode === AUTH_FAILED) {
         clearInterval(intervalId);
+        console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
         return;
       }
 
@@ -169,10 +196,11 @@ const searchByItems = ({ dispatch, getState }) => {
       if (toSendAgain.length > 0) {
         const [idToRepeat] = toSendAgain;
         // const requestToRepeat = reqs[idToRepeat];
-        console.log(`Repeat FAILED with ${idToRepeat} ` +
-          `offset and attempt ${reqs[idToRepeat].attempt + 1} `);
+        // console.log(`Repeat FAILED with ${idToRepeat} ` +
+        //   `offset and attempt ${reqs[idToRepeat].attempt + 1} `);
 
         makeCallToAPI(idToRepeat);
+        console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
         return;
       }
 
@@ -185,8 +213,11 @@ const searchByItems = ({ dispatch, getState }) => {
         (!resultsLimit || resultsCount < resultsLimit) &&
         (items.length && nextIndex < items.length)
       ) {
-        next({ type: SEARCH_BY_ITEMS_SET_INDEX, nextIndex });
         makeCallToAPI(items[nextIndex].id);
+        console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
+        console.time(`<<< SET INDEX ${measureId} >>>`);
+        next({ type: SEARCH_BY_ITEMS_SET_INDEX, nextIndex });
+        console.timeEnd(`<<< SET INDEX ${measureId} >>>`);
         return;
       }
 
@@ -194,7 +225,10 @@ const searchByItems = ({ dispatch, getState }) => {
       if (pending.length === 0) {
         clearInterval(intervalId);
         next({ type: SEARCH_BY_ITEMS_END });
+        console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
+        return;
       }
+      console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
     }, requestInterval);
     // NOTE: return was added for eslint, maybe replace it with
     // next(initialAction); OR next({ type: requestType });

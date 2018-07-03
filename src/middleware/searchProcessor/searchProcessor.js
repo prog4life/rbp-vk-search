@@ -6,6 +6,7 @@ import {
   getAccessToken, getSearchTotal, getSearchOffset, getSearchErrorCode,
   getRequestsByOffset, getFailedList, getPendingList,
 } from 'selectors';
+import shortId from 'shortid';
 // import fetchJSONP from 'utils/fetchJSONP';
 import jsonpPromise from 'utils/jsonpPromise';
 import { onSuccess, onFail } from './requestHandlers';
@@ -44,7 +45,6 @@ const searchProcessor = ({ dispatch, getState }) => {
   //     id: 'offset_400'
   //     offset: 400,
   //     attempt: 1, // how many times request was sent/sent again
-  //     startTime: integer // Date.now() value
   //     isPending: true, // failed request will get "false" value here
   //   }
   // };
@@ -102,30 +102,43 @@ const searchProcessor = ({ dispatch, getState }) => {
 
     // TODO: replace to top level ?
     const makeCallToAPI = (offset = 0) => {
+      // const measureId = shortId.generate();
       // const tempCheckpoint2 = checkpoint2;
       // checkpoint2 = performance.now();
       // console.warn(`NEW REQUEST with ${offset} offset, ` +
       //   `interval: ${checkpoint2 - tempCheckpoint2} and
       //    shift: ${performance.now() - checkpoint}`);
       // add request obj with isPending: true to "requests"
-      next({ type: SEARCH_REQUEST, offset, startTime: Date.now() });
+      console.time('~~~ CALL API REQUEST ~~~');
+      next({ type: SEARCH_REQUEST, offset });
+      console.timeEnd('~~~ CALL API REQUEST ~~~');
+
+      console.time('::: CALL API :::');
 
       const currentRequestURL = `${baseRequestURL}&offset=${offset}` +
         `&access_token=${accessToken}`;
 
-      return jsonpPromise(currentRequestURL)
+      const promise = jsonpPromise(currentRequestURL)
         .then(
           onSuccess({ next, getState, offset }),
           onFail({ next, getState, offset }),
         )
         // TODO: filter response first here ?
-        .then(response => transformResponse(response, target, filters))
+        .then((response) => {
+          console.time('--- TRANSFORM RESPONSE ---');
+          const transformed = transformResponse(response, target, filters);
+          console.timeEnd('--- TRANSFORM RESPONSE ---');
+          return transformed;
+        })
         .then(
           results => next({ type: resultsType, ...results }),
+          // results => results,
           // TODO: consider if (eror.code === AUTH_FAILED) clearInterval() with
           // replacing first makeCallToAPI() after setInterval
           err => (err.isRefuse ? console.warn(err) : console.error(err)),
         );
+      console.timeEnd('::: CALL API :::');
+      return promise;
     };
     // first request before timer tick
     makeCallToAPI();
@@ -134,6 +147,9 @@ const searchProcessor = ({ dispatch, getState }) => {
       // const tempCheckpoint = checkpoint;
       // checkpoint = performance.now();
       // console.warn(`NEW interval TICK: ${checkpoint - tempCheckpoint}`);
+      const measureId = shortId.generate();
+
+      // console.time(`*** INTERVAL SELECTORS *** ${measureId}`);
 
       // total is equivalent of "count" field in response from vk API
       const state = getState();
@@ -145,8 +161,13 @@ const searchProcessor = ({ dispatch, getState }) => {
       const pending = getPendingList(state);
       const errorCode = getSearchErrorCode(state);
 
+      // console.timeEnd(`*** INTERVAL SELECTORS *** ${measureId}`);
+
+      console.time(`=== INTERVAL CONDITIONS === ${measureId}`);
+
       if (errorCode === AUTH_FAILED) {
         clearInterval(intervalId);
+        console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
         return;
       }
 
@@ -162,10 +183,11 @@ const searchProcessor = ({ dispatch, getState }) => {
       if (toSendAgain.length > 0) {
         const [offsetToRepeat] = toSendAgain;
         // const requestToRepeat = reqs[offsetToRepeat];
-        console.log(`Repeat FAILED with ${offsetToRepeat} ` +
-          `offset and attempt ${reqs[offsetToRepeat].attempt + 1} `);
+        // console.log(`Repeat FAILED with ${offsetToRepeat} ` +
+        //   `offset and attempt ${reqs[offsetToRepeat].attempt + 1} `);
 
         makeCallToAPI(offsetToRepeat);
+        console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
         return;
       }
 
@@ -178,8 +200,11 @@ const searchProcessor = ({ dispatch, getState }) => {
         (!resultsLimit || resultsCount < resultsLimit) &&
         (!total || nextOffset <= total)
       ) {
-        next({ type: SEARCH_SET_OFFSET, offset: nextOffset });
         makeCallToAPI(nextOffset);
+        console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
+        console.time(`<<< SET OFFSET ${measureId} >>>`);
+        next({ type: SEARCH_SET_OFFSET, offset: nextOffset });
+        console.timeEnd(`<<< SET OFFSET ${measureId} >>>`);
         return;
       }
 
@@ -187,7 +212,10 @@ const searchProcessor = ({ dispatch, getState }) => {
       if (pending.length === 0) {
         clearInterval(intervalId);
         next({ type: SEARCH_END });
+        console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
+        return;
       }
+      console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
     }, requestInterval);
     // NOTE: return was added for eslint, maybe replace it with
     // next(initialAction); OR next({ type: requestType });

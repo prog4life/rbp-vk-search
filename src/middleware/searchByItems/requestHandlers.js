@@ -7,7 +7,11 @@ import {
   isSearchByItemsActive, getRequestById, getSearchByItemsPending,
 } from 'selectors';
 
+import shortId from 'shortid';
+
 const refuseSearchRequest = (next, reason, { itemId, callbackId = null }) => {
+  const measureId = shortId.generate();
+  console.time(`--- REFUSE ${measureId} ---`);
   let msg = 'Request was refused by unknown reason';
 
   switch (reason) {
@@ -31,41 +35,54 @@ const refuseSearchRequest = (next, reason, { itemId, callbackId = null }) => {
   const error = new Error(msg);
 
   error.isRefuse = true;
+  console.timeEnd(`--- REFUSE ${measureId} ---`);
   throw error;
 };
 
 // remove successful request obj from "requests"
 export const onSuccess = ({ next, getState, itemId }) => (response) => {
+  const measureId = shortId.generate();
+  console.time(`--- ON SUCCESS SELECTORS ${measureId} ---`);
   const state = getState();
   const isActive = isSearchByItemsActive(state);
   const request = getRequestById(state, itemId);
+  console.timeEnd(`--- ON SUCCESS SELECTORS ${measureId} ---`);
+  console.time(`--- ON SUCCESS ${measureId} ---`);
 
   if (!isActive) {
+    console.timeEnd(`--- ON SUCCESS ${measureId} ---`);
     refuseSearchRequest(next, 'search-is-over', { itemId });
   }
   // if another request with such id was completed and therefore removed
   // from store already
   if (!request) {
+    console.timeEnd(`--- ON SUCCESS ${measureId} ---`);
     refuseSearchRequest(next, 'request-succeeded', { itemId });
   }
   next({
     type: SEARCH_BY_ITEMS_REQUEST_SUCCESS,
     id: itemId,
-    // response,
+    response,
   });
 
+  console.timeEnd(`--- ON SUCCESS ${measureId} ---`);
   return response;
 };
 
 // add failed request obj to "requests"
 export const onFail = ({ next, getState, itemId }) => (error) => {
+  const measureId = shortId.generate();
+  console.time(`--- ON FAIL SELECTORS ${measureId} ---`);
   const state = getState();
   const isActive = isSearchByItemsActive(state);
   const pending = getSearchByItemsPending(state);
+  console.timeEnd(`--- ON FAIL SELECTORS ${measureId} ---`);
+  console.time(`--- ON FAIL ${measureId} ---`);
 
   // NOTE: in case when prev attempt request will fail but next
   // attempt pending exists: if pending succeeds later - it will rewrite failed
   if (!isActive) {
+    console.timeEnd(`--- ON FAIL ${measureId} ---`);
     refuseSearchRequest(next, 'search-is-over', { itemId });
   }
   const { code = null, message = null, requestParams } = error;
@@ -75,6 +92,7 @@ export const onFail = ({ next, getState, itemId }) => (error) => {
 
   // if another request with such offset has succeeded or failed earlier
   if (!pending.includes(itemId)) {
+    console.timeEnd(`--- ON FAIL ${measureId} ---`);
     refuseSearchRequest(next, 'request-processed', { itemId, callbackId });
   }
 
@@ -83,6 +101,7 @@ export const onFail = ({ next, getState, itemId }) => (error) => {
       type: SEARCH_BY_ITEMS_ERROR,
       error: { code, message, requestParams },
     });
+    console.timeEnd(`--- ON FAIL ${measureId} ---`);
     throw error;
   }
   next({
@@ -92,6 +111,7 @@ export const onFail = ({ next, getState, itemId }) => (error) => {
     message,
     callbackId,
   });
+  console.timeEnd(`--- ON FAIL ${measureId} ---`);
   throw error; // maybe add offset prop
 };
 

@@ -24,14 +24,14 @@ if (process.env.NODE_ENV === 'development') {
     // components: ['ControlButtons'],
   }, (measures) => {
     const componentsToCollect = [
-      'Connect(FoundPostOptim)', 'FoundPost', 'FoundPostOptim',
+      // 'Connect(FoundPostOptim)', 'FoundPost', 'FoundPostOptim',
       'FoundPostsList', 'FoundPostsListOptim',
     ];
     const result = !componentsToCollect.length
       ? measures
       : measures.filter(m => componentsToCollect.includes(m.componentName));
 
-    console.log(result); // can log "measures" right to console
+    // console.log(result); // can log "measures" right to console
   });
 }
 
