@@ -1,8 +1,6 @@
-import { SEARCH_PARAMETERS } from './searchProcessor';
-
-export const validateAction = (action) => {
+export const validateAction = (action, key) => {
   const {
-    types, [SEARCH_PARAMETERS]: searchParams, getNumberOfResults,
+    types, [key]: searchParams, getNumberOfResults,
   } = action;
 
   if (!Array.isArray(types) || types.length !== 1) {

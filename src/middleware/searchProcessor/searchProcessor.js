@@ -67,7 +67,7 @@ const searchProcessor = ({ dispatch, getState }) => {
     }
     const { meta = {} } = action;
 
-    validateAction(action);
+    validateAction(action, SEARCH_PARAMETERS);
     validateOptions(meta);
     validateParams(searchParams); // TODO: validate filter names with constants
 

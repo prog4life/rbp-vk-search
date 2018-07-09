@@ -7,6 +7,7 @@ const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const DuplPkgCheckrPlugin = require('duplicate-package-checker-webpack-plugin');
+const CircularDependencyPlugin = require('circular-dependency-plugin');
 const BabelPluginTransformImports = require('babel-plugin-transform-imports');
 // const CompressionPlugin = require('compression-webpack-plugin');
 // const VisualizerPlugin = require('webpack-visualizer-plugin');
@@ -22,72 +23,6 @@ const isProduction = env === 'production';
 console.log('env: ', env);
 console.log('process.env.NODE_ENV: ', process.env.NODE_ENV);
 
-const htmlWebpackPlugin = new HTMLWebpackPlugin({
-  title: 'vk-search with reactbootstrap',
-  favicon: path.resolve(__dirname, 'src/assets/favicon.png'),
-  // meta: { viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no' },
-  inject: false,
-  template: path.resolve(__dirname, 'src/assets/template.html'),
-  // chunksSortMode(a, b) {
-  //   const order = ['polyfills', 'react-bootstrap', 'vendors', 'main'];
-  //   return order.indexOf(a.names[0]) - order.indexOf(b.names[0]);
-  // },
-  appMountId: 'app',
-  mobile: true,
-});
-
-// TODO: use .babelrc instead ?
-const babelLoaderOptions = {
-  // ------------------------ BABEL PLUGINS -----------------------------------
-  plugins: [
-    'react-hot-loader/babel',
-    // 'fast-async',
-    'syntax-dynamic-import',
-    'transform-class-properties',
-    // 'transform-flow-strip-types',
-    [BabelPluginTransformImports, { // TODO: try "transform-imports"
-      'react-bootstrap': {
-        transform(importName) {
-          return `react-bootstrap/lib/${importName}`;
-        },
-        preventFullImport: true,
-      },
-      'redux-form': {
-        transform(importName) {
-          return `redux-form/es/${importName}`;
-        },
-        preventFullImport: true,
-      },
-    }],
-  ].concat(isProduction ? [] : ['transform-react-jsx-source']),
-  // ------------------------ BABEL PRESETS -----------------------------------
-  presets: [
-    ['env', {
-      // need to be turned on for Jest testing
-      // modules: env === 'development' ? false : 'commonjs',
-      useBuiltIns: 'usage', // 'entry' OR false
-      debug: true,
-      targets: {
-        // browsers: ['defaults', 'firefox 52', 'not ie <= 11'],
-        browsers: [
-          'last 2 versions',
-          'not ie <= 11',
-          'not android <= 62',
-        ],
-      },
-      exclude: [
-        // 'transform-regenerator',
-        // 'transform-async-to-generator',
-      ],
-    }],
-    // 'flow',
-    'react',
-    'stage-3',
-  ],
-  cacheDirectory: true,
-};
-
-// ========================== WEBPACK CONFIG ==================================
 module.exports = {
   mode: env,
   entry: {
@@ -106,6 +41,7 @@ module.exports = {
     path: path.resolve(__dirname, 'build'),
     publicPath: '/',
   },
+  // ========================== OPTIMIZATION ==================================
   optimization: {
     minimizer: [ // setting this overrides webpack 4 defaults
       new UglifyJSPlugin({
@@ -132,6 +68,8 @@ module.exports = {
           // test: /(react|react-dom|react-router|react-router-dom)/,
           test(module, chunks) {
             const name = module.nameForCondition && module.nameForCondition();
+            // TODO: use new RegExp(`re`) for multiline, but remember about
+            // backslash in string
             const re = /[\\/](react|react-dom|react-router|react-router-dom|history|react-bootstrap|core-js|whatwg-fetch)[\\/]/;
             const result = re.test(name);
 
@@ -156,6 +94,7 @@ module.exports = {
       name: 'manifest',
     },
   },
+  // =============================== PLUGINS ==================================
   plugins: [
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
@@ -167,7 +106,19 @@ module.exports = {
       ['build'], // OR 'build' OR 'dist', removes folder
       { exclude: ['index.html'] }, // TEMP
     ),
-    htmlWebpackPlugin,
+    new HTMLWebpackPlugin({
+      title: 'vk-search with reactbootstrap',
+      favicon: path.resolve(__dirname, 'src/assets/favicon.png'),
+      // meta: { viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no' },
+      inject: false,
+      template: path.resolve(__dirname, 'src/assets/template.html'),
+      // chunksSortMode(a, b) {
+      //   const order = ['polyfills', 'react-bootstrap', 'vendors', 'main'];
+      //   return order.indexOf(a.names[0]) - order.indexOf(b.names[0]);
+      // },
+      appMountId: 'app',
+      mobile: true,
+    }),
     // new CompressionPlugin({
     //   deleteOriginalAssets: true,
     //   test: /\.js/
@@ -177,11 +128,19 @@ module.exports = {
       // reportFilename: '../temp', // relative to output.path
       openAnalyzer: false,
     }),
+    new CircularDependencyPlugin({
+      exclude: /temp|node_modules/i, // exclude detection of files
+      failOnError: true, // add errors to webpack instead of warnings
+      // allow import cycles that include an asyncronous import, e.g. via
+      allowAsyncCycles: false, // import(/* webpackMode: "weak" */ './file.js')
+      cwd: process.cwd(), // for displaying module paths
+    }),
     new DuplPkgCheckrPlugin(),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     // new VisualizerPlugin(),
     ...isProduction ? [] : [new webpack.HotModuleReplacementPlugin()],
   ],
+  // =============================== RESOLVE ==================================
   resolve: {
     alias: {
       // components: path.resolve(__dirname, 'src/components'),
@@ -197,6 +156,7 @@ module.exports = {
     ],
     extensions: ['.js', '.json', '.jsx', '*'],
   },
+  // ============================ MODULE (lOADERS) ============================
   module: {
     rules: [
       // -------------------- JS/JSX BABEL-LOADER -----------------------------
@@ -205,7 +165,56 @@ module.exports = {
         loader: 'babel-loader',
         include: [path.resolve(__dirname, 'src')],
         exclude: [path.resolve(__dirname, 'node_modules')],
-        options: babelLoaderOptions,
+        // TODO: use .babelrc instead ?
+        options: {
+          // ------------------------ BABEL PLUGINS ---------------------------
+          plugins: [
+            'react-hot-loader/babel',
+            // 'fast-async',
+            'syntax-dynamic-import',
+            'transform-class-properties',
+            // 'transform-flow-strip-types',
+            [BabelPluginTransformImports, { // TODO: try "transform-imports"
+              'react-bootstrap': {
+                transform(importName) {
+                  return `react-bootstrap/lib/${importName}`;
+                },
+                preventFullImport: true,
+              },
+              'redux-form': {
+                transform(importName) {
+                  return `redux-form/es/${importName}`;
+                },
+                preventFullImport: true,
+              },
+            }],
+          ].concat(isProduction ? [] : ['transform-react-jsx-source']),
+          // ------------------------ BABEL PRESETS ---------------------------
+          presets: [
+            ['env', {
+              // need to be turned on for Jest testing
+              // modules: env === 'development' ? false : 'commonjs',
+              useBuiltIns: 'usage', // 'entry' OR false
+              debug: true,
+              targets: {
+                // browsers: ['defaults', 'firefox 52', 'not ie <= 11'],
+                browsers: [
+                  'last 2 versions',
+                  'not ie <= 11',
+                  'not android <= 62',
+                ],
+              },
+              exclude: [
+                // 'transform-regenerator',
+                // 'transform-async-to-generator',
+              ],
+            }],
+            // 'flow',
+            'react',
+            'stage-3',
+          ],
+          cacheDirectory: true,
+        },
       },
       // --------------------- CSS/SCSS LOADERS -------------------------------
       {
@@ -221,7 +230,7 @@ module.exports = {
           { // not translates url() that starts with "/"
             loader: 'css-loader',
             // options: { importLoaders: 3, url: false }
-            options: { minimize: true, sourceMap: true },
+            options: { sourceMap: true },
           },
           // 'resolve-url-loader',
           { loader: 'sass-loader', options: { sourceMap: true } },
@@ -265,6 +274,7 @@ module.exports = {
       },
     ],
   },
+  // ============================= DEV-SERVER =================================
   devServer: {
     progress: true,
     contentBase: path.resolve(__dirname, 'build'),
