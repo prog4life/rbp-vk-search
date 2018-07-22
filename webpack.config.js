@@ -70,7 +70,7 @@ module.exports = {
             const name = module.nameForCondition && module.nameForCondition();
             // TODO: use new RegExp(`re`) for multiline, but remember about
             // backslash in string
-            const re = /[\\/](react|react-dom|react-router|react-router-dom|history|react-bootstrap|core-js|whatwg-fetch)[\\/]/;
+            const re = /[\\/](react|react-dom|react-router|react-router-dom|react-bootstrap|core-js|whatwg-fetch)[\\/]/;
             const result = re.test(name);
 
             // console.log(`module.nameForCondition: ${name}`);
@@ -89,10 +89,10 @@ module.exports = {
       },
     },
     // adds an additonal chunk to each entrypoint containing only the runtime
-    // runtimeChunk: true, // something like extracting a manifest
-    runtimeChunk: {
-      name: 'manifest',
-    },
+    // something like extracting a manifest
+    runtimeChunk: 'single', // boolean | 'multiple' | {
+    //   name: entrypoint => `runtime~${entrypoint.name}`,
+    // },
   },
   // =============================== PLUGINS ==================================
   plugins: [
