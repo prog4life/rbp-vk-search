@@ -5,7 +5,6 @@ import { reduxForm, Field } from 'redux-form';
 import { Grid, Row, Col, Button } from 'react-bootstrap';
 
 import * as actionCreators from 'actions';
-import { getVisiblePosts } from 'selectors';
 
 import FormInputGroup from 'components/common/FormInputGroup';
 
@@ -26,25 +25,19 @@ class UserDataPage extends React.Component {
   static propTypes = {
     handleSubmit: pt.func.isRequired,
   }
+
   handleSubmit = (values) => {
-    const { fetchUserData, searchForLikesToPosts, dispatch } = this.props;
+    const { fetchUserData, dispatch } = this.props;
 
     console.log('USER DATA SUBMITTED values: ', values);
 
-    // fetchUserData(values);
-    dispatch((dispatch, getState) => {
-      const posts = getVisiblePosts(getState());
-
-      searchForLikesToPosts({
-        posts, likerId: values.userId,
-      });
-    });
+    fetchUserData(values);
   }
+
   handleStopClick = () => {
     const { dispatch } = this.props;
-
-    dispatch({ type: 'SEARCH_BY_ITEMS_TERMINATE' });
   }
+
   render() {
     const { handleSubmit } = this.props;
 
@@ -63,14 +56,14 @@ class UserDataPage extends React.Component {
             </Col>
           </Row>
           <Row>
-            <Col xsOffset={1} smOffset={0} xs={10} >
+            <Col xsOffset={1} smOffset={0} xs={10}>
               <Button type="submit" bsStyle="info">
                 {'Get User Data'}
               </Button>
             </Col>
           </Row>
           <Row>
-            <Col xsOffset={1} smOffset={0} xs={10} >
+            <Col xsOffset={1} smOffset={0} xs={10}>
               <Button type="button" onClick={this.handleStopClick}>
                 {'Stop Search'}
               </Button>
@@ -90,9 +83,9 @@ const UserDataPageWrapped = reduxForm({
   // onSubmit: component.handleSubmit,
 })(UserDataPage);
 
-const { fetchUserData, searchForLikesToPosts } = actionCreators;
+const { fetchUserData } = actionCreators;
 
-const propsToDispatch = { fetchUserData, searchForLikesToPosts };
+const propsToDispatch = { fetchUserData };
 
 // export default UserDataPageWrapped;
 export default connect(null, propsToDispatch)(UserDataPageWrapped);

@@ -7,7 +7,7 @@ import { createLogger } from 'redux-logger';
 // import { composeWithDevTools } from 'redux-devtools-extension';
 import { composeWithDevTools } from 'remote-redux-devtools';
 import search from 'middleware/searchProcessor';
-import searchByItems from 'middleware/searchByItems';
+
 import { mainSaga } from 'actions';
 import rootReducer from '../reducers';
 
@@ -29,9 +29,7 @@ const logger = createLogger({
 });
 const watcher = immutabilityWatcher();
 
-const middleware = [
-  watcher, searchByItems, sagaMiddleware, search, thunk, logger,
-];
+const middleware = [watcher, sagaMiddleware, search, thunk, logger];
 
 const configureStore = (preloadedState) => {
   const composeEnhancers = composeWithDevTools({
@@ -54,7 +52,7 @@ const configureStore = (preloadedState) => {
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers
     module.hot.accept('../reducers', () => {
-      const nextRootReducer = require('../reducers');
+      const nextRootReducer = require('../reducers'); // eslint-disable-line
       store.replaceReducer(nextRootReducer);
     });
   }

@@ -54,8 +54,13 @@ const failed = createReducer([], {
 });
 
 const errors = createReducer([], { // TODO: { type, ...rest } -> { ...rest }
-  [SEARCH_REQUEST_FAIL]: (state, { code, offset, message, callbackId }) => (
-    [...state, { code, offset, message, callbackId }]
+  [SEARCH_REQUEST_FAIL]: (state, action) => (
+    [...state, {
+      code: action.code,
+      offset: action.offset,
+      message: action.message,
+      callbackId: action.callbackId,
+    }]
   ),
   [SEARCH_REQUEST_REFUSE]: (state, { offset, reason, callbackId }) => (
     [...state, { offset, reason, callbackId }]

@@ -115,8 +115,9 @@ const searchProcessor = ({ dispatch, getState }) => {
 
       console.time('::: CALL API :::');
 
-      const currentRequestURL = `${baseRequestURL}&offset=${offset}` +
-        `&access_token=${accessToken}`;
+      const currentRequestURL = `${baseRequestURL}`
+        + `&offset=${offset}`
+        + `&access_token=${accessToken}`;
 
       const promise = jsonpPromise(currentRequestURL)
         .then(
@@ -197,8 +198,8 @@ const searchProcessor = ({ dispatch, getState }) => {
 
       // request next portion of items using increased offset
       if (
-        (!resultsLimit || resultsCount < resultsLimit) &&
-        (!total || nextOffset <= total)
+        (!resultsLimit || resultsCount < resultsLimit)
+        && (!total || nextOffset <= total)
       ) {
         makeCallToAPI(nextOffset);
         console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);

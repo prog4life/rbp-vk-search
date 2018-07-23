@@ -19,9 +19,9 @@ export const fetchUserData = enteredValues => async (dispatch, getState) => {
     'can_write_private_message', 'can_send_friend_request', 'connections',
     'is_friend', 'blacklisted', 'personal', 'timezone',
   ];
-  const url = 'https://api.vk.com/method/users.get?' +
-    `&access_token=${accessToken}&v=5.80` +
-    `&user_ids=${userId}&fields=${fields.join(',')}&name_case=nom`;
+  const url = 'https://api.vk.com/method/users.get?' // TODO: USERS_GET_BASE_URL
+    + `&access_token=${accessToken}&v=5.80`
+    + `&user_ids=${userId}&fields=${fields.join(',')}&name_case=nom`;
 
   dispatch(fetchUserDataRequest());
 

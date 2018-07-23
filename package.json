@@ -85,7 +85,7 @@
     "remote-redux-devtools": "^0.5.12",
     "remotedev-extension": "0.0.10",
     "remotedev-server": "0.1.5",
-    "reselect-tools": "0.0.6",
+    "reselect-tools": "^0.0.6",
     "resolve-url-loader": "^2.3.0",
     "sass-loader": "^7.0.3",
     "style-loader": "^0.21.0",
