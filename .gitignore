@@ -2,13 +2,13 @@
 node_modules/
 
 # production:
-build/
 dist/
+build/
 
-# src/assets/
 # public/
 
 # config/
+
 **/.env
 
 # .eslintrc.json

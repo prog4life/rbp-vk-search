@@ -1,9 +1,10 @@
 const webpack = require('webpack');
 const path = require('path');
+const os = require('os');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const DuplPkgCheckrPlugin = require('duplicate-package-checker-webpack-plugin');
@@ -12,13 +13,14 @@ const BabelPluginTransformImports = require('babel-plugin-transform-imports');
 // const CompressionPlugin = require('compression-webpack-plugin');
 // const VisualizerPlugin = require('webpack-visualizer-plugin');
 // const autoprefixer = require('autoprefixer');
-// const scssSyntax = require('postcss-scss');
 // const cssnano = require('cssnano');
+// const scssSyntax = require('postcss-scss');
 
 process.traceDeprecation = true; // or run process with --trace-deprecation flag
 
 const env = process.env.NODE_ENV || 'development';
 const isProduction = env === 'production';
+// const devMode = env !== 'production';
 
 console.log('env: ', env);
 console.log('process.env.NODE_ENV: ', process.env.NODE_ENV);
@@ -30,6 +32,7 @@ module.exports = {
     main: [ // OR "app"
       // 'babel-polyfill',
       // 'normalize.css/normalize.css',
+      // 'sanitize.css/sanitize.css',
       // './src/styles/index.scss',
       // './src/config/polyfills.js',
       './src/index.js',
@@ -46,10 +49,11 @@ module.exports = {
     minimizer: [ // setting this overrides webpack 4 defaults
       new UglifyJSPlugin({
         cache: true,
-        parallel: 2, // if "true": os.cpus().length -1 (default)
+        parallel: os.cpus().length || 2, // "true": os.cpus().length - 1 (def)
         sourceMap: true, // set to true if you want JS source maps
       }),
-      new OptimizeCssAssetsPlugin({}),
+      // use this or 'cssnano' or 'optimize-cssnano-plugin'
+      new OptimizeCSSAssetsPlugin({}), // source maps are not created
     ],
     // ------------------------ SPLIT CHUNKS ----------------------------------
     splitChunks: {
@@ -150,8 +154,8 @@ module.exports = {
       // styles: path.resolve(__dirname, 'src/styles'),
     },
     modules: [
-      path.resolve(__dirname, 'src'),
       // path.resolve(__dirname, 'src/components'),
+      path.resolve(__dirname, 'src'),
       'node_modules',
     ],
     extensions: ['.js', '.json', '.jsx', '*'],
@@ -165,7 +169,7 @@ module.exports = {
         loader: 'babel-loader',
         include: [path.resolve(__dirname, 'src')],
         exclude: [path.resolve(__dirname, 'node_modules')],
-        // TODO: use .babelrc instead ?
+        // TODO: use .babelrc instead ? NOTE: .babelrc added for Jest already
         options: {
           // ------------------------ BABEL PLUGINS ---------------------------
           plugins: [
@@ -218,7 +222,7 @@ module.exports = {
       },
       // --------------------- CSS/SCSS LOADERS -------------------------------
       {
-        test: /\.(scss|css)$/, // OR /\.s?[ac]ss$/,
+        test: /\.(scss|css)$/, // OR /\.s?[ac]ss$/, OR /\.(sa|sc|c)ss$/,
         include: [
           // path.resolve(__dirname, 'src'),
           path.resolve(__dirname, 'src/styles'),
@@ -250,6 +254,7 @@ module.exports = {
               useRelativePath: true, // isProd
             },
           },
+          // --------------------- IMAGE-WEBPACK-LOADER -----------------------
           // {
           //   loader: 'image-webpack-loader',
           //   query: {
