@@ -1,14 +1,14 @@
-.topbar__nav-auth {
+.topbar__nav {
   margin-right: 0;
 }
 
-.topbar__sign-in-item {
+.topbar__sign-in {
   margin-right: 15px;
 }
 
 @media (max-width: 767px) {
-  .topbar__nav-auth,
-  .topbar__sign-in-item {
+  .topbar__nav,
+  .topbar__sign-in {
     a {
       text-align: right;
     }

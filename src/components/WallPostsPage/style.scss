@@ -1,5 +1,7 @@
 .wall-posts-page {
-  margin-top: 58px;
+  // to prevent content hiding by fixed navbar
+  // replaced by body padding-top (see Bootstrap docs)
+  // margin-top: 58px;
 
   /* width: 70%;
   height: 100%;

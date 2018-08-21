@@ -11,7 +11,7 @@ import { loadState, saveState } from 'utils/localStorage';
 
 import App from 'components/App';
 
-import 'styles/main.css';
+import 'styles/main.scss';
 
 // import * as selectors from 'selectors'; // for reselect-tools
 

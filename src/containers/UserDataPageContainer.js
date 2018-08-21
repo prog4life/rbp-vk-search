@@ -7,6 +7,7 @@ import { Grid, Row, Col, Button } from 'react-bootstrap';
 import * as actionCreators from 'actions';
 
 import FormInputGroup from 'components/common/FormInputGroup';
+import TopBarContainer from 'containers/TopBarContainer';
 
 const UserIdField = ({ input: { value, onChange } }) => (
   <FormInputGroup
@@ -42,35 +43,38 @@ class UserDataPage extends React.Component {
     const { handleSubmit } = this.props;
 
     return (
-      <Grid>
-        <form
-          className="user-data-form"
-          onSubmit={handleSubmit(this.handleSubmit)}
-        >
-          <Row>
-            <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
-              <Field
-                name="userId"
-                component={UserIdField}
-              />
-            </Col>
-          </Row>
-          <Row>
-            <Col xsOffset={1} smOffset={0} xs={10}>
-              <Button type="submit" bsStyle="info">
-                {'Get User Data'}
-              </Button>
-            </Col>
-          </Row>
-          <Row>
-            <Col xsOffset={1} smOffset={0} xs={10}>
-              <Button type="button" onClick={this.handleStopClick}>
-                {'Stop Search'}
-              </Button>
-            </Col>
-          </Row>
-        </form>
-      </Grid>
+      <React.Fragment>
+        <TopBarContainer />
+        <Grid>
+          <form
+            className="user-data-form"
+            onSubmit={handleSubmit(this.handleSubmit)}
+          >
+            <Row>
+              <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
+                <Field
+                  name="userId"
+                  component={UserIdField}
+                />
+              </Col>
+            </Row>
+            <Row>
+              <Col xsOffset={1} smOffset={0} xs={10}>
+                <Button type="submit" bsStyle="info">
+                  {'Get User Data'}
+                </Button>
+              </Col>
+            </Row>
+            <Row>
+              <Col xsOffset={1} smOffset={0} xs={10}>
+                <Button type="button" onClick={this.handleStopClick}>
+                  {'Stop Search'}
+                </Button>
+              </Col>
+            </Row>
+          </form>
+        </Grid>
+      </React.Fragment>
     );
   }
 }

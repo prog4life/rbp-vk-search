@@ -13,6 +13,7 @@ class TopBarContainer extends React.Component {
   componentDidMount() {
     this.loadUserName();
   }
+
   componentDidUpdate(prevProps) {
     const { accessToken } = this.props;
 
@@ -20,13 +21,7 @@ class TopBarContainer extends React.Component {
       this.loadUserName();
     }
   }
-  loadUserName() {
-    const { accessToken, userId, fetchUserName } = this.props;
 
-    if (accessToken && userId) {
-      fetchUserName(userId, accessToken);
-    }
-  }
   handleNavSelect = (eventKey) => { // (eventKey, event) => {
     const {
       accessToken, isSearchActive, signOut, terminateSearch, redirectToAuth,
@@ -49,6 +44,15 @@ class TopBarContainer extends React.Component {
       redirectToAuth();
     }
   }
+
+  loadUserName() {
+    const { accessToken, userId, fetchUserName } = this.props;
+
+    if (accessToken && userId) {
+      fetchUserName(userId, accessToken);
+    }
+  }
+
   render() {
     const { accessToken, userName, userId } = this.props;
 

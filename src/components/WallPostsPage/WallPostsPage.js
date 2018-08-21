@@ -35,11 +35,12 @@ const WallPostsPage = (props) => {
       <TopBarContainer />
       <AuthErrorBoundary>
         <Fragment>
-          {hasDelayedAuthOffer &&
+          {hasDelayedAuthOffer && (
+            // TODO: make withDelayedRender HOC ?
             <DelayedRender delay={AUTH_OFFER_DELAY}>
               {authOfferModal}
             </DelayedRender>
-          }
+          )}
           {hasAuthOffer && authOfferModal}
         </Fragment>
       </AuthErrorBoundary>
