@@ -69,6 +69,6 @@
         }
       }
     },
-    "polyfills": ["fetch", "Promise"],
+    "polyfills": ["fetch", "promises"]
   }
 }
