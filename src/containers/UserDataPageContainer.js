@@ -32,7 +32,15 @@ class UserDataPage extends React.Component {
 
     console.log('USER DATA SUBMITTED values: ', values);
 
-    fetchUserData(values);
+    VK.Auth.getLoginStatus((response) => {
+      console.info('VK.Auth.getLoginStatus RESPONSE: ', response);
+
+      if (response.session) {
+        console.log('User is authorized');
+      }
+    });
+
+    // fetchUserData(values);
   }
 
   handleStopClick = () => {

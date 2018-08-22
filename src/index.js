@@ -1,3 +1,4 @@
+import 'config/vkOpenAPI';
 import 'config/polyfills'; // NOTE: import fetch and babel-polyfill separately ?
 import React from 'react';
 import ReactDOM from 'react-dom';

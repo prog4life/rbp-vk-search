@@ -1,11 +1,96 @@
 {
+  // -------------------------------- PLUGINS ---------------------------------
+  "plugins": [
+    // "fast-async",
+    "syntax-dynamic-import",
+    "transform-class-properties",
+    // "transform-flow-strip-types",
+    ["transform-imports", {
+      "react-bootstrap": {
+        "transform": "react-bootstrap/lib/${member}",
+        "preventFullImport": true,
+      },
+      "redux-form": {
+        "transform": "redux-form/es/${member}",
+        "preventFullImport": true,
+      },
+    }],
+  ],
+  // --------------------------------- PRESETS --------------------------------
+  "presets": [
+    // "flow",
+    "react",
+    "stage-3",
+  ],
+  // "env" will be taken from process.env.BABEL_ENV || process.env.NODE_ENV ||
+  // defaults to "development"
+  // env specific options will be merged and overwrite non-env specific options
   "env": {
-    "test": {
-      "presets": ["env", "react", "stage-3"],
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PRODUCTION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    "production": {
+      "presets": [
+        ["env", {
+          // "modules": "commonjs", // default
+          "useBuiltIns": "usage", // "entry" OR false
+          "debug": true,
+          "targets": {
+            // external config in package.json or .browserslistrc will be supported in 7.0
+            "browsers": [
+              "defaults", // > 0.5%, last 2 versions, Firefox ESR, not dead
+              "not ie <= 11",
+              // "not Firefox ESR", // requires few polyfills
+              "not android <= 62",
+              "not chrome <= 49"
+            ],
+          },
+          // "exclude": [],
+        }],
+      ],
+    },
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ DEVELOPMENT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    "development": {
       "plugins": [
-        "transform-es2015-modules-commonjs",
-        "syntax-dynamic-import",
-        "transform-class-properties",
+        "react-hot-loader/babel",
+        "transform-react-jsx-source",
+      ],
+      "presets": [
+        ["env", {
+          "modules": false, // disable transformation of ES modules
+          "useBuiltIns": "usage", // "entry" OR false
+          "debug": true,
+          "targets": {
+            "browsers": [
+              "last 1 version",
+              "not ie <= 11",
+              "not android <= 62",
+              "not edge <= 17",
+              "not dead",
+              // "not ff ESR", // requires few polyfills
+            ],
+          },
+          "exclude": [
+            // "transform-regenerator",
+            // "transform-async-to-generator",
+          ],
+        }],
+      ],
+    },
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TEST ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    "test": {
+      "plugins": [
+        "transform-es2015-modules-commonjs", // clarify, bcs modules: "commonjs"
+        // "syntax-dynamic-import",
+        // "transform-class-properties",
+      ],
+      "presets": [
+        ["env", {
+          // ES modules must be transformed for Jest testing
+          "modules": "commonjs",
+          "useBuiltIns": "usage", // "entry" OR false
+          "debug": true,
+        }],
+        // "react",
+        // "stage-3",
       ],
     }
   }

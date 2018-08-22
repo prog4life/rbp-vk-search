@@ -169,55 +169,60 @@ module.exports = {
         loader: 'babel-loader',
         include: [path.resolve(__dirname, 'src')],
         exclude: [path.resolve(__dirname, 'node_modules')],
-        // TODO: use .babelrc instead ? NOTE: .babelrc added for Jest already
         options: {
-          // ------------------------ BABEL PLUGINS ---------------------------
-          plugins: [
-            'react-hot-loader/babel',
-            // 'fast-async',
-            'syntax-dynamic-import',
-            'transform-class-properties',
-            // 'transform-flow-strip-types',
-            [BabelPluginTransformImports, { // TODO: try "transform-imports"
-              'react-bootstrap': {
-                transform(importName) {
-                  return `react-bootstrap/lib/${importName}`;
-                },
-                preventFullImport: true,
-              },
-              'redux-form': {
-                transform(importName) {
-                  return `redux-form/es/${importName}`;
-                },
-                preventFullImport: true,
-              },
-            }],
-          ].concat(isProduction ? [] : ['transform-react-jsx-source']),
-          // ------------------------ BABEL PRESETS ---------------------------
-          presets: [
-            ['env', {
-              // need to be turned on for Jest testing
-              // modules: env === 'development' ? false : 'commonjs',
-              useBuiltIns: 'usage', // 'entry' OR false
-              debug: true,
-              targets: {
-                // browsers: ['defaults', 'firefox 52', 'not ie <= 11'],
-                browsers: [
-                  'last 2 versions',
-                  'not ie <= 11',
-                  'not android <= 62',
-                ],
-              },
-              exclude: [
-                // 'transform-regenerator',
-                // 'transform-async-to-generator',
-              ],
-            }],
-            // 'flow',
-            'react',
-            'stage-3',
-          ],
+          // babelrc: false, // default: true
           cacheDirectory: true,
+          // ------------------------ BABEL PLUGINS ---------------------------
+          // plugins: [
+          //   'react-hot-loader/babel', // consider replacing if not in dev mode
+          //   // 'fast-async',
+          //   'syntax-dynamic-import',
+          //   'transform-class-properties',
+          //   // 'transform-flow-strip-types',
+          //   [BabelPluginTransformImports, { // TODO: try "transform-imports"
+          //     'react-bootstrap': {
+          //       transform(importName) {
+          //         return `react-bootstrap/lib/${importName}`;
+          //       },
+          //       preventFullImport: true,
+          //     },
+          //     'redux-form': {
+          //       transform(importName) {
+          //         return `redux-form/es/${importName}`;
+          //       },
+          //       preventFullImport: true,
+          //     },
+          //   }],
+          // // TODO: replace next concat by .filter(Boolean)
+          // ].concat(isProduction ? [] : ['transform-react-jsx-source']),
+          // // ------------------------ BABEL PRESETS ---------------------------
+          // presets: [
+          //   ['env', {
+          //     // need to be turned on for Jest testing
+          //     // modules: env === 'development' ? false : 'commonjs',
+          //     modules: false,
+          //     useBuiltIns: 'usage', // 'entry' OR false
+          //     debug: true,
+          //     targets: {
+          //       // external config in package.json or .browserslistrc will
+          //       // be supported in 7.0
+          //       browsers: [
+          //         "defaults", // > 0.5%, last 2 versions, Firefox ESR, not dead
+          //         // "not Firefox ESR", // requires few polyfills
+          //         "not ie <= 11",
+          //         "not android <= 62",
+          //         // "not chrome <= 49",
+          //       ],
+          //     },
+          //     exclude: [
+          //       // 'transform-regenerator',
+          //       // 'transform-async-to-generator',
+          //     ],
+          //   }],
+          //   // 'flow',
+          //   'react',
+          //   'stage-3',
+          // ],
         },
       },
       // --------------------- CSS/SCSS LOADERS -------------------------------

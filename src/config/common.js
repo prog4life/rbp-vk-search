@@ -1,4 +1,4 @@
-const clientID = 5931563;
+const clientID = 5931563; // same as app_id or api_id
 const display = 'popup';
 // const redirectURI = 'https://nameless-sea-73563.herokuapp.com';
 const redirectURI = 'http://localhost:7031';
