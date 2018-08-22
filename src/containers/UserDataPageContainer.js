@@ -89,7 +89,7 @@ const UserDataPageWrapped = reduxForm({
 
 const { fetchUserData } = actionCreators;
 
-const propsToDispatch = { fetchUserData };
+const toDispatch = { fetchUserData };
 
 // export default UserDataPageWrapped;
-export default connect(null, propsToDispatch)(UserDataPageWrapped);
+export default connect(null, toDispatch)(UserDataPageWrapped);

@@ -15,36 +15,32 @@ const propTypes = {
 };
 
 // TODO: use ...rest when onSignIn will be added
-const TopBar = ({ userId, userName, isLoggedIn, onNavSelect }, context) => {
-  console.log('TopBar CONTEXT: ', context);
-
-  return (
-    <Navbar fixedTop onSelect={onNavSelect}>
-      <Navbar.Header>
-        <Navbar.Brand>
-          <Link to="/">
-            {'VK SEARCH'}
-          </Link>
-        </Navbar.Brand>
-        <Navbar.Toggle />
-      </Navbar.Header>
-      <Navbar.Collapse>
-        <Nav className="topbar__nav" pullRight>
-          <NavItemLink
-            to="/user-data"
-            eventKey={3}
-          >
-            {'User Data'}
-          </NavItemLink>
-          {isLoggedIn
-            ? <AuthDropdown userId={userId} userName={userName} />
-            : <SignInNavItem />
-          }
-        </Nav>
-      </Navbar.Collapse>
-    </Navbar>
-  );
-};
+const TopBar = ({ userId, userName, isLoggedIn, onNavSelect }) => (
+  <Navbar fixedTop onSelect={onNavSelect}>
+    <Navbar.Header>
+      <Navbar.Brand>
+        <Link to="/">
+          {'VK SEARCH'}
+        </Link>
+      </Navbar.Brand>
+      <Navbar.Toggle />
+    </Navbar.Header>
+    <Navbar.Collapse>
+      <Nav className="topbar__nav" pullRight>
+        <NavItemLink
+          to="/user-data"
+          eventKey={3}
+        >
+          {'User Data'}
+        </NavItemLink>
+        {isLoggedIn
+          ? <AuthDropdown userId={userId} userName={userName} />
+          : <SignInNavItem />
+        }
+      </Nav>
+    </Navbar.Collapse>
+  </Navbar>
+);
 
 TopBar.propTypes = propTypes;
 
