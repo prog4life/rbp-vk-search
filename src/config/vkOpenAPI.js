@@ -10,7 +10,7 @@
 //     apiId: 5931563, // TODO: inject from env var or common app config later
 //     onlyWidgets: false,
 //   });
-//   console.log('VK.init is requested');
+//   console.log('VK.init was called');
 // };
 
 const initPromise = new Promise((resolve) => {
@@ -19,7 +19,8 @@ const initPromise = new Promise((resolve) => {
       apiId: 5931563, // TODO: inject from env var or common app config later
       onlyWidgets: false,
     });
-    console.log('VK.init is requested');
+    console.log('VK.init was called');
+    resolve();
   };
 });
 
@@ -32,3 +33,5 @@ const initPromise = new Promise((resolve) => {
 //   document.getElementById('vk_api_transport').appendChild(el);
 //   console.log('Append VK init script');
 // }, 0);
+
+export default initPromise;

@@ -19,10 +19,13 @@
     "jquery": true,
     "commonjs": true,
     "mocha": true,
-    "jest": true
+    "jest": true,
+    "serviceworker": true
   },
   "root": true,
-  "globals": {},
+  "globals": {
+    "VK": false
+  },
   "extends": [
     "airbnb",
     "plugin:react/all",

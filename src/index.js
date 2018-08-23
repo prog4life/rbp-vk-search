@@ -1,4 +1,4 @@
-import 'config/vkOpenAPI';
+import initPromise from 'config/vkOpenAPI';
 import 'config/polyfills'; // NOTE: import fetch and babel-polyfill separately ?
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -16,8 +16,13 @@ import 'styles/main.scss';
 
 // import * as selectors from 'selectors'; // for reselect-tools
 
-if (process.env.NODE_ENV === 'development') {
-  const { registerObserver } = require('react-perf-devtool');
+const env = process.env.NODE_ENV;
+const reactPerfDevtool = env === 'development'
+  ? require('react-perf-devtool')
+  : null;
+
+if (env === 'development') {
+  const { registerObserver } = reactPerfDevtool;
 
   registerObserver({ // both options for logging to console with additional lib
     // shouldLog: true,
@@ -35,8 +40,7 @@ if (process.env.NODE_ENV === 'development') {
     // console.log(result); // can log "measures" right to console
   });
 }
-
-console.log('process.env.NODE_ENV: ', process.env.NODE_ENV);
+console.log('process.env.NODE_ENV: ', env);
 
 // TEMP
 const posts = {
@@ -85,6 +89,17 @@ const preloadedState = persistedState || posts
 
 const store = configureStore(preloadedState);
 
+initPromise.then(() => {
+  VK.Auth.getLoginStatus((response) => {
+    console.info('VK.Auth.getLoginStatus RESPONSE: ', response);
+
+    if (response.session) {
+      console.log('User is authorized');
+    }
+  });
+  store.dispatch({ type: 'OPEN_API_INITIALIZATION' });
+});
+
 store.subscribe(() => console.log(
   'State update ',
   (new Date()).toLocaleTimeString('en-Gb'),
@@ -108,7 +123,7 @@ const saveStateDebounced = debounce(() => {
 
 store.subscribe(saveStateDebounced);
 
-// if (process.env.NIDE_ENV === 'development') {
+// if (env === 'development') {
 //   const { registerSelectors, getStateWith } = require('reselect-tools');
 //
 //   registerSelectors(selectors);
