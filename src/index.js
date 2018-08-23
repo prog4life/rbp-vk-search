@@ -90,6 +90,7 @@ const preloadedState = persistedState || posts
 const store = configureStore(preloadedState);
 
 initPromise.then(() => {
+  console.log('VK.init was called');
   VK.Auth.getLoginStatus((response) => {
     console.info('VK.Auth.getLoginStatus RESPONSE: ', response);
 

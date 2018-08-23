@@ -11,9 +11,6 @@ import NotFoundPage from 'components/NotFoundPage';
 
 setConfig({ logLevel: 'error' }); // ['debug', 'log', 'warn', 'error'(default)]
 
-// TODO: replace store creation to index.js and pass it as prop into here
-// and make this component presentational, not container
-
 const App = ({ store }) => (
   <Provider store={store}>
     <Router>
@@ -33,4 +30,4 @@ App.propTypes = {
 };
 
 // export default hot(module)(App);
-export default process.env.NODE_ENV === 'production' ? App : hot(module)(App);
+export default process.env.NODE_ENV !== 'development' ? App : hot(module)(App);

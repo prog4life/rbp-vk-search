@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import pt from 'prop-types';
 import { connect } from 'react-redux';
 import { reduxForm, Field } from 'redux-form';
@@ -51,7 +51,7 @@ class UserDataPage extends React.Component {
     const { handleSubmit } = this.props;
 
     return (
-      <React.Fragment>
+      <Fragment>
         <TopBarContainer />
         <Grid>
           <form
@@ -82,7 +82,7 @@ class UserDataPage extends React.Component {
             </Row>
           </form>
         </Grid>
-      </React.Fragment>
+      </Fragment>
     );
   }
 }

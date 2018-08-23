@@ -26,9 +26,10 @@ class TopBarContainer extends React.Component {
     const {
       accessToken, isSearchActive, signOut, terminateSearch, redirectToAuth,
     } = this.props;
-    console.log('Select: ', eventKey);
 
-    // 1.2 - Sign Out auth menu item
+    console.log('Selected event key: ', eventKey);
+
+    // 1.2 - Sign Out from TopBarNav
     if (eventKey === 1.2) {
       if (accessToken) {
         signOut();
@@ -39,7 +40,7 @@ class TopBarContainer extends React.Component {
       }
       return;
     }
-    // 2 - Sign In nav item
+    // 2 - Sign In from TopBarNav
     if (eventKey === 2) {
       redirectToAuth();
     }

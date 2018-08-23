@@ -15,11 +15,11 @@
 
 const initPromise = new Promise((resolve) => {
   window.vkAsyncInit = () => {
-    VK.init({ // eslint-disable-line no-undef
+    VK.init({
       apiId: 5931563, // TODO: inject from env var or common app config later
       onlyWidgets: false,
     });
-    console.log('VK.init was called');
+    // console.log('VK.init was called');
     resolve();
   };
 });

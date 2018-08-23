@@ -58,6 +58,7 @@ export const extractAuthData = (hash, pathname) => (dispatch) => {
 
   if (error) {
     dispatch(accessTokenError(error, parsedHash.errorDescription));
+    return false;
   }
   if (accessToken) {
     dispatch(saveAuthData(accessToken, tokenExpiresAt, userId));

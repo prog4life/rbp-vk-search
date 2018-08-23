@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { NavLink, Link } from 'react-router-dom';
-import { Navbar, Nav, NavItem } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import { Navbar } from 'react-bootstrap';
 
-import AuthDropdown from './AuthDropdown';
-import SignInNavItem from './SignInNavItem';
-import NavItemLink from './NavItemLink';
+import './style.scss';
+
+import TopBarNav from './TopBarNav';
 
 const propTypes = {
   isLoggedIn: PropTypes.bool.isRequired,
@@ -14,7 +14,6 @@ const propTypes = {
   userName: PropTypes.string.isRequired,
 };
 
-// TODO: use ...rest when onSignIn will be added
 const TopBar = ({ userId, userName, isLoggedIn, onNavSelect }) => (
   <Navbar fixedTop onSelect={onNavSelect}>
     <Navbar.Header>
@@ -26,18 +25,7 @@ const TopBar = ({ userId, userName, isLoggedIn, onNavSelect }) => (
       <Navbar.Toggle />
     </Navbar.Header>
     <Navbar.Collapse>
-      <Nav className="topbar__nav" pullRight>
-        <NavItemLink
-          to="/user-data"
-          eventKey={3}
-        >
-          {'User Data'}
-        </NavItemLink>
-        {isLoggedIn
-          ? <AuthDropdown userId={userId} userName={userName} />
-          : <SignInNavItem />
-        }
-      </Nav>
+      <TopBarNav isLoggedIn={isLoggedIn} userId={userId} userName={userName} />
     </Navbar.Collapse>
   </Navbar>
 );
