@@ -8,7 +8,7 @@ import {
 } from 'selectors';
 import shortId from 'shortid';
 // import fetchJSONP from 'utils/fetchJSONP';
-import jsonpPromise from 'utils/jsonpPromise';
+import jsonp from 'utils/jsonpPromise';
 import { onSuccess, onFail } from './requestHandlers';
 import transformResponse from './transformResponse';
 import {
@@ -119,7 +119,7 @@ const searchProcessor = ({ dispatch, getState }) => {
         + `&offset=${offset}`
         + `&access_token=${accessToken}`;
 
-      const promise = jsonpPromise(currentRequestURL)
+      const promise = jsonp(currentRequestURL)
         .then(
           onSuccess({ next, getState, offset }),
           onFail({ next, getState, offset }),

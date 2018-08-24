@@ -1,25 +1,22 @@
-import jsonp from 'jsonp-promise';
+import jsonpPromise from 'jsonp-promise';
+import { maybeThrowResponseError } from 'utils/helpers';
 
-async function jsonpPromise(url) {
-  const jsonpObj = jsonp(url, {
+async function jsonp(url) {
+  const jsonpObj = jsonpPromise(url, {
     timeout: 5000, // 0 to disable (defaults to 15000)
   });
 
-  jsonpPromise.cancel = jsonpObj.cancel;
-  const { response, error } = await jsonpObj.promise;
+  // TEMP:
+  jsonp.cancel = jsonpObj.cancel;
+  const resData = await jsonpObj.promise;
+  const { response } = resData;
 
-  if (error) {
-    // throw new Error(JSON.stringify(error, null, 2));
-    const err = new Error(error.error_msg);
+  maybeThrowResponseError(resData);
 
-    err.code = error.error_code;
-    err.requestParams = error.request_params;
-    throw err;
-  }
   if (response) {
     return response;
   }
   throw new Error('Empty response');
 }
 
-export default jsonpPromise;
+export default jsonp;

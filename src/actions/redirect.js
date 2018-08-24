@@ -1,4 +1,4 @@
-import { redirectToTokenRequestUrl } from 'utils/accessToken';
+import { tokenRequestURL } from 'config/common';
 
 import {
   REDIRECT_TO_AUTH,
@@ -17,6 +17,6 @@ export const offerAuthRedirect = ({ hasDelay = false }) => ({
 export const rejectAuthOffer = () => ({ type: REJECT_AUTH_OFFER });
 
 export const redirectToAuth = () => {
-  redirectToTokenRequestUrl();
+  window.location.assign(tokenRequestURL);
   return { type: REDIRECT_TO_AUTH };
 };

@@ -1,10 +1,11 @@
 // import moment from 'moment';
 import { getAccessToken } from 'selectors';
 import { parseAccessTokenHash } from 'utils/accessToken';
-import requestUserName from 'utils/userName';
+import { requestUserName } from 'utils/apiUsage';
 
 import {
   SAVE_AUTH_DATA,
+  FETCH_USER_NAME,
   FETCH_USER_NAME_SUCCESS,
   FETCH_USER_NAME_FAIL,
   SIGN_OUT,
@@ -13,6 +14,7 @@ import {
 
 // TODO: terminate search on sign out
 export const signOut = () => ({ type: SIGN_OUT });
+// export const fetchUsername = () => ({ type: FETCH_USER_NAME });
 
 export const fetchUserNameSuccess = userName => ({
   type: FETCH_USER_NAME_SUCCESS,
@@ -23,11 +25,10 @@ export const fetchUserNameFail = ({ code = null, message, params = null }) => ({
   error: { code, message, params },
 });
 
-
 export const fetchUserName = (userId, token) => (dispatch, getState) => {
   const accessToken = token || getAccessToken(getState());
 
-  // TODO: add request and success actions
+  dispatch({ type: FETCH_USER_NAME });
 
   requestUserName(userId, accessToken).then(
     userName => dispatch(fetchUserNameSuccess(userName)),

@@ -1,4 +1,4 @@
-import initPromise from 'config/vkOpenAPI';
+import initPromise from 'config/openAPI';
 import 'config/polyfills'; // NOTE: import fetch and babel-polyfill separately ?
 import React from 'react';
 import ReactDOM from 'react-dom';

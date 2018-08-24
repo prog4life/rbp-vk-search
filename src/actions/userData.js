@@ -1,4 +1,4 @@
-import jsonpPromise from 'utils/jsonpPromise';
+import jsonp from 'utils/jsonpPromise';
 import { getAccessToken } from 'selectors';
 
 export const fetchUserDataRequest = () => ({ type: 'FETCH_USER_DATA_REQUEST' });
@@ -25,7 +25,7 @@ export const fetchUserData = enteredValues => async (dispatch, getState) => {
 
   dispatch(fetchUserDataRequest());
 
-  return jsonpPromise(url).then(
+  return jsonp(url).then(
     // ([userData]) => dispatch(fetchUserDataSuccess(userData)),
     ([userData]) => console.log(userData),
     error => console.error(error),

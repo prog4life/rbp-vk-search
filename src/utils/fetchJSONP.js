@@ -1,7 +1,8 @@
-import fetchJsonp from 'fetch-jsonp';
+import fetchWithJSONP from 'fetch-jsonp';
 import { jsonpTimeout } from 'config/common';
+import { maybeThrowResponseError } from 'utils/helpers';
 
-const getObjectFromJSON = response => response.json();
+// const getObjectFromJSON = response => response.json();
 
 // vk API error response example:
 // resData = {
@@ -13,11 +14,10 @@ const getObjectFromJSON = response => response.json();
 // };
 
 const throwIfEmptyOrError = (resData) => {
-  const { response, error } = resData;
+  const { response } = resData;
 
-  if (error) {
-    throw new Error(JSON.stringify(resData.error, null, 2));
-  }
+  maybeThrowResponseError(resData);
+
   if (response) {
     return response;
   }
@@ -26,10 +26,11 @@ const throwIfEmptyOrError = (resData) => {
 
 // TODO: think over timeout modifying functionality
 const fetchJSONP = (url, updatedTimeout) => (
-  fetchJsonp(url, {
+  fetchWithJSONP(url, {
     timeout: updatedTimeout || jsonpTimeout, // default - 5000
   })
-    .then(getObjectFromJSON)
+    .then(response => response.json())
+    // .then(maybeThrowResponseError)
     .then(throwIfEmptyOrError)
 );
 
