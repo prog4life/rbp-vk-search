@@ -5,7 +5,7 @@ import requestUserName from 'utils/userName';
 
 import {
   SAVE_AUTH_DATA,
-  SET_USER_NAME,
+  FETCH_USER_NAME_SUCCESS,
   FETCH_USER_NAME_FAIL,
   SIGN_OUT,
   ACCESS_TOKEN_ERROR,
@@ -13,12 +13,16 @@ import {
 
 // TODO: terminate search on sign out
 export const signOut = () => ({ type: SIGN_OUT });
-export const fetchUserNameFail = () => ({ type: FETCH_USER_NAME_FAIL });
 
-export const setUserName = userName => ({
-  type: SET_USER_NAME,
+export const fetchUserNameSuccess = userName => ({
+  type: FETCH_USER_NAME_SUCCESS,
   userName,
 });
+export const fetchUserNameFail = ({ code = null, message, params = null }) => ({
+  type: FETCH_USER_NAME_FAIL,
+  error: { code, message, params },
+});
+
 
 export const fetchUserName = (userId, token) => (dispatch, getState) => {
   const accessToken = token || getAccessToken(getState());
@@ -26,8 +30,8 @@ export const fetchUserName = (userId, token) => (dispatch, getState) => {
   // TODO: add request and success actions
 
   requestUserName(userId, accessToken).then(
-    userName => dispatch(setUserName(userName)),
-    () => dispatch(fetchUserNameFail()),
+    userName => dispatch(fetchUserNameSuccess(userName)),
+    error => dispatch(fetchUserNameFail(error)),
   );
 };
 

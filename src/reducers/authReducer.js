@@ -1,6 +1,6 @@
 import {
   SAVE_AUTH_DATA,
-  SET_USER_NAME,
+  FETCH_USER_NAME_SUCCESS,
   SIGN_OUT,
 } from 'constants/actionTypes';
 
@@ -20,7 +20,7 @@ const authReducer = (state = defaultState, action) => {
         tokenExpiresAt: action.tokenExpiresAt,
         userId: action.userId,
       };
-    case SET_USER_NAME:
+    case FETCH_USER_NAME_SUCCESS:
       return {
         ...state,
         userName: action.userName,
