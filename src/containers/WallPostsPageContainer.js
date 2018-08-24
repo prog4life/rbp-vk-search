@@ -18,42 +18,51 @@ class WallPostsPageContainer extends React.Component {
     this.handleSearchStart = this.handleSearchStart.bind(this);
     this.handleSearchStop = this.handleSearchStop.bind(this);
   }
+
   componentDidMount() {
     const {
       extractAuthData,
-      offerAuthRedirect,
+      rejectAuthOffer,
       accessToken,
       location, // TODO: location: { hash, pathname },
     } = this.props;
     const { hash, pathname } = location;
-    const parsedData = extractAuthData(hash.substr(1), pathname);
+
+    extractAuthData(hash.substr(1), pathname);
 
     // TODO: display message to user if error was parsed
-    // also prevent repeated auth offer ?
 
-    if (parsedData) {
-      if (parsedData.accessToken) { // TEMP:
-        console.info('new accessToken was retrieved: ', parsedData.accessToken);
-      }
-      return;
+    // if (parsedData) {
+    //   if (parsedData.accessToken) { // TEMP:
+    //     console.info('new accessToken was retrieved: ', parsedData.accessToken);
+    //   }
+    //   return;
+    // }
+
+    if (accessToken) {
+      console.info('accessToken is already present: ', accessToken);
+      rejectAuthOffer();
     }
 
-    // TODO: enable initial delayed offer for auth redirection and do not
-    // enable it on another mount, REJECT_AUTH_OFFER if token present instead
-
-    if (!accessToken) {
-      offerAuthRedirect({ hasDelay: true });
-      return;
-    }
-    console.info('accessToken is already present: ', accessToken);
     // TODO: sign in at search start
     // NOTE: store in localStorage path of page from wich token was requested
     // and return to it after parsing of auth data from hash
     // localStorage.setItem('url', current route path);
   }
+
+  componentDidUpdate() {
+    const { accessToken, hasDelayedAuthOffer, rejectAuthOffer } = this.props;
+
+    if (accessToken && hasDelayedAuthOffer) {
+      console.info('accessToken is present after update: ', accessToken);
+      rejectAuthOffer();
+    }
+  }
+
   componentWillUnmount() {
     this.handleSearchStop();
   }
+
   handleSearchStart = (inputData) => {
     const {
       startWallPostsSearch, accessToken, offerAuthRedirect,
@@ -67,6 +76,7 @@ class WallPostsPageContainer extends React.Component {
     // TODO: save input values to localStorage
     offerAuthRedirect({ hasDelay: false });
   }
+
   handleSearchStop() {
     const { isSearchActive, terminateSearch } = this.props;
 
@@ -74,6 +84,7 @@ class WallPostsPageContainer extends React.Component {
       terminateSearch();
     }
   }
+
   render() {
     // const {
     //   isSearchActive,

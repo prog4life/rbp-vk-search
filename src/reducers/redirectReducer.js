@@ -8,7 +8,7 @@ import {
 const initialState = {
   isRedirecting: false,
   hasAuthOffer: false,
-  hasDelayedAuthOffer: false,
+  hasDelayedAuthOffer: true,
 };
 
 // Reducer for vk.com authentication redirection

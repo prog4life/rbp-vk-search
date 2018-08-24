@@ -35,7 +35,7 @@ const OwnerCustomIdField = ({
       <FormControl
         name="wallOwnerCustomId"
         onChange={onChange}
-        placeholder="modified user id from url"
+        placeholder="textual user id from url"
         disabled={isDisabled}
         type="text"
         value={value}
