@@ -9,6 +9,22 @@ export const changeMssg = (error, newMessage) => {
   }
 };
 
+// TODO: change to more reusable form/create/extractError
+
+export const createError = (error) => {
+  const {
+    error_code: code = null,
+    error_msg: message = 'No error message',
+    request_params: params,
+  } = error;
+  const err = new Error(message);
+
+  err.code = code;
+  err.params = params ? JSON.stringify(params, null, 2) : null;
+
+  return error;
+};
+
 export const maybeThrowResponseError = (response) => {
   if (response && response.error) {
     const {

@@ -30,11 +30,10 @@ const inputDefaults = {
   postAuthorIdDef: 372045306,
 };
 
-const tokenRequestURL =
-  `https://oauth.vk.com/authorize?client_id=${clientID}&` +
-  `display=${display}&redirect_uri=${redirectURI}&` +
-  `scope=${scope}&response_type=${responseType}&` +
-  `v=${apiVersion}&state=${state}`;
+const tokenRequestURL = `https://oauth.vk.com/authorize?client_id=${clientID}&`
+  + `display=${display}&redirect_uri=${redirectURI}&`
+  + `scope=${scope}&response_type=${responseType}&`
+  + `v=${apiVersion}&state=${state}`;
 
 export {
   clientID,

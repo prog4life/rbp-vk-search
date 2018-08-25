@@ -65,12 +65,12 @@ class WallPostsPageContainer extends React.Component {
 
   handleSearchStart = (inputData) => {
     const {
-      startWallPostsSearch, accessToken, offerAuthRedirect,
+      startWallPostsSearch2, accessToken, offerAuthRedirect,
     } = this.props;
 
     if (accessToken) {
       console.log('FORM STATE: ', inputData); // TEMP
-      startWallPostsSearch(inputData);
+      startWallPostsSearch2(inputData);
       return;
     }
     // TODO: save input values to localStorage
