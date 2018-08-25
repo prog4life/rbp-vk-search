@@ -1,18 +1,16 @@
 import {
   SET_POSTS_SORT_ORDER, SET_POSTS_FILTER_TEXT, POSTS_RECEIVED,
 } from 'constants/actionTypes';
-import { WALL_POSTS_BY_SEX, WALL_POSTS_BY_AUTHOR_ID } from 'constants/searchModes';
+// import { WALL_POSTS_BY_SEX, WALL_POSTS_BY_AUTHOR_ID } from 'constants/searchModes';
 import { WALL_GET_BASE_URL } from 'constants/api';
 import { apiVersion, count, offsetModifier, requestInterval } from 'config/common';
+import { validateActionCreator } from 'utils/validators';
 import { targets, SEARCH_PARAMETERS } from 'middleware/searchProcessor';
 import { getIdsOfPosts } from 'selectors';
 
 export const setPostsSortOrder = (order = 'descend') => {
-  const nodeEnv = process.env.NODE_ENV;
+  validateActionCreator('setPostsSortOrder', { order });
 
-  if (nodeEnv !== 'production' && order !== 'descend' && order !== 'ascend') {
-    throw new Error('Expected order to be "descend" or "ascend"');
-  }
   return {
     type: SET_POSTS_SORT_ORDER,
     order,
@@ -32,20 +30,14 @@ export const setPostsFilterText = (filterText = '') => ({
 // NOTE: or create separate action creators: findWallPostsBySex/AuthorId
 // will be utilized by searchProcessor middleware
 export const startWallPostsSearch = (inputData) => { // pass accessToken here ?
-  const nodeEnv = process.env.NODE_ENV;
   const {
     wallOwnerType, wallOwnerUsualId, wallOwnerCustomId,
     postAuthorId, postAuthorSex, resultsLimit,
   } = inputData;
 
   // TODO: validate wallOwnerId with additional preceding request to API
+  validateActionCreator('startWallPostsSearch', inputData);
 
-  if (nodeEnv !== 'production' && !wallOwnerUsualId && !wallOwnerCustomId) {
-    throw new Error('One of wallOwnerUsualId or wallOwnerCustomId is required');
-  }
-  if (nodeEnv !== 'production' && !postAuthorId && !postAuthorSex) {
-    throw new Error('One of postAuthorId or postAuthorSex is required');
-  }
   const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
   const ownerId = wallOwnerUsualId
     ? `owner_id=${wallOwnerTypePrefix}${wallOwnerUsualId}`
@@ -57,8 +49,8 @@ export const startWallPostsSearch = (inputData) => { // pass accessToken here ?
   // TODO: get value of count from offsetModifier and apply it internally        !!!
 
   // with extended=1 can also set specific fields to be returned by API
-  const baseRequestURL = `${WALL_GET_BASE_URL}?` +
-    `${ownerId}${domain}&count=${count}&v=${apiVersion}&extended=1`;
+  const baseRequestURL = `${WALL_GET_BASE_URL}?`
+    + `${ownerId}${domain}&count=${count}&v=${apiVersion}&extended=1`;
 
   return {
     types: [
