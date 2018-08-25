@@ -2,13 +2,11 @@ import initPromise from 'config/openAPI';
 import 'config/polyfills'; // NOTE: import fetch and babel-polyfill separately ?
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import debounce from 'lodash-es/debounce';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap-theme.min.css';
 
 import configureStore from 'store/configureStore';
-// import { loadState, saveState } from 'utils/localStorage';
 
 import App from 'components/App';
 
@@ -77,7 +75,6 @@ const posts = {
 //   limit: null,
 // };
 
-// const persistedState = loadState('vk-search-state') || undefined;
 const preloadedState = { posts };
 
 const store = configureStore(preloadedState);
@@ -98,23 +95,6 @@ store.subscribe(() => console.log(
   'State update ',
   (new Date()).toLocaleTimeString('en-Gb'),
 ));
-
-// const saveStateDebounced = debounce(() => {
-//   const { auth } = store.getState();
-//   const stateToStore = {
-//     auth,
-//   };
-//
-//   console.log(
-//     'Saved state with debounce ',
-//     stateToStore,
-//     (new Date()).toLocaleTimeString('en-Gb'),
-//   );
-//
-//   saveState(stateToStore, 'vk-search-state');
-// }, 500, { leading: true, trailing: true });
-
-// store.subscribe(saveStateDebounced);
 
 // if (env === 'development') {
 //   const { registerSelectors, getStateWith } = require('reselect-tools');
