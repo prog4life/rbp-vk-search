@@ -22,7 +22,7 @@ export const createError = (error) => {
   err.code = code;
   err.params = params ? JSON.stringify(params, null, 2) : null;
 
-  return error;
+  return err;
 };
 
 export const maybeThrowResponseError = (response) => {

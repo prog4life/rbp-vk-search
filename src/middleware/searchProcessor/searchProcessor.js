@@ -95,26 +95,18 @@ const searchProcessor = ({ dispatch, getState }) => {
     // will also clear "requests" in store
     next({ type: SEARCH_START, limit: resultsLimit });
 
-    // TODO: cache posts and not search in cache first if amount and last id
+    // TODO: cache posts and search in cache first if amount and last id
     // is the same
-
-    // let checkpoint = performance.now(); // TEMP:
-    // let checkpoint2 = performance.now(); // TEMP:
 
     // TODO: replace to top level ?
     const makeCallToAPI = (offset = 0) => {
       // const measureId = shortId.generate();
-      // const tempCheckpoint2 = checkpoint2;
-      // checkpoint2 = performance.now();
-      // console.warn(`NEW REQUEST with ${offset} offset, ` +
-      //   `interval: ${checkpoint2 - tempCheckpoint2} and
-      //    shift: ${performance.now() - checkpoint}`);
       // add request obj with isPending: true to "requests"
-      console.time('~~~ CALL API REQUEST ~~~');
+      // console.time('~~~ CALL API REQUEST ~~~');
       next({ type: SEARCH_REQUEST, offset });
-      console.timeEnd('~~~ CALL API REQUEST ~~~');
+      // console.timeEnd('~~~ CALL API REQUEST ~~~');
 
-      console.time('::: CALL API :::');
+      // console.time('::: CALL API :::');
 
       const promise = callAPI(method, { ...requestParams, offset })
         .then(
@@ -123,9 +115,9 @@ const searchProcessor = ({ dispatch, getState }) => {
         )
         // TODO: filter response first here ?
         .then((response) => {
-          console.time('--- TRANSFORM RESPONSE ---');
+          // console.time('--- TRANSFORM RESPONSE ---');
           const transformed = transformResponse(response, target, filters);
-          console.timeEnd('--- TRANSFORM RESPONSE ---');
+          // console.timeEnd('--- TRANSFORM RESPONSE ---');
           return transformed;
         })
         .then(
@@ -135,18 +127,14 @@ const searchProcessor = ({ dispatch, getState }) => {
           // replacing first makeCallToAPI() after setInterval
           err => (err.isRefuse ? console.warn(err) : console.error(err)),
         );
-      console.timeEnd('::: CALL API :::');
+      // console.timeEnd('::: CALL API :::');
       return promise;
     };
     // first request before timer tick
     makeCallToAPI();
 
     intervalId = setInterval(() => {
-      // const tempCheckpoint = checkpoint;
-      // checkpoint = performance.now();
-      // console.warn(`NEW interval TICK: ${checkpoint - tempCheckpoint}`);
-      const measureId = shortId.generate();
-
+      // const measureId = shortId.generate();
       // console.time(`*** INTERVAL SELECTORS *** ${measureId}`);
 
       // total is equivalent of "count" field in response from vk API
@@ -161,11 +149,11 @@ const searchProcessor = ({ dispatch, getState }) => {
 
       // console.timeEnd(`*** INTERVAL SELECTORS *** ${measureId}`);
 
-      console.time(`=== INTERVAL CONDITIONS === ${measureId}`);
+      // console.time(`=== INTERVAL CONDITIONS === ${measureId}`);
 
       if (errorCode === AUTH_FAILED) {
         clearInterval(intervalId);
-        console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
+        // console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
         return;
       }
 
@@ -185,7 +173,7 @@ const searchProcessor = ({ dispatch, getState }) => {
         //   `offset and attempt ${reqs[offsetToRepeat].attempt + 1} `);
 
         makeCallToAPI(offsetToRepeat);
-        console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
+        // console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
         return;
       }
 
@@ -199,10 +187,10 @@ const searchProcessor = ({ dispatch, getState }) => {
         && (!total || nextOffset <= total)
       ) {
         makeCallToAPI(nextOffset);
-        console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
-        console.time(`<<< SET OFFSET ${measureId} >>>`);
+        // console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
+        // console.time(`<<< SET OFFSET ${measureId} >>>`);
         next({ type: SEARCH_SET_OFFSET, offset: nextOffset });
-        console.timeEnd(`<<< SET OFFSET ${measureId} >>>`);
+        // console.timeEnd(`<<< SET OFFSET ${measureId} >>>`);
         return;
       }
 
@@ -210,10 +198,10 @@ const searchProcessor = ({ dispatch, getState }) => {
       if (pending.length === 0) {
         clearInterval(intervalId);
         next({ type: SEARCH_END });
-        console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
-        return;
+        // console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
+        // return;
       }
-      console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
+      // console.timeEnd(`=== INTERVAL CONDITIONS === ${measureId}`);
     }, requestInterval);
     // NOTE: return was added for eslint, maybe replace it with
     // next(initialAction); OR next({ type: requestType });
