@@ -86,9 +86,9 @@ export const onFail = ({ next, getState, offset }) => (error) => {
     // console.timeEnd(`--- ON FAIL ${measureId} ---`);
     refuseSearchRequest(next, 'search-is-over', { offset });
   }
-  const { code = null, message = null, requestParams } = error;
-  const callbackId = Array.isArray(requestParams) // OPTIONAL
-    ? requestParams.find(param => param.key === 'callback').value
+  const { code = null, message = null, params } = error;
+  const callbackId = Array.isArray(params) // OPTIONAL
+    ? params.find(param => param.key === 'callback').value
     : null;
 
   // if another request with such offset has succeeded or failed earlier
@@ -98,7 +98,7 @@ export const onFail = ({ next, getState, offset }) => (error) => {
   }
 
   if (code === AUTH_FAILED) { // invalid access_token
-    next({ type: SEARCH_ERROR, error: { code, message, requestParams } });
+    next({ type: SEARCH_ERROR, error: { code, message, params } });
     // console.timeEnd(`--- ON FAIL ${measureId} ---`);
     throw error;
   }
