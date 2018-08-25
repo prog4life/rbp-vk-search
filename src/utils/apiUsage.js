@@ -1,28 +1,7 @@
-import { compose } from 'redux';
 import { apiVersion } from 'config/common';
-import { changeMssg, createError } from 'utils/errorHelpers';
+import { changeMssg } from 'utils/errorHelpers';
 import fetchJSONP from 'utils/fetchJSONP';
 // import jsonp from 'utils/jsonpPromise';
-
-export function callAPI(method, params) {
-  return new Promise((resolve, reject) => {
-    VK.Api.call(method, params, ({ response, error }) => {
-      if (error) {
-        console.log('Error in response ', error);
-        reject(createError(error));
-        return;
-      }
-      if (response) {
-        resolve(response);
-        return;
-      }
-      const reason = new Error(`API call failed, method: ${method},
-        params: ${JSON.stringify(params)}`);
-      reject(reason);
-      // compose()(method, params); // TODO:
-    });
-  });
-}
 
 // eslint-disable-next-line import/prefer-default-export
 export function requestUserName(id, token) {

@@ -8,7 +8,7 @@ import {
 } from 'selectors';
 import shortId from 'shortid';
 // import fetchJSONP from 'utils/fetchJSONP';
-import { callAPI } from 'utils/apiUsage';
+import jsonp from 'utils/jsonpPromise';
 import { onSuccess, onFail } from './requestHandlers';
 import transformResponse from './transformResponse';
 import {
@@ -67,28 +67,27 @@ const searchProcessor = ({ dispatch, getState }) => {
     }
     const { meta = {} } = action;
 
-    // validateAction(action, SEARCH_PARAMETERS);
+    validateAction(action, SEARCH_PARAMETERS);
     validateOptions(meta);
-    // validateParams(searchParams); // TODO: validate filter names with constants
+    validateParams(searchParams); // TODO: validate filter names with constants
 
     const [resultsType] = types;
+    const accessToken = getAccessToken(getState());
+    // const accessToken = 'dwad123231uhhuh13uh13';
+
+    if (typeof accessToken !== 'string' || !accessToken.length) {
+      throw new Error('No valid access token');
+    }
 
     // TODO: not destructure postAuthorId here and pass whole searchParams obj
     // to transformResponse(transformResponse)
-    const {
-      requestParams, method, target, filters, resultsLimit,
-    } = searchParams;
-    const { owner_id: ownerId } = requestParams;
+    const { baseRequestURL, target, filters, resultsLimit } = searchParams;
     const {
       // TODO: retrieve next 3 from options passed to middleware factory
       offsetModifier, // should be equal to request url "count" param value
       requestInterval,
       maxAttempts,
     } = meta;
-
-    if (!ownerId) {
-      delete requestParams.owner_id;
-    }
 
     // doublecheck
     clearInterval(intervalId);
@@ -101,6 +100,7 @@ const searchProcessor = ({ dispatch, getState }) => {
     // TODO: replace to top level ?
     const makeCallToAPI = (offset = 0) => {
       // const measureId = shortId.generate();
+
       // add request obj with isPending: true to "requests"
       // console.time('~~~ CALL API REQUEST ~~~');
       next({ type: SEARCH_REQUEST, offset });
@@ -108,7 +108,11 @@ const searchProcessor = ({ dispatch, getState }) => {
 
       // console.time('::: CALL API :::');
 
-      const promise = callAPI(method, { ...requestParams, offset })
+      const currentRequestURL = `${baseRequestURL}`
+        + `&offset=${offset}`
+        + `&access_token=${accessToken}`;
+
+      const promise = jsonp(currentRequestURL)
         .then(
           onSuccess({ next, getState, offset }),
           onFail({ next, getState, offset }),

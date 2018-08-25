@@ -78,47 +78,6 @@ export const startWallPostsSearch = (inputData) => { // pass accessToken here ?
   };
 };
 
-export const startWallPostsSearch2 = (inputData) => { // pass accessToken here ?
-  const {
-    wallOwnerType, wallOwnerUsualId, wallOwnerCustomId,
-    postAuthorId, postAuthorSex, resultsLimit,
-  } = inputData;
-
-  validateActionCreator('startWallPostsSearch', inputData);
-
-  const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
-  const ownerId = wallOwnerUsualId
-    ? `${wallOwnerTypePrefix}${wallOwnerUsualId}`
-    : '';
-  const domain = wallOwnerCustomId || '';
-  // const baseRequestURL = `${WALL_GET_BASE_URL}?`
-  //   + `${ownerId}${domain}&count=${count}&v=${apiVersion}&extended=1`;
-
-  return {
-    types: [POSTS_RECEIVED],
-    // state => number of searched items
-    getNumberOfResults: state => getIdsOfPosts(state).length, // OR:
-    [SEARCH_PARAMETERS]: {
-      method: 'wall.get',
-      requestParams: {
-        count,
-        owner_id: ownerId ? Number(ownerId) : null,
-        domain,
-        v: `${apiVersion}`,
-        extended: 1,
-      },
-      target: targets.WALL_POSTS,
-      filters: { postAuthorId, postAuthorSex },
-      resultsLimit,
-    },
-    meta: {
-      offsetModifier, // must be equal to request url "count" param value !!!
-      requestInterval,
-      maxAttempts: 5,
-    },
-  };
-};
-
 // export const startWallPostsSearch = (inputData, interval = requestInterval) => (
 //   (dispatch) => {
 //     const intId = setInterval(() => dispatch(searchTimerTick()), interval);

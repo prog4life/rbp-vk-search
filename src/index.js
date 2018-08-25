@@ -1,4 +1,3 @@
-import initPromise from 'config/openAPI';
 import 'config/polyfills'; // NOTE: import fetch and babel-polyfill separately ?
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -88,18 +87,6 @@ const preloadedState = persistedState || posts
   : undefined;
 
 const store = configureStore(preloadedState);
-
-initPromise.then(() => {
-  console.log('VK.init was called');
-  VK.Auth.getLoginStatus((response) => {
-    console.info('VK.Auth.getLoginStatus RESPONSE: ', response);
-
-    if (response.session) {
-      console.log('User is authorized');
-    }
-  });
-  store.dispatch({ type: 'OPEN_API_INITIALIZATION' });
-});
 
 store.subscribe(() => console.log(
   'State update ',
