@@ -1,32 +1,44 @@
 import {
-  SAVE_AUTH_DATA,
-  FETCH_USER_NAME_SUCCESS,
-  SIGN_OUT,
+  LOGIN,
+  LOGIN_SUCCESS,
+  LOGIN_FAIL,
+  LOGIN_CANCEL,
+  LOGOUT,
 } from 'constants/actionTypes';
 
 const defaultState = {
   accessToken: null,
+  isAuthenticating: false,
+  isLoggedIn: false,
   tokenExpiresAt: null,
-  userId: '',
+  // userId: '',
   userName: '',
+  userPageHref: '',
 };
 
 const authReducer = (state = defaultState, action) => {
-  switch (action.type) {
-    case SAVE_AUTH_DATA:
+  const { type, session = {} } = action;
+  const { user } = session;
+
+  switch (type) {
+    case LOGIN:
+      return { ...state, isAuthenticating: true };
+    case LOGIN_SUCCESS:
       return {
         ...state,
-        accessToken: action.accessToken,
-        tokenExpiresAt: action.tokenExpiresAt,
-        userId: action.userId,
+        isLoggedIn: true,
+        isAuthenticating: false,
+        userName: `${user.first_name || ''} ${user.last_name || ''}`, // TEMP:
+        userPageHref: user.href,
       };
-    case FETCH_USER_NAME_SUCCESS:
-      return {
-        ...state,
-        userName: action.userName,
-      };
-    case SIGN_OUT: // is returning of defaultState correct?
-      return defaultState;
+    case LOGIN_FAIL:
+      return { ...state, isLoggedIn: false, isAuthenticating: false };
+    case LOGIN_CANCEL:
+      return { ...state, isLoggedIn: false, isAuthenticating: false };
+    case LOGOUT: // is returning of defaultState correct?
+      return { ...state, isLoggedIn: false, userName: '', userPageHref: '' };
+    // case SIGN_OUT: // is returning of defaultState correct?
+    //   return defaultState;
     default:
       return state;
   }
@@ -34,5 +46,7 @@ const authReducer = (state = defaultState, action) => {
 
 export default authReducer;
 
-export const getUserId = state => state.userId;
+// export const getUserId = state => state.userId;
 export const getUserName = state => state.userName;
+export const getUserPageHref = state => state.userPageHref;
+export const isLoggedIn = state => state.isLoggedIn;

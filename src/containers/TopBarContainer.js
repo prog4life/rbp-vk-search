@@ -4,35 +4,23 @@ import PropTypes from 'prop-types';
 
 import * as actionCreators from 'actions';
 import {
-  getAccessToken, getUserId, getUserName, getSearchIsActive,
+  getUserPageHref, getUserName, getSearchIsActive, isLoggedInSelector,
 } from 'selectors';
 
 import TopBar from 'components/TopBar';
 
 class TopBarContainer extends React.Component {
-  componentDidMount() {
-    this.loadUserName();
-  }
-
-  componentDidUpdate(prevProps) {
-    const { accessToken } = this.props;
-
-    if (prevProps.accessToken !== accessToken) {
-      this.loadUserName();
-    }
-  }
-
   handleNavSelect = (eventKey) => { // (eventKey, event) => {
     const {
-      accessToken, isSearchActive, signOut, terminateSearch, redirectToAuth,
+      isLoggedIn, isSearchActive, login, logout, terminateSearch,
     } = this.props;
 
     console.log('Selected event key: ', eventKey);
 
     // 1.2 - Sign Out from TopBarNav
     if (eventKey === 1.2) {
-      if (accessToken) {
-        signOut();
+      if (isLoggedIn) {
+        logout();
       }
 
       if (isSearchActive) {
@@ -42,26 +30,18 @@ class TopBarContainer extends React.Component {
     }
     // 2 - Sign In from TopBarNav
     if (eventKey === 2) {
-      redirectToAuth();
-    }
-  }
-
-  loadUserName() {
-    const { accessToken, userId, fetchUserName } = this.props;
-
-    if (accessToken && userId) {
-      fetchUserName(userId, accessToken);
+      login();
     }
   }
 
   render() {
-    const { accessToken, userName, userId } = this.props;
+    const { isLoggedIn, userName, userPage } = this.props;
 
     return (
       <TopBar
-        isLoggedIn={Boolean(accessToken)}
+        isLoggedIn={isLoggedIn}
         onNavSelect={this.handleNavSelect}
-        userId={userId}
+        userPage={userPage}
         userName={userName}
       />
     );
@@ -69,35 +49,30 @@ class TopBarContainer extends React.Component {
 }
 
 TopBarContainer.propTypes = {
-  accessToken: PropTypes.string,
-  fetchUserName: PropTypes.func.isRequired,
+  isLoggedIn: PropTypes.bool.isRequired,
   isSearchActive: PropTypes.bool.isRequired,
-  redirectToAuth: PropTypes.func.isRequired,
-  signOut: PropTypes.func.isRequired,
+  login: PropTypes.func.isRequired,
+  logout: PropTypes.func.isRequired,
   terminateSearch: PropTypes.func.isRequired,
-  userId: PropTypes.string.isRequired,
   userName: PropTypes.string.isRequired,
-};
-
-TopBarContainer.defaultProps = {
-  accessToken: null,
+  userPage: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = state => ({
-  accessToken: getAccessToken(state),
+  isLoggedIn: isLoggedInSelector(state),
   isSearchActive: getSearchIsActive(state),
-  userId: getUserId(state),
+  userPage: getUserPageHref(state),
   userName: getUserName(state),
 });
 
 const {
-  signOut, terminateSearch, redirectToAuth, fetchUserName,
+  logout, terminateSearch, login, fetchUserName,
 } = actionCreators;
 
 export default connect(mapStateToProps, {
-  signOut,
+  logout,
   terminateSearch,
-  redirectToAuth,
+  login,
   fetchUserName,
 })(TopBarContainer);
 
@@ -113,7 +88,7 @@ export default connect(mapStateToProps, {
 //       const { accessToken, isSearchActive } = stateProps;
 //
 //       if (accessToken) {
-//         dispatchProps.signOut();
+//         dispatchProps.logout();
 //       }
 //
 //       if (isSearchActive) {
@@ -123,8 +98,8 @@ export default connect(mapStateToProps, {
 //     }
 //     // 2 - Sign In nav item
 //     if (eventKey === 2) {
-//       const { redirectToAuth } = dispatchProps;
-//       redirectToAuth();
+//       const { login } = dispatchProps;
+//       login();
 //     }
 //   },
 // });

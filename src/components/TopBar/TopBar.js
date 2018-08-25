@@ -10,11 +10,11 @@ import TopBarNav from './TopBarNav';
 const propTypes = {
   isLoggedIn: PropTypes.bool.isRequired,
   onNavSelect: PropTypes.func.isRequired,
-  userId: PropTypes.string.isRequired,
   userName: PropTypes.string.isRequired,
+  userPage: PropTypes.string.isRequired,
 };
 
-const TopBar = ({ userId, userName, isLoggedIn, onNavSelect }) => (
+const TopBar = ({ userPage, userName, isLoggedIn, onNavSelect }) => (
   <Navbar fixedTop onSelect={onNavSelect}>
     <Navbar.Header>
       <Navbar.Brand>
@@ -25,7 +25,11 @@ const TopBar = ({ userId, userName, isLoggedIn, onNavSelect }) => (
       <Navbar.Toggle />
     </Navbar.Header>
     <Navbar.Collapse>
-      <TopBarNav isLoggedIn={isLoggedIn} userId={userId} userName={userName} />
+      <TopBarNav
+        isLoggedIn={isLoggedIn}
+        userName={userName}
+        userPage={userPage}
+      />
     </Navbar.Collapse>
   </Navbar>
 );

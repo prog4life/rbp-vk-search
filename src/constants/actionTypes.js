@@ -22,6 +22,12 @@ export const FETCH_WALL_POSTS_FAIL = 'FETCH_WALL_POSTS_FAIL';
 // auth
 export const SAVE_AUTH_DATA = 'SAVE_AUTH_DATA';
 
+export const LOGIN = 'LOGIN';
+export const LOGIN_CANCEL = 'LOGIN_CANCEL';
+export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
+export const LOGIN_FAIL = 'LOGIN_FAIL';
+export const LOGOUT = 'LOGOUT';
+
 export const FETCH_USER_NAME = 'FETCH_USER_NAME';
 export const FETCH_USER_NAME_SUCCESS = 'FETCH_USER_NAME_SUCCESS';
 export const FETCH_USER_NAME_FAIL = 'FETCH_USER_NAME_FAIL';

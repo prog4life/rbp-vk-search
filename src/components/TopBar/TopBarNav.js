@@ -8,25 +8,25 @@ import NavItemLink from './NavItemLink';
 
 const propTypes = {
   isLoggedIn: PropTypes.bool.isRequired,
-  userId: PropTypes.string.isRequired,
   userName: PropTypes.string.isRequired,
+  userPage: PropTypes.string.isRequired,
 };
 
 // NOTE: eventKey prop was not working if NavItem | NavDropdown was nested into
 // some other component or even Fragment. Array is used to render MenuItems
 
-const TopBarNav = ({ isLoggedIn, userId, userName }) => {
+const TopBarNav = ({ isLoggedIn, userPage, userName }) => {
   const navDropdown = (
     <NavDropdown
       eventKey={1}
       id="topbar-nav-dropdown"
       title={userName ? `Signed in as: ${userName}` : 'Signed in'}
     >
-      {userId && [ // see NOTE above
+      {userPage && [ // see NOTE above
         <MenuItem
           key="1.1.0"
           eventKey={1.1}
-          href={`https://vk.com/id${userId}`}
+          href={userPage}
           target="blank"
           title="Open your vk.com page in new tab"
         >

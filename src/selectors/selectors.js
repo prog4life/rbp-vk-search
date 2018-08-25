@@ -19,8 +19,10 @@ import * as fromPosts from 'reducers/postsReducer';
 
 // ------------------------------ AUTH ----------------------------------------
 export const getAuthData = state => state.auth;
-export const getUserId = state => fromAuth.getUserId(state.auth);
+// export const getUserId = state => fromAuth.getUserId(state.auth);
 export const getUserName = state => fromAuth.getUserName(state.auth);
+export const getUserPageHref = state => fromAuth.getUserPageHref(state.auth);
+export const isLoggedInSelector = state => fromAuth.isLoggedIn(state.auth);
 
 // TODO: extract "isTokenExpired" as separate selector ?
 export const getAccessToken = createSelector(

@@ -2,18 +2,55 @@
 import { getAccessToken } from 'selectors';
 import { parseAccessTokenHash } from 'utils/accessToken';
 import { requestUserName } from 'utils/apiUsage';
+import { createError } from 'utils/errorHelpers';
 
 import {
+  LOGIN,
+  LOGIN_CANCEL,
+  LOGIN_SUCCESS,
+  LOGIN_FAIL,
+  LOGOUT,
   SAVE_AUTH_DATA,
   FETCH_USER_NAME,
   FETCH_USER_NAME_SUCCESS,
   FETCH_USER_NAME_FAIL,
-  SIGN_OUT,
+  // SIGN_OUT,
   ACCESS_TOKEN_ERROR,
 } from 'constants/actionTypes';
 
 // TODO: terminate search on sign out
-export const signOut = () => ({ type: SIGN_OUT });
+export const login = () => (dispatch, getState) => {
+  // const isAuthenticating = isAuthenticatingSelector(getState());
+
+  // if (isAuthenticating) {
+  //   return Promise.reject();
+  // }
+  dispatch({ type: LOGIN });
+  // should be invoked in response to user action to prevent auth popup block
+  VK.Auth.login((response) => {
+    const { session, settings, error } = response;
+
+    if (error) {
+      dispatch({ type: LOGIN_FAIL, error: createError(error) });
+      return;
+    }
+
+    if (session) {
+      if (settings) {
+        /* Выбранные настройки доступа пользователя, если они были запрошены */
+        dispatch({ type: LOGIN_SUCCESS, session, settings });
+        return;
+      }
+      dispatch({ type: LOGIN_SUCCESS, session });
+    } else {
+      /* Пользователь нажал кнопку Отмена в окне авторизации */
+      dispatch({ type: LOGIN_CANCEL });
+    }
+  } /* , settings: Integer */);
+};
+
+export const logout = () => ({ type: LOGOUT });
+// export const signOut = () => ({ type: SIGN_OUT });
 // export const fetchUsername = () => ({ type: FETCH_USER_NAME });
 
 export const fetchUserNameSuccess = userName => ({
