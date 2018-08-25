@@ -1,5 +1,5 @@
 import jsonpPromise from 'jsonp-promise';
-import { maybeThrowResponseError } from 'utils/helpers';
+import { maybeThrowResponseError } from 'utils/errorHelpers';
 
 async function jsonp(url) {
   const jsonpObj = jsonpPromise(url, {

@@ -1,6 +1,6 @@
 import { compose } from 'redux';
 import { apiVersion } from 'config/common';
-import { changeMssg, createError } from 'utils/helpers';
+import { changeMssg, createError } from 'utils/errorHelpers';
 import fetchJSONP from 'utils/fetchJSONP';
 // import jsonp from 'utils/jsonpPromise';
 

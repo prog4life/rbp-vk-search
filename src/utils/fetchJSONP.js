@@ -1,6 +1,6 @@
 import fetchWithJSONP from 'fetch-jsonp';
 import { jsonpTimeout } from 'config/common';
-import { maybeThrowResponseError } from 'utils/helpers';
+import { maybeThrowResponseError } from 'utils/errorHelpers';
 
 // const getObjectFromJSON = response => response.json();
 
