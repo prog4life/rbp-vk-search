@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import * as actionCreators from 'actions';
 import {
-  getSearchIsActive, getAccessToken, getAuthOfferFlag, getDelayedAuthOfferFlag,
+  getSearchIsActive, isLoggedInSelector, getAuthOfferFlag, getDelayedAuthOfferFlag,
   getIsRedirecting,
 } from 'selectors';
 
@@ -21,26 +21,15 @@ class WallPostsPageContainer extends React.Component {
 
   componentDidMount() {
     const {
-      extractAuthData,
       rejectAuthOffer,
-      accessToken,
+      isLoggedIn,
       location, // TODO: location: { hash, pathname },
     } = this.props;
-    const { hash, pathname } = location;
 
-    extractAuthData(hash.substr(1), pathname);
+    // TODO: display message to user if get auth error
 
-    // TODO: display message to user if error was parsed
-
-    // if (parsedData) {
-    //   if (parsedData.accessToken) { // TEMP:
-    //     console.info('new accessToken was retrieved: ', parsedData.accessToken);
-    //   }
-    //   return;
-    // }
-
-    if (accessToken) {
-      console.info('accessToken is already present: ', accessToken);
+    if (isLoggedIn) {
+      console.info('isLoggedIn: ', isLoggedIn);
       rejectAuthOffer();
     }
 
@@ -51,30 +40,39 @@ class WallPostsPageContainer extends React.Component {
   }
 
   componentDidUpdate() {
-    const { accessToken, hasDelayedAuthOffer, rejectAuthOffer } = this.props;
+    const { isLoggedIn, hasDelayedAuthOffer, rejectAuthOffer } = this.props;
 
-    if (accessToken && hasDelayedAuthOffer) {
-      console.info('accessToken is present after update: ', accessToken);
+    if (isLoggedIn && hasDelayedAuthOffer) {
+      console.info('isLoggedIn after update: ', isLoggedIn);
       rejectAuthOffer();
     }
   }
 
   componentWillUnmount() {
     this.handleSearchStop();
+    this.isPostsSearchDeferred = false;
   }
 
   handleSearchStart = (inputData) => {
     const {
-      startWallPostsSearch2, accessToken, offerAuthRedirect,
+      startWallPostsSearch2, isLoggedIn, login,
     } = this.props;
 
-    if (accessToken) {
+    if (isLoggedIn) {
       console.log('FORM STATE: ', inputData); // TEMP
       startWallPostsSearch2(inputData);
       return;
     }
     // TODO: save input values to localStorage
-    offerAuthRedirect({ hasDelay: false });
+
+    this.isPostsSearchDeferred = true;
+
+    login().then(() => {
+      console.log('is search deferred ', this.isPostsSearchDeferred);
+      if (this.isPostsSearchDeferred) {
+        startWallPostsSearch2(inputData);
+      }
+    });
   }
 
   handleSearchStop() {
@@ -105,7 +103,7 @@ class WallPostsPageContainer extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  accessToken: getAccessToken(state),
+  isLoggedIn: isLoggedInSelector(state),
   isRedirecting: getIsRedirecting(state),
   hasAuthOffer: getAuthOfferFlag(state),
   hasDelayedAuthOffer: getDelayedAuthOfferFlag(state),
@@ -117,8 +115,7 @@ const mapDispatchToProps = dispatch => (
 );
 
 WallPostsPageContainer.propTypes = {
-  accessToken: PropTypes.string,
-  extractAuthData: PropTypes.func.isRequired,
+  isLoggedIn: PropTypes.bool.isRequired,
   isSearchActive: PropTypes.bool.isRequired,
   location: PropTypes.shape({}).isRequired,
   offerAuthRedirect: PropTypes.func.isRequired,
@@ -126,9 +123,7 @@ WallPostsPageContainer.propTypes = {
   terminateSearch: PropTypes.func.isRequired,
 };
 
-WallPostsPageContainer.defaultProps = {
-  accessToken: null,
-};
+WallPostsPageContainer.defaultProps = {};
 
 export default connect(
   mapStateToProps,

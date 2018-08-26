@@ -1,8 +1,7 @@
 // import moment from 'moment';
 import { getAccessToken } from 'selectors';
 import { parseAccessTokenHash } from 'utils/accessToken';
-import { requestUserName } from 'utils/apiUsage';
-import { createError } from 'utils/errorHelpers';
+import openAPI from 'utils/openAPI';
 
 import {
   LOGIN,
@@ -22,31 +21,27 @@ import {
 export const login = () => (dispatch, getState) => {
   // const isAuthenticating = isAuthenticatingSelector(getState());
 
+  const delay = ms => piped => new Promise((resolve) => {
+    setTimeout(() => resolve(piped), ms);
+  });
+
   // if (isAuthenticating) {
   //   return Promise.reject();
   // }
   dispatch({ type: LOGIN });
   // should be invoked in response to user action to prevent auth popup block
-  VK.Auth.login((response) => {
-    const { session, settings, error } = response;
-
-    if (error) {
-      dispatch({ type: LOGIN_FAIL, error: createError(error) });
-      return;
-    }
-
-    if (session) {
-      if (settings) {
-        /* Выбранные настройки доступа пользователя, если они были запрошены */
-        dispatch({ type: LOGIN_SUCCESS, session, settings });
-        return;
+  return openAPI.login().then(delay(10000)).then(
+    (response) => {
+      if (response.status !== 'connected') {
+        return dispatch({ type: LOGIN_CANCEL, ...response });
       }
-      dispatch({ type: LOGIN_SUCCESS, session });
-    } else {
-      /* Пользователь нажал кнопку Отмена в окне авторизации */
-      dispatch({ type: LOGIN_CANCEL });
-    }
-  } /* , settings: Integer */);
+      return dispatch({ type: LOGIN_SUCCESS, ...response });
+    },
+    (error) => {
+      dispatch({ type: LOGIN_FAIL, error });
+      return Promise.reject(error);
+    },
+  );
 };
 
 export const logout = () => ({ type: LOGOUT });

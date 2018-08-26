@@ -8,7 +8,7 @@ import {
 } from 'selectors';
 import shortId from 'shortid';
 // import fetchJSONP from 'utils/fetchJSONP';
-import { callAPI } from 'utils/apiUsage';
+import openAPI from 'utils/openAPI';
 import { onSuccess, onFail } from './requestHandlers';
 import transformResponse from './transformResponse';
 import {
@@ -108,7 +108,7 @@ const searchProcessor = ({ dispatch, getState }) => {
 
       // console.time('::: CALL API :::');
 
-      const promise = callAPI(method, { ...requestParams, offset })
+      const promise = openAPI.call(method, { ...requestParams, offset })
         .then(
           onSuccess({ next, getState, offset }),
           onFail({ next, getState, offset }),
