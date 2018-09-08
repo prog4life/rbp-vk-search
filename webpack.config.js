@@ -124,6 +124,7 @@ module.exports = {
       mobile: true,
     }),
     // new CompressionPlugin({
+    //   cache: true, // default: false, enable file caching
     //   deleteOriginalAssets: true,
     //   test: /\.js/
     // }),

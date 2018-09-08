@@ -19,12 +19,15 @@
   </script>
 </head>
 <body>
-<div id="vk_api_transport"></div>
-<% if (htmlWebpackPlugin.options.appMountId) { %>
-<div id="<%= htmlWebpackPlugin.options.appMountId%>"></div>
-<% } %>
-<% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
-<script src="<%= htmlWebpackPlugin.files.chunks[chunk].entry %>"></script>
-<% } %>
+  <noscript>
+    You need to enable JavaScript to run this app.
+  </noscript>
+  <div id="vk_api_transport"></div>
+  <% if (htmlWebpackPlugin.options.appMountId) { %>
+  <div id="<%= htmlWebpackPlugin.options.appMountId%>"></div>
+  <% } %>
+  <% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
+  <script src="<%= htmlWebpackPlugin.files.chunks[chunk].entry %>"></script>
+  <% } %>
 </body>
 </html>

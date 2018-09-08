@@ -58,6 +58,8 @@ class WallPostsPageContainer extends React.Component {
       startWallPostsSearch2, isLoggedIn, login,
     } = this.props;
 
+    // TODO: consider to dispatch startOrDeferPostsSearch thunk instead          !!!
+
     if (isLoggedIn) {
       console.log('FORM STATE: ', inputData); // TEMP
       startWallPostsSearch2(inputData);
