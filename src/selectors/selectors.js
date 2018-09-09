@@ -3,14 +3,12 @@ import { createSelector } from 'reselect';
 import sortBy from 'lodash-es/sortBy';
 // import { sortItemsByNumField } from 'utils/sorting';
 import * as fromAuth from 'reducers/authReducer';
-import * as fromRedirect from 'reducers/redirectReducer';
 import * as fromSearch from 'reducers/searchReducer';
 import * as fromRequests from 'reducers/requestsReducer';
 import * as fromPosts from 'reducers/postsReducer';
 
 // const state = {
 //   auth,
-//   redirect,
 //   posts,
 //   search,
 //   requests,
@@ -25,28 +23,27 @@ export const getUserPageHref = state => fromAuth.getUserPageHref(state.auth);
 export const isLoggedInSelector = state => fromAuth.isLoggedIn(state.auth);
 
 // TODO: extract "isTokenExpired" as separate selector ?
-export const getAccessToken = createSelector(
-  getAuthData,
-  ({ accessToken, tokenExpiresAt }) => {
-    const TEN_MINUTES = 10 * 60 * 1000;
-
-    if (!accessToken) {
-      return null;
-    }
-    if (tokenExpiresAt < Date.now() - TEN_MINUTES) {
-      return null;
-    }
-    return accessToken;
-  },
-);
-
-// ------------------------------ REDIRECT ------------------------------------
-// export const getDelayedAuthOfferFlag = state => (
-//   fromRedirect.getDelayedAuthOffer(state.redirect)
+// export const getAccessToken = createSelector(
+//   getAuthData,
+//   ({ accessToken, tokenExpiresAt }) => {
+//     const TEN_MINUTES = 10 * 60 * 1000;
+//
+//     if (!accessToken) {
+//       return null;
+//     }
+//     if (tokenExpiresAt < Date.now() - TEN_MINUTES) {
+//       return null;
+//     }
+//     return accessToken;
+//   },
 // );
-export const getAuthOffer = state => fromRedirect.hasAuthOffer(state.redirect);
+
+// export const getDelayedAuthOfferFlag = state => (
+//   fromAuth.getDelayedAuthOffer(state.auth)
+// );
+export const getAuthOffer = state => fromAuth.hasAuthOffer(state.auth);
 export const getAuthOfferDelay = state => (
-  fromRedirect.getAuthOfferDelay(state.redirect)
+  fromAuth.getAuthOfferDelay(state.auth)
 );
 
 // ------------------------------ SEARCH --------------------------------------

@@ -117,7 +117,6 @@ WallPostsPageContainer.propTypes = {
   isLoggedIn: PropTypes.bool.isRequired,
   isSearchActive: PropTypes.bool.isRequired,
   location: PropTypes.shape({}).isRequired,
-  offerAuth: PropTypes.func.isRequired,
   startWallPostsSearch: PropTypes.func.isRequired,
   terminateSearch: PropTypes.func.isRequired,
 };

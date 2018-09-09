@@ -40,7 +40,7 @@ const WallPostsPage = (props) => {
             </DelayedRender>
           )}
           {/* TODO: remove later to show popup without preceding modal */}
-          {hasAuthOffer && !authOfferDelay && authOfferModal}
+          {/* {hasAuthOffer && !authOfferDelay && authOfferModal} */}
         </Fragment>
       </AuthErrorBoundary>
       <PostsSearchForm

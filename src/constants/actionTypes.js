@@ -28,15 +28,8 @@ export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAIL = 'LOGIN_FAIL';
 export const LOGOUT = 'LOGOUT';
 
-export const FETCH_USER_NAME = 'FETCH_USER_NAME';
-export const FETCH_USER_NAME_SUCCESS = 'FETCH_USER_NAME_SUCCESS';
-export const FETCH_USER_NAME_FAIL = 'FETCH_USER_NAME_FAIL';
-
 export const SIGN_OUT = 'SIGN_OUT';
 export const NO_VALID_TOKEN = 'NO_VALID_TOKEN';
-export const ACCESS_TOKEN_ERROR = 'ACCESS_TOKEN_ERROR';
 
-// redirect
-export const REDIRECT_TO_AUTH = 'REDIRECT_TO_AUTH';
-export const REJECT_AUTH_OFFER = 'REJECT_AUTH_OFFER';
 export const OFFER_AUTH = 'OFFER_AUTH';
+export const REJECT_AUTH_OFFER = 'REJECT_AUTH_OFFER';

@@ -3,7 +3,7 @@ import {
 } from 'constants/actionTypes';
 import { AUTH_FAILED } from 'constants/api'; // TODO: pass with options ?
 import {
-  getAccessToken, getSearchTotal, getSearchOffset, getSearchErrorCode,
+  getSearchTotal, getSearchOffset, getSearchErrorCode,
   getRequestsByOffset, getFailedList, getPendingList,
 } from 'selectors';
 import shortId from 'shortid';
