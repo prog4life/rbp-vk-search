@@ -6,7 +6,6 @@ import PostsSearchForm from 'components/PostsSearchForm';
 import DelayedRender from 'components/common/DelayedRender';
 import AuthErrorBoundary from 'components/common/AuthErrorBoundary';
 import AuthOfferModal from 'components/AuthOfferModal';
-import AuthRedirectModal from 'components/AuthRedirectModal';
 import PostsPanelContainer from 'containers/PostsPanelContainer';
 // import { AUTH_OFFER_DELAY } from 'constants/ui';
 
@@ -15,7 +14,6 @@ import './style.scss';
 const WallPostsPage = (props) => {
   const {
     isSearchActive,
-    isRedirecting,
     hasAuthOffer,
     authOfferDelay,
     login,
@@ -45,7 +43,6 @@ const WallPostsPage = (props) => {
           {hasAuthOffer && !authOfferDelay && authOfferModal}
         </Fragment>
       </AuthErrorBoundary>
-      {isRedirecting && <AuthRedirectModal />}
       <PostsSearchForm
         isSearchActive={isSearchActive}
         onStartSearch={onStartSearch}
@@ -58,7 +55,6 @@ const WallPostsPage = (props) => {
 WallPostsPage.propTypes = {
   authOfferDelay: PropTypes.number.isRequired,
   hasAuthOffer: PropTypes.bool.isRequired,
-  isRedirecting: PropTypes.bool.isRequired,
   isSearchActive: PropTypes.bool.isRequired,
   login: PropTypes.func.isRequired,
   onStartSearch: PropTypes.func.isRequired,

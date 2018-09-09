@@ -41,9 +41,6 @@ export const getAccessToken = createSelector(
 );
 
 // ------------------------------ REDIRECT ------------------------------------
-export const getIsRedirecting = state => (
-  fromRedirect.getIsRedirecting(state.redirect)
-);
 // export const getDelayedAuthOfferFlag = state => (
 //   fromRedirect.getDelayedAuthOffer(state.redirect)
 // );

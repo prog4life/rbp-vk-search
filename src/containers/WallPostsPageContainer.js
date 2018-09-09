@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 import * as actionCreators from 'actions';
 import {
   getSearchIsActive, isLoggedInSelector, getAuthOffer, getAuthOfferDelay,
-  getIsRedirecting,
 } from 'selectors';
 
 import WallPostsPage from 'components/WallPostsPage';
@@ -88,7 +87,6 @@ class WallPostsPageContainer extends React.Component {
   render() {
     // const {
     //   isSearchActive,
-    //   isRedirecting,
     //   hasAuthOffer,
     //   posts,
     //   login,
@@ -106,7 +104,6 @@ class WallPostsPageContainer extends React.Component {
 
 const mapStateToProps = state => ({
   isLoggedIn: isLoggedInSelector(state),
-  isRedirecting: getIsRedirecting(state),
   hasAuthOffer: getAuthOffer(state),
   authOfferDelay: getAuthOfferDelay(state),
   isSearchActive: getSearchIsActive(state),
