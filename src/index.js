@@ -81,13 +81,13 @@ const store = configureStore(preloadedState);
 
 initPromise.then(() => {
   console.log('VK.init was called');
-  VK.Auth.getLoginStatus((response) => {
-    console.info('VK.Auth.getLoginStatus RESPONSE: ', response);
-
-    if (response.session) {
-      console.log('User is authorized');
-    }
-  });
+  // VK.Auth.getLoginStatus((response) => {
+  //   console.info('VK.Auth.getLoginStatus RESPONSE: ', response);
+  //
+  //   if (response.session) {
+  //     console.log('User is authorized');
+  //   }
+  // });
   store.dispatch({ type: 'OPEN_API_INITIALIZATION' });
 });
 

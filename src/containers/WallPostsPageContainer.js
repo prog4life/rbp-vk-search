@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import * as actionCreators from 'actions';
 import {
-  getSearchIsActive, isLoggedInSelector, getAuthOfferFlag, getDelayedAuthOfferFlag,
+  getSearchIsActive, isLoggedInSelector, getAuthOffer, getAuthOfferDelay,
   getIsRedirecting,
 } from 'selectors';
 
@@ -91,7 +91,7 @@ class WallPostsPageContainer extends React.Component {
     //   isRedirecting,
     //   hasAuthOffer,
     //   posts,
-    //   redirectToAuth,
+    //   login,
     //   rejectAuthOffer,
     // } = this.props;
 
@@ -107,8 +107,8 @@ class WallPostsPageContainer extends React.Component {
 const mapStateToProps = state => ({
   isLoggedIn: isLoggedInSelector(state),
   isRedirecting: getIsRedirecting(state),
-  hasAuthOffer: getAuthOfferFlag(state),
-  hasDelayedAuthOffer: getDelayedAuthOfferFlag(state),
+  hasAuthOffer: getAuthOffer(state),
+  authOfferDelay: getAuthOfferDelay(state),
   isSearchActive: getSearchIsActive(state),
 });
 
@@ -120,7 +120,7 @@ WallPostsPageContainer.propTypes = {
   isLoggedIn: PropTypes.bool.isRequired,
   isSearchActive: PropTypes.bool.isRequired,
   location: PropTypes.shape({}).isRequired,
-  offerAuthRedirect: PropTypes.func.isRequired,
+  offerAuth: PropTypes.func.isRequired,
   startWallPostsSearch: PropTypes.func.isRequired,
   terminateSearch: PropTypes.func.isRequired,
 };

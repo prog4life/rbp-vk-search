@@ -3,12 +3,12 @@ import { tokenRequestURL } from 'config/common';
 import {
   REDIRECT_TO_AUTH,
   REJECT_AUTH_OFFER,
-  OFFER_AUTH_REDIRECT,
+  OFFER_AUTH,
   // NO_VALID_TOKEN,
 } from 'constants/actionTypes';
 
-export const offerAuthRedirect = ({ hasDelay = false }) => ({
-  type: OFFER_AUTH_REDIRECT,
+export const offerAuth = ({ hasDelay = false }) => ({
+  type: OFFER_AUTH,
   hasDelay,
 });
 

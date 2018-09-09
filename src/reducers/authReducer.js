@@ -17,8 +17,8 @@ const defaultState = {
 };
 
 const authReducer = (state = defaultState, action) => {
-  const { type, session = {} } = action;
-  const { user } = session;
+  const { type, session } = action; // session can be null
+  const { user } = session || {};
 
   switch (type) {
     case LOGIN:

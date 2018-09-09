@@ -11,26 +11,30 @@ import {
 
 class AuthOfferModal extends React.Component {
   static propTypes = {
-    onClose: PropTypes.func.isRequired,
-    onRedirect: PropTypes.func.isRequired,
+    onConfirm: PropTypes.func.isRequired,
+    onReject: PropTypes.func.isRequired,
   }
+
   state = {
     isOpened: true,
   }
-  handleRedirectClick = () => {
-    const { onRedirect } = this.props;
 
-    onRedirect();
+  handleConfirmation = () => {
+    const { onConfirm } = this.props;
 
-    this.setState({ isOpened: false });
-  }
-  handleClose = () => {
-    const { onClose } = this.props;
-
-    onClose();
+    onConfirm();
 
     this.setState({ isOpened: false });
   }
+
+  handleReject = () => {
+    const { onReject } = this.props;
+
+    onReject();
+
+    this.setState({ isOpened: false });
+  }
+
   render() {
     const { isOpened } = this.state;
 
@@ -39,18 +43,18 @@ class AuthOfferModal extends React.Component {
       <Modal show={isOpened}>
         <ModalHeader>
           <ModalTitle>
-            {'Redirection for authentication'}
+            {'Authentication request'}
           </ModalTitle>
         </ModalHeader>
         <ModalBody>
           {`You must be logged in with vk.com to search.
-              Redirect to sign in page now?`}
+              Sign in now? (vk.com auth popup may be opened)`}
         </ModalBody>
         <ModalFooter>
-          <Button onClick={this.handleRedirectClick}>
-            {'Redirect'}
+          <Button onClick={this.handleConfirmation}>
+            {'Sign In'}
           </Button>
-          <Button onClick={this.handleClose}>
+          <Button onClick={this.handleReject}>
             {'Later'}
           </Button>
         </ModalFooter>

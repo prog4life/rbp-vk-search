@@ -44,10 +44,13 @@ export const getAccessToken = createSelector(
 export const getIsRedirecting = state => (
   fromRedirect.getIsRedirecting(state.redirect)
 );
-export const getDelayedAuthOfferFlag = state => (
-  fromRedirect.getDelayedAuthOffer(state.redirect)
+// export const getDelayedAuthOfferFlag = state => (
+//   fromRedirect.getDelayedAuthOffer(state.redirect)
+// );
+export const getAuthOffer = state => fromRedirect.hasAuthOffer(state.redirect);
+export const getAuthOfferDelay = state => (
+  fromRedirect.getAuthOfferDelay(state.redirect)
 );
-export const getAuthOfferFlag = state => fromRedirect.getAuthOffer(state.redirect);
 
 // ------------------------------ SEARCH --------------------------------------
 export const getSearchIsActive = state => fromSearch.getIsActive(state.search);

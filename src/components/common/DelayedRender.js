@@ -11,32 +11,29 @@ class DelayedRender extends React.Component {
     super(props);
 
     this.state = {
-      isVisible: !props.delay,
+      isVisible: false,
     };
   }
 
   componentDidMount() {
-    this.makeVisibleAfterTimeout();
+    // this.makeVisibleAfterTimeout();
+    const { delay } = this.props;
+
+    this.timeout = setTimeout(() => this.setState({ isVisible: true }), delay);
   }
 
-  componentDidUpdate() {
-    this.makeVisibleAfterTimeout();
-  }
+  // componentDidUpdate(prevProps) {
+  //   const { delay } = this.props;
+  //   const { delay: prevDelay } = prevProps;
+  //
+  //   if (this.timeout) {
+  //     return;
+  //   }
+  //   this.makeVisibleAfterTimeout();
+  // }
 
   componentWillUnmount() {
     clearTimeout(this.timeout);
-  }
-
-  makeVisibleAfterTimeout() {
-    const { delay } = this.props;
-
-    if (!Number.isInteger(delay)) {
-      throw new Error('Expected delay to be an integer');
-    }
-    if (this.timeout) {
-      return;
-    }
-    this.timeout = setTimeout(() => this.setState({ isVisible: true }), delay);
   }
 
   render() {

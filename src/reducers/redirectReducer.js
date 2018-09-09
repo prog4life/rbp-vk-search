@@ -1,14 +1,16 @@
 import {
   REDIRECT_TO_AUTH,
   REJECT_AUTH_OFFER,
-  OFFER_AUTH_REDIRECT,
+  OFFER_AUTH,
   // AUTH_FAILED,
 } from 'constants/actionTypes';
+import { AUTH_OFFER_DELAY } from 'constants/ui';
 
 const initialState = {
   isRedirecting: false,
-  hasAuthOffer: false,
-  hasDelayedAuthOffer: true,
+  hasAuthOffer: true,
+  // hasDelayedAuthOffer: true,
+  authOfferDelay: AUTH_OFFER_DELAY,
 };
 
 // Reducer for vk.com authentication redirection
@@ -20,25 +22,27 @@ const redirectReducer = (state = initialState, action) => {
       return {
         isRedirecting: true,
         hasAuthOffer: false,
-        hasDelayedAuthOffer: false,
+        // hasDelayedAuthOffer: false,
+        authOfferDelay: AUTH_OFFER_DELAY,
       };
-    case OFFER_AUTH_REDIRECT:
+    case OFFER_AUTH: // TODO: rename to AUTH_REQUIRED
       return {
         ...state,
-        hasAuthOffer: !action.hasDelay,
-        hasDelayedAuthOffer: action.hasDelay,
+        hasAuthOffer: true,
+        // hasDelayedAuthOffer: action.hasDelay,
+        authOfferDelay: action.hasDelay ? AUTH_OFFER_DELAY : 0,
       };
     case REJECT_AUTH_OFFER:
       return {
         ...state,
         hasAuthOffer: false,
-        hasDelayedAuthOffer: false,
+        // hasDelayedAuthOffer: false,
+        authOfferDelay: 0, // next time without delay
       };
     // case AUTH_FAILED:
     //   return {
     //     ...state,
-    //     isAuthFailed: true,
-    //   };
+    //  };
     default:
       return state;
   }
@@ -47,5 +51,6 @@ const redirectReducer = (state = initialState, action) => {
 export default redirectReducer;
 
 export const getIsRedirecting = state => state.isRedirecting;
-export const getAuthOffer = state => state.hasAuthOffer;
-export const getDelayedAuthOffer = state => state.hasDelayedAuthOffer;
+// export const getDelayedAuthOffer = state => state.hasDelayedAuthOffer;
+export const hasAuthOffer = state => state.hasAuthOffer;
+export const getAuthOfferDelay = state => state.authOfferDelay;

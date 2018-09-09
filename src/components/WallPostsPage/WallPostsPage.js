@@ -8,7 +8,7 @@ import AuthErrorBoundary from 'components/common/AuthErrorBoundary';
 import AuthOfferModal from 'components/AuthOfferModal';
 import AuthRedirectModal from 'components/AuthRedirectModal';
 import PostsPanelContainer from 'containers/PostsPanelContainer';
-import { AUTH_OFFER_DELAY } from 'constants/ui';
+// import { AUTH_OFFER_DELAY } from 'constants/ui';
 
 import './style.scss';
 
@@ -17,16 +17,16 @@ const WallPostsPage = (props) => {
     isSearchActive,
     isRedirecting,
     hasAuthOffer,
-    hasDelayedAuthOffer,
-    redirectToAuth,
+    authOfferDelay,
+    login,
     rejectAuthOffer,
     onStartSearch,
   } = props;
 
   const authOfferModal = (
     <AuthOfferModal
-      onRedirect={redirectToAuth}
-      onClose={rejectAuthOffer}
+      onConfirm={login}
+      onReject={rejectAuthOffer}
     />
   );
 
@@ -35,13 +35,14 @@ const WallPostsPage = (props) => {
       <TopBarContainer />
       <AuthErrorBoundary>
         <Fragment>
-          {hasDelayedAuthOffer && (
+          {hasAuthOffer && authOfferDelay && (
             // TODO: make withDelayedRender HOC ?
-            <DelayedRender delay={AUTH_OFFER_DELAY}>
+            <DelayedRender delay={authOfferDelay}>
               {authOfferModal}
             </DelayedRender>
           )}
-          {hasAuthOffer && authOfferModal}
+          {/* TODO: remove later to show popup without preceding modal */}
+          {hasAuthOffer && !authOfferDelay && authOfferModal}
         </Fragment>
       </AuthErrorBoundary>
       {isRedirecting && <AuthRedirectModal />}
@@ -55,12 +56,12 @@ const WallPostsPage = (props) => {
 };
 
 WallPostsPage.propTypes = {
+  authOfferDelay: PropTypes.number.isRequired,
   hasAuthOffer: PropTypes.bool.isRequired,
-  hasDelayedAuthOffer: PropTypes.bool.isRequired,
   isRedirecting: PropTypes.bool.isRequired,
   isSearchActive: PropTypes.bool.isRequired,
+  login: PropTypes.func.isRequired,
   onStartSearch: PropTypes.func.isRequired,
-  redirectToAuth: PropTypes.func.isRequired,
   rejectAuthOffer: PropTypes.func.isRequired,
 };
 
