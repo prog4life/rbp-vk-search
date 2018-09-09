@@ -4,7 +4,7 @@ import {
   LOGIN_FAIL,
   LOGIN_CANCEL,
   LOGOUT,
-  OFFER_AUTH,
+  // OFFER_AUTH,
   REJECT_AUTH_OFFER,
 } from 'constants/actionTypes';
 import { AUTH_OFFER_DELAY } from 'constants/ui';

@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import * as actionCreators from 'actions';
 import {
   getUserPageHref, getUserName, getSearchIsActive, isLoggedInSelector,
+  isAuthenticatingSelector,
 } from 'selectors';
 
 import TopBar from 'components/TopBar';
@@ -12,7 +13,8 @@ import TopBar from 'components/TopBar';
 class TopBarContainer extends React.Component {
   handleNavSelect = (eventKey) => { // (eventKey, event) => {
     const {
-      isLoggedIn, isSearchActive, login, logout, terminateSearch,
+      isLoggedIn, isAuthenticating, isSearchActive,
+      login, logout, terminateSearch,
     } = this.props;
 
     console.log('Selected event key: ', eventKey);
@@ -29,22 +31,13 @@ class TopBarContainer extends React.Component {
       return;
     }
     // 2 - Sign In from TopBarNav
-    if (eventKey === 2) {
+    if (eventKey === 2 && !isAuthenticating) {
       login();
     }
   }
 
   render() {
-    const { isLoggedIn, userName, userPage } = this.props;
-
-    return (
-      <TopBar
-        isLoggedIn={isLoggedIn}
-        onNavSelect={this.handleNavSelect}
-        userPage={userPage}
-        userName={userName}
-      />
-    );
+    return <TopBar {...this.props} onNavSelect={this.handleNavSelect} />;
   }
 }
 
@@ -54,26 +47,22 @@ TopBarContainer.propTypes = {
   login: PropTypes.func.isRequired,
   logout: PropTypes.func.isRequired,
   terminateSearch: PropTypes.func.isRequired,
-  userName: PropTypes.string.isRequired,
-  userPage: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = state => ({
+  isAuthenticating: isAuthenticatingSelector(state),
   isLoggedIn: isLoggedInSelector(state),
   isSearchActive: getSearchIsActive(state),
   userPage: getUserPageHref(state),
   userName: getUserName(state),
 });
 
-const {
-  logout, terminateSearch, login, fetchUserName,
-} = actionCreators;
+const { terminateSearch, login, logout } = actionCreators;
 
 export default connect(mapStateToProps, {
+  login,
   logout,
   terminateSearch,
-  login,
-  fetchUserName,
 })(TopBarContainer);
 
 // const mergeProps = (stateProps, dispatchProps, ownProps) => ({

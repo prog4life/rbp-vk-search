@@ -1,26 +1,29 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { NavDropdown, MenuItem, Nav, NavItem } from 'react-bootstrap';
+import MaterialDesignSpinner from 'react-md-spinner';
+import { AUTH_SPINNER_SIZE, AUTH_SPINNER_COLOR } from 'constants/ui';
 
 // import './style.scss';
 
 import NavItemLink from './NavItemLink';
 
 const propTypes = {
+  isAuthenticating: PropTypes.bool.isRequired,
   isLoggedIn: PropTypes.bool.isRequired,
   userName: PropTypes.string.isRequired,
   userPage: PropTypes.string.isRequired,
 };
 
-// NOTE: eventKey prop was not working if NavItem | NavDropdown was nested into
+// NOTE: eventKey prop was not working if MenuItems? were nested into
 // some other component or even Fragment. Array is used to render MenuItems
 
-const TopBarNav = ({ isLoggedIn, userPage, userName }) => {
+const TopBarNav = ({ isLoggedIn, isAuthenticating, userPage, userName }) => {
   const navDropdown = (
     <NavDropdown
       eventKey={1}
-      id="topbar-nav-dropdown"
-      title={userName ? `Signed in as: ${userName}` : 'Signed in'}
+      id="topbarnav-dropdown"
+      title={userName || 'Signed in'}
     >
       {userPage && [ // see NOTE above
         <MenuItem
@@ -40,19 +43,34 @@ const TopBarNav = ({ isLoggedIn, userPage, userName }) => {
     </NavDropdown>
   );
 
-  const signInNavItem = (
+  const authLoader = (
+    <Fragment>
+      <MaterialDesignSpinner
+        size={AUTH_SPINNER_SIZE}
+        singleColor={AUTH_SPINNER_COLOR}
+      />
+      {' '}
+      <span className="topbarnav__authenticating">
+        {'Authenticating'}
+      </span>
+    </Fragment>
+  );
+
+  const singleNavItem = (
     <NavItem
-      className="topbar__sign-in"
+      className="topbarnav__single"
       eventKey={2}
       href="#"
     >
-      {/* TODO: prevent repeated requests, show redirection modal */}
-      {'Sign in'}
+      {isAuthenticating
+        ? authLoader
+        : 'Sign in'
+      }
     </NavItem>
   );
 
   return (
-    <Nav className="topbar__nav" pullRight>
+    <Nav className="topbarnav" pullRight>
       <NavItemLink
         to="/"
         eventKey={3}
@@ -67,7 +85,7 @@ const TopBarNav = ({ isLoggedIn, userPage, userName }) => {
       </NavItemLink>
       {isLoggedIn
         ? navDropdown
-        : signInNavItem
+        : singleNavItem
       }
     </Nav>
   );

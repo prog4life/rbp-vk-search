@@ -1,5 +1,4 @@
 import openAPI from 'utils/openAPI';
-
 import {
   LOGIN,
   LOGIN_CANCEL,
@@ -11,18 +10,19 @@ import {
   OFFER_AUTH,
   // NO_VALID_TOKEN,
 } from 'constants/actionTypes';
+import { isAuthenticatingSelector } from 'selectors';
 
 // TODO: terminate search on sign out
 export const login = () => (dispatch, getState) => {
-  // const isAuthenticating = isAuthenticatingSelector(getState());
+  const isAuthenticating = isAuthenticatingSelector(getState());
 
   const delay = ms => piped => new Promise((resolve) => {
     setTimeout(() => resolve(piped), ms);
   });
 
-  // if (isAuthenticating) {
-  //   return Promise.reject();
-  // }
+  if (isAuthenticating) {
+    return Promise.reject();
+  }
   dispatch({ type: LOGIN });
   // should be invoked in response to user action to prevent auth popup block
   return openAPI.login().then(delay(3000)).then(

@@ -23,7 +23,6 @@ class AuthOfferModal extends React.Component {
     const { onConfirm } = this.props;
 
     onConfirm();
-
     this.setState({ isOpened: false });
   }
 
@@ -31,7 +30,6 @@ class AuthOfferModal extends React.Component {
     const { onReject } = this.props;
 
     onReject();
-
     this.setState({ isOpened: false });
   }
 
