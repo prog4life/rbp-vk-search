@@ -248,16 +248,22 @@ module.exports = {
       },
       {
         test: /\.(png|jpe?g|gif|svg)$/,
-        // TODO: consider to remove include
+        // TODO: consider to remove include or change to assets
         include: path.resolve(__dirname, 'src'),
         use: [
           // --------------------- FILE-LOADER --------------------------------
           {
             loader: 'file-loader',
             options: {
+              // name(file) {
+              //   // if (env === 'development') {
+              //   //   return '[path][name].[ext]';
+              //   // }
+              //   return '[hash].[ext]';
+              // },
               name: isProduction ? '[name].[hash:4].[ext]' : '[name].[ext]',
               // outputPath: 'assets/', // custom output path
-              useRelativePath: true, // isProd
+              // useRelativePath: true, // isProd
             },
           },
           // --------------------- IMAGE-WEBPACK-LOADER -----------------------
@@ -269,18 +275,20 @@ module.exports = {
           //     interlaced: false,
           //     pngquant: {
           //       quality: '65-90',
-          //       speed: 4
-          //     }
-          //   }
-          // }
+          //       speed: 4,
+          //     },
+          //   },
+          // },
         ],
       },
       // --------------------------- URL-LOADER -------------------------------
       {
-        test: /\.(png|jpe?g|gif|svg|eot|ttf|woff|woff2)$/,
+        // TEMP: png removed, due to problem with extra emitted png file
+        // caused by not working limit option
+        test: /\.(jpe?g|gif|svg|eot|ttf|woff|woff2)$/i,
         loader: 'url-loader',
         options: {
-          limit: 10000,
+          limit: 8192, // 10000
         },
       },
     ],

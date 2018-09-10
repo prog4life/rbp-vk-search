@@ -3,9 +3,12 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Navbar } from 'react-bootstrap';
 
+import topBarLogo from 'assets/topbar-logo.png';
 import './style.scss';
 
 import TopBarNav from './TopBarNav';
+
+console.log('PATH: ', topBarLogo);
 
 const propTypes = {
   onNavSelect: PropTypes.func.isRequired,
@@ -16,7 +19,8 @@ const TopBar = ({ onNavSelect, ...restProps }) => (
     <Navbar.Header>
       <Navbar.Brand>
         <Link to="/">
-          {'VK SEARCH'}
+          {/* {'VK SEARCH'} */}
+          <img src={topBarLogo} height={50} alt="topbar-logo" />
         </Link>
       </Navbar.Brand>
       <Navbar.Toggle />
