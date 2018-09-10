@@ -18,9 +18,8 @@ const TopBar = ({ onNavSelect, ...restProps }) => (
   <Navbar fixedTop onSelect={onNavSelect}>
     <Navbar.Header>
       <Navbar.Brand>
-        <Link to="/">
-          {/* {'VK SEARCH'} */}
-          <img src={topBarLogo} height={50} alt="topbar-logo" />
+        <Link className="topbar__logo-link" to="/">
+          <img className="topbar__logo" src={topBarLogo} alt="topbar-logo" />
         </Link>
       </Navbar.Brand>
       <Navbar.Toggle />

@@ -6,6 +6,15 @@
   // margin-right: 15px;
 }
 
+.topbar__logo-link {
+  padding: 0; // to remove bootstrap's .navbar-brand padding
+}
+
+.topbar__logo {
+  height: 50px; // equaly to bootstrap's .navbar min-height
+  padding: 5px 0;
+}
+
 .topbarnav__authenticating {
   padding-left: 5px;
 }
@@ -21,5 +30,12 @@
     .navbar-collapse .dropdown a {
     .navbar-collapse a {
     */
+  }
+}
+
+// modify bootstrap styles
+@media (min-width: 768px) {
+  .navbar > .container .navbar-brand {
+    margin-left: 0; // -15px - default value in bootstrap styles
   }
 }

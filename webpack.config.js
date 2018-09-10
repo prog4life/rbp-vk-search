@@ -255,13 +255,13 @@ module.exports = {
           {
             loader: 'file-loader',
             options: {
-              // name(file) {
-              //   // if (env === 'development') {
-              //   //   return '[path][name].[ext]';
-              //   // }
-              //   return '[hash].[ext]';
-              // },
-              name: isProduction ? '[name].[hash:4].[ext]' : '[name].[ext]',
+              name(file) {
+                if (env === 'development') {
+                  return '[path][name].[ext]';
+                }
+                return '[name].[hash:5].[ext]';
+              },
+              // name: isProduction ? '[name].[hash:4].[ext]' : '[name].[ext]',
               // outputPath: 'assets/', // custom output path
               // useRelativePath: true, // isProd
             },
