@@ -6,6 +6,7 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const DuplPkgCheckrPlugin = require('duplicate-package-checker-webpack-plugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
@@ -25,6 +26,8 @@ const isProduction = env === 'production';
 console.log('env: ', env);
 console.log('process.env.NODE_ENV: ', process.env.NODE_ENV);
 
+console.log('isTTY: ', process.stdout.isTTY);
+
 module.exports = {
   mode: env,
   entry: {
@@ -39,13 +42,15 @@ module.exports = {
     ],
   },
   output: {
-    filename: isProduction ? 'js/[name].[chunkhash:4].js' : '[name].[id].js',
-    chunkFilename: isProduction ? 'js/[name].[chunkhash:4].js' : '[name].js',
+    filename: isProduction ? 'js/[name].[chunkhash:7].js' : '[name].[id].js',
+    chunkFilename: isProduction ? 'js/[name].[chunkhash:7].js' : '[name].js',
     path: path.resolve(__dirname, 'build'),
     publicPath: '/',
   },
   // ========================== OPTIMIZATION ==================================
   optimization: {
+    // nodeEnv: 'production', // TODO: ???
+    // minimize: true, // TODO: ???
     minimizer: [ // setting this overrides webpack 4 defaults
       new UglifyJSPlugin({
         cache: true,
@@ -103,13 +108,22 @@ module.exports = {
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
-      filename: isProduction ? 'css/styles.[contenthash:4].css' : '[name].css',
-      chunkFilename: isProduction ? 'css/[name].[contenthash:4].css' : '[id].css',
+      filename: isProduction ? 'css/styles.[contenthash:7].css' : '[name].css',
+      chunkFilename: isProduction ? 'css/[name].[contenthash:7].css' : '[id].css',
     }),
     new CleanWebpackPlugin(
-      ['build'], // OR 'build' OR 'dist', removes folder
+      ['build'], // removes folder
       { exclude: ['index.html'] }, // TEMP
     ),
+    // new CopyWebpackPlugin([
+    //     {
+    //       from: 'src/*.css',
+    //       to: 'css/',
+    //       flatten: true, // default: false - to remove dir references
+    //     },
+    //   ],
+    //   { debug: 'info' }, // options
+    // ),
     new HTMLWebpackPlugin({
       title: 'vk-search with reactbootstrap',
       favicon: path.resolve(__dirname, 'src/assets/favicon.png'),
@@ -130,7 +144,7 @@ module.exports = {
     // }),
     new BundleAnalyzerPlugin({
       analyzerMode: 'static',
-      // reportFilename: '../temp', // relative to output.path
+      reportFilename: '../temp/report.html', // relative to output.path
       openAnalyzer: false,
     }),
     new CircularDependencyPlugin({
@@ -163,7 +177,7 @@ module.exports = {
   },
   // ============================ MODULE (lOADERS) ============================
   module: {
-    rules: [
+    rules: [ // TODO: "rules" --> "loaders"
       // -------------------- JS/JSX BABEL-LOADER -----------------------------
       {
         test: /\.(js|jsx)$/,
@@ -171,59 +185,59 @@ module.exports = {
         include: [path.resolve(__dirname, 'src')],
         exclude: [path.resolve(__dirname, 'node_modules')],
         options: {
-          // babelrc: false, // default: true
+          babelrc: false, // default: true
           cacheDirectory: true,
           // ------------------------ BABEL PLUGINS ---------------------------
-          // plugins: [
-          //   'react-hot-loader/babel', // consider replacing if not in dev mode
-          //   // 'fast-async',
-          //   'syntax-dynamic-import',
-          //   'transform-class-properties',
-          //   // 'transform-flow-strip-types',
-          //   [BabelPluginTransformImports, { // TODO: try "transform-imports"
-          //     'react-bootstrap': {
-          //       transform(importName) {
-          //         return `react-bootstrap/lib/${importName}`;
-          //       },
-          //       preventFullImport: true,
-          //     },
-          //     'redux-form': {
-          //       transform(importName) {
-          //         return `redux-form/es/${importName}`;
-          //       },
-          //       preventFullImport: true,
-          //     },
-          //   }],
-          // // TODO: replace next concat by .filter(Boolean)
-          // ].concat(isProduction ? [] : ['transform-react-jsx-source']),
+          plugins: [
+            'react-hot-loader/babel', // consider replacing if not in dev mode
+            // 'fast-async',
+            'syntax-dynamic-import',
+            'transform-class-properties',
+            // 'transform-flow-strip-types',
+            [BabelPluginTransformImports, {
+              'react-bootstrap': {
+                transform(importName) {
+                  return `react-bootstrap/lib/${importName}`;
+                },
+                preventFullImport: true,
+              },
+              'redux-form': {
+                transform(importName) {
+                  return `redux-form/es/${importName}`;
+                },
+                preventFullImport: true,
+              },
+            }],
+          // TODO: replace next concat by .filter(Boolean)
+          ].concat(isProduction ? [] : ['transform-react-jsx-source']),
           // // ------------------------ BABEL PRESETS ---------------------------
-          // presets: [
-          //   ['env', {
-          //     // need to be turned on for Jest testing
-          //     // modules: env === 'development' ? false : 'commonjs',
-          //     modules: false,
-          //     useBuiltIns: 'usage', // 'entry' OR false
-          //     debug: true,
-          //     targets: {
-          //       // external config in package.json or .browserslistrc will
-          //       // be supported in 7.0
-          //       browsers: [
-          //         "defaults", // > 0.5%, last 2 versions, Firefox ESR, not dead
-          //         // "not Firefox ESR", // requires few polyfills
-          //         "not ie <= 11",
-          //         "not android <= 62",
-          //         // "not chrome <= 49",
-          //       ],
-          //     },
-          //     exclude: [
-          //       // 'transform-regenerator',
-          //       // 'transform-async-to-generator',
-          //     ],
-          //   }],
-          //   // 'flow',
-          //   'react',
-          //   'stage-3',
-          // ],
+          presets: [
+            ['env', {
+              // ES modules must be transformed for Jest testing
+              // modules: env === 'development' ? false : 'commonjs',
+              modules: false, // TODO: try ES modules in IE
+              useBuiltIns: 'usage', // 'entry' OR false
+              debug: true,
+              targets: {
+                // external config in package.json or .browserslistrc will
+                // be supported in 7.0
+                browsers: [
+                  'defaults', // > 0.5%, last 2 versions, Firefox ESR, not dead
+                  // "not Firefox ESR", // requires few polyfills
+                  `not ie ${isProduction ? '<' : '<='} 11`,
+                  `not android <= ${isProduction ? '62' : '66'}`,
+                  // "not chrome <= 49",
+                ],
+              },
+              exclude: [
+                // 'transform-regenerator',
+                // 'transform-async-to-generator',
+              ],
+            }],
+            // 'flow',
+            'react',
+            'stage-3',
+          ],
         },
       },
       // --------------------- CSS/SCSS LOADERS -------------------------------
@@ -259,9 +273,9 @@ module.exports = {
                 if (env === 'development') {
                   return '[path][name].[ext]';
                 }
-                return '[name].[hash:5].[ext]';
+                return '[name].[hash:7].[ext]';
               },
-              // name: isProduction ? '[name].[hash:4].[ext]' : '[name].[ext]',
+              // name: isProduction ? '[name].[hash:7].[ext]' : '[name].[ext]',
               // outputPath: 'assets/', // custom output path
               // useRelativePath: true, // isProd
             },
@@ -281,10 +295,31 @@ module.exports = {
           // },
         ],
       },
+      // ----------------- svg-url-loader : need to try -----------------------
       // --------------------------- URL-LOADER -------------------------------
       {
         // TEMP: png removed, due to problem with extra emitted png file
-        // caused by not working limit option
+        // caused by not working limit option -
+        // looks like it is normal behavior:
+        // Without configuration, it takes a passed file, puts it next to the
+        // compiled bundle and returns an url of that file. However, if we
+        // specify the limit option, it will encode files smaller than this
+        // limit as a Base64 data url and return this url. This inlines the
+        // image into the JavaScript code and saves an HTTP request
+        // index.js
+        // ------------------------------------
+        // import imageUrl from './image.png';
+        // → If image.png is smaller than 10 kB, `imageUrl` will include
+        // the encoded image: 'data:image/png;base64,iVBORw0KGg…'
+        // → If image.png is larger than 10 kB, the loader will create a new file,
+        // and `imageUrl` will include its url: `/2fcd56a1920be.png`
+        // ------------------------------------
+        // Note: Inlined images reduce the number of separate requests, which
+        // is good (even with HTTP/2), but increase the download/parse time of
+        // your bundle and memory consumption. Make sure to not embed large
+        // images or a lot of them – or increased bundle time would outweigh
+        // the benefit of inlining
+        // More: https://developers.google.com/web/fundamentals/performance/webpack/decrease-frontend-size
         test: /\.(jpe?g|gif|svg|eot|ttf|woff|woff2)$/i,
         loader: 'url-loader',
         options: {
@@ -301,6 +336,18 @@ module.exports = {
     historyApiFallback: true,
     hot: true,
     port: 7031, // 9000, default: 8080
+    // stats: {
+    //   assets: false,
+    //   children: false,
+    //   chunks: false,
+    //   chunkModules: false,
+    //   colors: true,
+    //   entrypoints: false,
+    //   hash: false,
+    //   modules: false,
+    //   timings: false,
+    //   version: false,
+    // },
   },
   devtool: 'source-map',
   // devtool: isProduction ? 'source-map' : 'eval-source-map',

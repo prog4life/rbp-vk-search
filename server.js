@@ -17,13 +17,13 @@ const app = express();
 const port = process.env.PORT || '7031';
 // const hostname = process.env.IP || 'localhost';
 
-const publicPath = path.join(__dirname, 'build');
+const buildPath = path.join(__dirname, 'build');
 
 // const compiler = webpack(config);
 // app.use(webpackHotMiddleware(compiler));
 // app.use(webpackDevMiddleware(compiler, {
 //   noInfo: true,
-//   publicPath: config.output.publicPath,
+//   buildPath: config.output.buildPath,
 //   stats: {
 //     colors: true
 //   }
@@ -31,7 +31,7 @@ const publicPath = path.join(__dirname, 'build');
 
 // remotedev({ hostname: 'localhost', port: 8000 }); // NOTE: not able to start
 
-app.use(express.static(publicPath));
+app.use(express.static(buildPath));
 
 // TODO: remove after favicon will be added
 app.get('/favicon.ico', (req, res) => {
@@ -40,7 +40,7 @@ app.get('/favicon.ico', (req, res) => {
 });
 
 app.get('*', (req, res, next) => {
-  res.sendFile(path.join(publicPath, 'index.html'));
+  res.sendFile(path.join(buildPath, 'index.html'));
 });
 
 app.set('port', port);
