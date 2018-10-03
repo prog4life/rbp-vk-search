@@ -1,8 +1,10 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { NavDropdown, MenuItem, Nav, NavItem } from 'react-bootstrap';
-import MaterialDesignSpinner from 'react-md-spinner';
-import { AUTH_SPINNER_SIZE, AUTH_SPINNER_COLOR } from 'constants/ui';
+// import MaterialDesignSpinner from 'react-md-spinner';
+// import { AUTH_SPINNER_SIZE, AUTH_SPINNER_COLOR } from 'constants/ui';
+import Loader from 'react-loader';
+import { Spinner } from 'components/SpinnerButton';
 
 // import './style.scss';
 
@@ -45,11 +47,12 @@ const TopBarNav = ({ isLoggedIn, isAuthenticating, userPage, userName }) => {
 
   const authLoader = (
     <Fragment>
-      <MaterialDesignSpinner
+      {/* <MaterialDesignSpinner
         size={AUTH_SPINNER_SIZE}
         singleColor={AUTH_SPINNER_COLOR}
       />
-      {' '}
+      {' '} */}
+      <Spinner spinColor="#000" spinAlignment="left" />
       <span className="topbarnav__authenticating">
         {'Authenticating'}
       </span>
@@ -62,7 +65,8 @@ const TopBarNav = ({ isLoggedIn, isAuthenticating, userPage, userName }) => {
       eventKey={2}
       href="#"
     >
-      {isAuthenticating
+      <Loader loaded={!isAuthenticating} />
+      {!isAuthenticating // TEMP: changed to !
         ? authLoader
         : 'Sign in'
       }

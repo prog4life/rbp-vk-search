@@ -16,9 +16,7 @@
     "node": true,
     "es6": true,
     "worker": true,
-    "jquery": true,
     "commonjs": true,
-    "mocha": true,
     "jest": true,
     "serviceworker": true
   },
@@ -42,7 +40,7 @@
     "import/no-extraneous-dependencies": ["error", {
       "devDependencies": true,
       "optionalDependencies": false,
-      "peerDependencies": false
+      "peerDependencies": true
     }],
     "linebreak-style": ["warn", "windows"],
     "no-prototype-builtins": 0,
@@ -52,10 +50,11 @@
     }],
     "react/require-optimization": 0,
     "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx"] }],
-    "react/jsx-max-depth": [0, { "max": 2 }],
+    "react/jsx-max-depth": ["warn", { "max": 4 }],
     "react/jsx-no-literals": ["warn", { "noStrings": false }],
     "react/jsx-sort-props": ["warn", { "noSortAlphabetically": true }],
     "react/no-set-state": 0,
+    "strict": 0,
     "jsx-a11y/anchor-is-valid": [ "error", {
       "components": [ "Link" ],
       "specialLink": [ "to" ]

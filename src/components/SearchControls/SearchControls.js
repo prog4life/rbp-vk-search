@@ -4,7 +4,7 @@ import { ProgressBar, ButtonToolbar, Button } from 'react-bootstrap';
 
 import './style.scss';
 
-// import SearchControlButtons from './SearchControlButtons';
+import SearchControlButtons from './SearchControlButtons';
 import ProgressViewer from './ProgressViewer';
 import SearchStatus from './SearchStatus';
 
@@ -20,6 +20,7 @@ class SearchControls extends Component {
 
     terminateSearch();
   }
+
   render() {
     const {
       isSearchActive,
@@ -34,47 +35,51 @@ class SearchControls extends Component {
       // TODO: replace Fragment by container div with margin-bottom equal to
       // FormGroup margin-bottom ?
       <div className="search-controls">
-        {/* <SearchControlButtons
+        <SearchControlButtons
           isSearchActive={isSearchActive}
-          onStopClick={terminateSearch}
-        /> */}
+          onStopClick={this.handleStopClick}
+        />
         {/* TODO: add RESET button for completed state ? */}
-        <ButtonToolbar className="search-controls__button-toolbar">
+        {/* <ButtonToolbar className="search-controls__button-toolbar">
           {isSearchActive
-            ?
+            ? (
               <Button
                 onClick={this.handleStopClick}
                 type="button"
               >
                 {'Stop Search'}
               </Button>
-            :
+            )
+            : (
               <Button
                 bsStyle="info"
                 type="submit"
               >
                 {'Start Search'}
               </Button>
+            )
           }
-        </ButtonToolbar>
-        {(isSearchActive || isSearchCompleted) &&
-          // TODO: rename to StatusViewer
-          <ProgressViewer className="search-controls__progress-viewer">
-            {/* TODO: or ProgressTextInfo/ProgressMessage */}
-            <SearchStatus
-              isActive={isSearchActive}
-              isCompleted={isSearchCompleted}
-              processed={processed}
-              total={total}
-              name={itemsName}
-            />
-            <ProgressBar
-              bsStyle="info"
-              className="search-controls__progress-bar"
-              label={Number.isFinite(progress) ? `${progress}%` : ''}
-              now={Number.isFinite(progress) ? progress : undefined}
-            />
-          </ProgressViewer>
+        </ButtonToolbar> */}
+        {(isSearchActive || isSearchCompleted)
+          && (
+            // TODO: rename to StatusViewer
+            <ProgressViewer className="search-controls__progress-viewer">
+              {/* TODO: or ProgressTextInfo/ProgressMessage */}
+              <SearchStatus
+                isActive={isSearchActive}
+                isCompleted={isSearchCompleted}
+                processed={processed}
+                total={total}
+                name={itemsName}
+              />
+              <ProgressBar
+                bsStyle="info"
+                className="search-controls__progress-bar"
+                label={Number.isFinite(progress) ? `${progress}%` : ''}
+                now={Number.isFinite(progress) ? progress : undefined}
+              />
+            </ProgressViewer>
+          )
         }
       </div>
     );

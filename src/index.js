@@ -1,5 +1,5 @@
-import initPromise from 'config/openAPI';
 import 'config/polyfills'; // NOTE: import fetch and babel-polyfill separately ?
+import initPromise from 'config/openAPI';
 import React from 'react';
 import ReactDOM from 'react-dom';
 

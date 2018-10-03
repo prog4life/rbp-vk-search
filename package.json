@@ -33,7 +33,6 @@
     "prop-types": "^15.6.2",
     "react": "^16.5.2",
     "react-bootstrap": "^0.32.4",
-    "react-bootstrap-button-loader": "^1.0.12",
     "react-dom": "^16.5.2",
     "react-loader": "^2.4.5",
     "react-md-spinner": "^0.3.0",
