@@ -209,6 +209,8 @@ module.exports = {
               },
             }],
           // TODO: replace next concat by .filter(Boolean)
+          // @babel/plugin-transform-react-jsx-self and next one are included
+          // to react preset with "development" option
           ].concat(isProduction ? [] : ['transform-react-jsx-source']),
           // // ------------------------ BABEL PRESETS ---------------------------
           presets: [
@@ -234,7 +236,7 @@ module.exports = {
                 // 'transform-async-to-generator',
               ],
             }],
-            // 'flow',
+            // 'flow', // looks like it is included in react preset in babel 6
             'react',
             'stage-3',
           ],

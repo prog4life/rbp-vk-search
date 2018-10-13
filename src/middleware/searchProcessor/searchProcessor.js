@@ -108,6 +108,8 @@ const searchProcessor = ({ dispatch, getState }) => {
 
       // console.time('::: CALL API :::');
 
+      // TODO: Promise.prototype.finally(onFinally), onFulfilled, onRejected
+
       const promise = openAPI.call(method, { ...requestParams, offset })
         .then(
           onSuccess({ next, getState, offset }),
