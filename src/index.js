@@ -8,7 +8,7 @@ import 'bootstrap/dist/css/bootstrap-theme.min.css';
 
 import configureStore from 'store/configureStore';
 
-import App from 'components/App';
+import App from './App';
 
 import 'styles/main.scss';
 

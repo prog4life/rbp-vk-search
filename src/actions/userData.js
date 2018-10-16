@@ -1,5 +1,5 @@
 import jsonp from 'utils/jsonpPromise';
-import { getAccessToken } from 'selectors';
+// import { getAccessToken } from 'selectors';
 
 export const fetchUserDataRequest = () => ({ type: 'FETCH_USER_DATA_REQUEST' });
 export const fetchUserDataSuccess = userData => ({

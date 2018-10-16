@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Button from 'react-bootstrap/lib/Button';
-import Spinner from './Spinner';
+import Spinner from 'components/common/Spinner';
 
 const propTypes = {
   bsStyle: PropTypes.string,
@@ -50,7 +50,5 @@ function SpinnerButton({
 
 SpinnerButton.propTypes = propTypes;
 SpinnerButton.defaultProps = defaultProps;
-
-export { SpinnerButton, Spinner };
 
 export default SpinnerButton;

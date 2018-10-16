@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { reduxForm, Field } from 'redux-form';
 import { Grid, Row, Col } from 'react-bootstrap';
 
-import ControlsContainer from 'containers/ControlsContainer';
+import SearchControlsContainer from 'containers/SearchControlsContainer';
 import PostAuthorIdField from 'components/common/PostAuthorIdField';
 import WallOwnerIdField from 'components/common/WallOwnerIdField';
 import OwnerCustomIdField from 'components/common/OwnerCustomIdField';
@@ -35,6 +35,7 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
     };
     this.renderCount = 0;
   }
+
   componentWillReceiveProps(nextProps) {
     const { isSearchActive: currentIsActive } = this.props;
     const nextIsActive = nextProps.isSearchActive;
@@ -47,6 +48,7 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
       });
     }
   }
+
   componentDidUpdate() {
     const { isSubmitted, isCustomIdUsed, ...rest } = this.state;
     const { onStartSearch } = this.props;
@@ -58,6 +60,7 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
     //   onStartSearch(rest);
     // }
   }
+
   handleSubmit(values) {
     // event.preventDefault();
     const { isSearchActive, onStartSearch } = this.props;
@@ -88,6 +91,7 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
       resultsLimit: Number(values.resultsLimit) || null,
     });
   }
+
   handleIdTypeSwitch(event) {
     const { target } = event;
 
@@ -97,6 +101,7 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
       });
     }
   }
+
   handleSearchTypeSwitch(event) {
     if (event.target.type === 'radio' && event.target.name === 'searchType') {
       this.setState({
@@ -104,6 +109,7 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
       });
     }
   }
+
   render() {
     const { isSearchActive, handleSubmit } = this.props;
     const { isCustomIdUsed, searchType } = this.state;
@@ -164,12 +170,12 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
               />
             </Col>
             {/* <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4} >
-              <ControlsContainer itemsName="posts" />
+              <SearchControlsContainer itemsName="posts" />
             </Col> */}
           </Row>
           <Row>
-            <Col xsOffset={1} smOffset={0} xs={10} >
-              <ControlsContainer itemsName="posts" />
+            <Col xsOffset={1} smOffset={0} xs={10}>
+              <SearchControlsContainer itemsName="posts" />
             </Col>
           </Row>
         </form>

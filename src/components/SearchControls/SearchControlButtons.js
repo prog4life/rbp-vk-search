@@ -1,28 +1,10 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { ButtonToolbar, Button } from 'react-bootstrap';
-import SpinnerButton from 'components/SpinnerButton';
+import SpinnerButton from 'components/common/SpinnerButton';
 
 const SearchControlButtons = ({ isSearchActive, onStopClick }) => {
   const startButton = (
-    <Fragment>
-      <Button
-        onClick={onStopClick}
-        type="button"
-      >
-        {'Stop Search'}
-      </Button>
-      <SpinnerButton
-        loading={!isSearchActive}
-        disabled={false}
-        bsStyle="default"
-        spinColor="#000"
-      >
-        {'Stop Search'}
-      </SpinnerButton>
-    </Fragment>
-  );
-  const stopButton = (
     <Button
       bsStyle="info"
       type="submit"
@@ -30,13 +12,25 @@ const SearchControlButtons = ({ isSearchActive, onStopClick }) => {
       {'Start Search'}
     </Button>
   );
+  const stopButton = (
+    <SpinnerButton
+      loading={!isSearchActive}
+      disabled={false}
+      bsStyle="default"
+      spinColor="#000"
+      onClick={onStopClick}
+      type="button"
+    >
+      {'Stop Search'}
+    </SpinnerButton>
+  );
 
   return (
     <ButtonToolbar className="search-controls__button-toolbar">
-      {/* TEMP changed to ! */}
+      {/* TEMP add ! to test button with loader */}
       {!isSearchActive
-        ? startButton
-        : stopButton
+        ? stopButton
+        : startButton
       }
     </ButtonToolbar>
     // <ButtonToolbar className="search-controls__button-toolbar">

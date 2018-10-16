@@ -1,10 +1,8 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { NavDropdown, MenuItem, Nav, NavItem } from 'react-bootstrap';
-// import MaterialDesignSpinner from 'react-md-spinner';
-// import { AUTH_SPINNER_SIZE, AUTH_SPINNER_COLOR } from 'constants/ui';
 import Loader from 'react-loader';
-import { Spinner } from 'components/SpinnerButton';
+import Spinner from 'components/common/Spinner';
 
 // import './style.scss';
 
@@ -27,7 +25,7 @@ const TopBarNav = ({ isLoggedIn, isAuthenticating, userPage, userName }) => {
       id="topbarnav-dropdown"
       title={userName || 'Signed in'}
     >
-      {userPage && [ // see NOTE above
+      {userPage && [ // see NOTE above, TODO: try without array
         <MenuItem
           key="1.1.0"
           eventKey={1.1}
@@ -47,14 +45,9 @@ const TopBarNav = ({ isLoggedIn, isAuthenticating, userPage, userName }) => {
 
   const authLoader = (
     <Fragment>
-      {/* <MaterialDesignSpinner
-        size={AUTH_SPINNER_SIZE}
-        singleColor={AUTH_SPINNER_COLOR}
-      />
-      {' '} */}
       <Spinner spinColor="#000" spinAlignment="left" />
-      <span className="topbarnav__authenticating">
-        {'Authenticating'}
+      <span className="topbarnav__authentication">
+        {'Authentication'}
       </span>
     </Fragment>
   );
