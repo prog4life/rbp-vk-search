@@ -6,7 +6,6 @@ import {
   getSearchTotal, getSearchOffset, getSearchErrorCode,
   getRequestsByOffset, getFailedList, getPendingList,
 } from 'selectors';
-import shortId from 'shortid';
 // import fetchJSONP from 'utils/fetchJSONP';
 import openAPI from 'utils/openAPI';
 import { onSuccess, onFail } from './requestHandlers';

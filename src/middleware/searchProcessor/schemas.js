@@ -2,7 +2,8 @@ import { schema } from 'normalizr';
 
 export const post = new schema.Entity('posts');
 export const user = new schema.Entity('users');
-export const arrayOfPosts = new schema.Array(post); // with shorthand:
+export const arrayOfPosts = new schema.Array(post);
+// shorthand of the same:
 export const arrayOfUsers = [user];
 
 const WALL_POSTS = 'wall-posts';
