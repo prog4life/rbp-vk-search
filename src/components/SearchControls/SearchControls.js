@@ -1,19 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { ProgressBar, ButtonToolbar, Button } from 'react-bootstrap';
+import { ProgressBar, Row, Col } from 'react-bootstrap';
 
 import './style.scss';
 
 import SearchControlButtons from './SearchControlButtons';
-import ProgressViewer from './ProgressViewer';
 import SearchStatus from './SearchStatus';
 
 class SearchControls extends Component {
-  // componentWillUnmount() {
-  //   const { terminateSearch } = this.props;
-
-  //   terminateSearch();
-  // }
   handleStopClick = (e) => {
     e.preventDefault();
     const { terminateSearch } = this.props;
@@ -32,77 +26,42 @@ class SearchControls extends Component {
     } = this.props;
 
     return (
-      // TODO: replace Fragment by container div with margin-bottom equal to
-      // FormGroup margin-bottom ?
       <div className="search-controls">
-        <SearchControlButtons
-          isSearchActive={isSearchActive}
-          onStopClick={this.handleStopClick}
-        />
-        {/* TODO: add RESET button for completed state ? */}
-        {/* <ButtonToolbar className="search-controls__button-toolbar">
-          {isSearchActive
-            ? (
-              <Button
-                onClick={this.handleStopClick}
-                type="button"
-              >
-                {'Stop Search'}
-              </Button>
-            )
-            : (
-              <Button
-                bsStyle="info"
-                type="submit"
-              >
-                {'Start Search'}
-              </Button>
-            )
-          }
-        </ButtonToolbar> */}
-        {(isSearchActive || isSearchCompleted)
-          && (
-            // TODO: rename to StatusViewer
-            <ProgressViewer className="search-controls__progress-viewer">
-              {/* TODO: or ProgressTextInfo/ProgressMessage */}
-              <SearchStatus
-                isActive={isSearchActive}
-                isCompleted={isSearchCompleted}
-                processed={processed}
-                total={total}
-                name={itemsName}
-              />
-              <ProgressBar
-                bsStyle="info"
-                className="search-controls__progress-bar"
-                label={Number.isFinite(progress) ? `${progress}%` : ''}
-                now={Number.isFinite(progress) ? progress : undefined}
-              />
-            </ProgressViewer>
-          )
-        }
+        <Row>
+          <Col xs={12} sm={6} md={6} lg={4}>
+            {(isSearchActive || isSearchCompleted)
+              && (
+                <div className="search-controls__progress-viewer">
+                  <SearchStatus
+                    isActive={isSearchActive}
+                    isCompleted={isSearchCompleted}
+                    processed={processed}
+                    total={total}
+                    name={itemsName}
+                  />
+                  <ProgressBar
+                    bsStyle="info"
+                    className="search-controls__progress-bar"
+                    label={Number.isFinite(progress) ? `${progress}%` : ''}
+                    now={Number.isFinite(progress) ? progress : undefined}
+                  />
+                </div>
+              )
+            }
+          </Col>
+          <Col xs={12} sm={6} md={6} lg={8}>
+            <SearchControlButtons
+              isSearchActive={isSearchActive}
+              onStopClick={this.handleStopClick}
+            />
+          </Col>
+          {/* TODO: add RESET button for completed state ? and think over
+            search terminating before unmount */}
+        </Row>
       </div>
     );
   }
 }
-
-// const preProgViewer = (
-//   <div className="progress-viewer">
-//     {/* TODO: extract component ProgressTextInfo, change className to __progress-text */}
-//     <p className="search-status">
-//       {processed && total
-//         ? `Processed ${processed} of ${total} ${itemsName}`
-//         : 'Search in progress'
-//       }
-//     </p>
-//     <ProgressBar
-//       bsStyle="info"
-//       className="search-controls__progress-bar"
-//       label={Number.isFinite(progress) ? `${progress}%` : ''}
-//       now={progress || undefined}
-//     />
-//   </div>
-// );
 
 SearchControls.propTypes = {
   isSearchActive: PropTypes.bool.isRequired,

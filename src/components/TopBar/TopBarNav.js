@@ -1,10 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { NavDropdown, MenuItem, Nav, NavItem } from 'react-bootstrap';
-import Loader from 'react-loader';
 import Spinner from 'components/common/Spinner';
-
-// import './style.scss';
 
 import NavItemLink from './NavItemLink';
 
@@ -43,7 +40,7 @@ const TopBarNav = ({ isLoggedIn, isAuthenticating, userPage, userName }) => {
     </NavDropdown>
   );
 
-  const authLoader = (
+  const authLoaderAndText = (
     <Fragment>
       <Spinner spinColor="#000" spinAlignment="left" />
       <span className="topbarnav__authentication">
@@ -58,9 +55,8 @@ const TopBarNav = ({ isLoggedIn, isAuthenticating, userPage, userName }) => {
       eventKey={2}
       href="#"
     >
-      <Loader loaded={!isAuthenticating} />
-      {!isAuthenticating // TEMP: changed to !
-        ? authLoader
+      {isAuthenticating
+        ? authLoaderAndText
         : 'Sign in'
       }
     </NavItem>

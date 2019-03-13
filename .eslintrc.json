@@ -50,6 +50,7 @@
     }],
     "react/require-optimization": 0,
     "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx"] }],
+    "react/jsx-fragments": ["off", "syntax"],
     "react/jsx-max-depth": ["warn", { "max": 4 }],
     "react/jsx-no-literals": ["warn", { "noStrings": false }],
     "react/jsx-sort-props": ["warn", { "noSortAlphabetically": true }],
@@ -70,6 +71,9 @@
           }
         }
       }
+    },
+    "react": {
+      "version": "detect"
     },
     "polyfills": ["fetch", "promises"]
   }

@@ -221,8 +221,8 @@ module.exports = {
               useBuiltIns: 'usage', // 'entry' OR false
               debug: true,
               targets: {
-                // external config in package.json or .browserslistrc will
-                // be supported in 7.0
+                // external config in package.json or .browserslistrc is
+                // supported in 7 verion
                 browsers: [
                   'defaults', // > 0.5%, last 2 versions, Firefox ESR, not dead
                   // "not Firefox ESR", // requires few polyfills

@@ -8,8 +8,6 @@ import './style.scss';
 
 import TopBarNav from './TopBarNav';
 
-console.log('PATH: ', topBarLogo);
-
 const propTypes = {
   onNavSelect: PropTypes.func.isRequired,
 };

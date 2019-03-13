@@ -38,10 +38,8 @@ const authReducer = (state = defaultState, action) => {
       return { ...state, isLoggedIn: false, isAuthenticating: false };
     case LOGIN_CANCEL:
       return { ...state, isLoggedIn: false, isAuthenticating: false };
-    case LOGOUT: // is returning of defaultState correct?
+    case LOGOUT: // or return defaultState?
       return { ...state, isLoggedIn: false, userName: '', userPageHref: '' };
-    // case SIGN_OUT: // is returning of defaultState correct?
-    //   return defaultState;
     // case OFFER_AUTH: // TODO: rename to AUTH_MISSING or NOT_AUTHENTICATED
     //   return {
     //     ...state,

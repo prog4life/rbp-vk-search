@@ -12,9 +12,9 @@ function FoundPostsList({ posts }) {
       <ListGroup>
         <ListGroupItem style={{ textAlign: 'center' }}>
           {
-            posts && posts.length === 0
-              ? 'Nothing found'
-              : 'No results yet' // posts === null
+            posts === null
+              ? 'No results yet'
+              : 'Nothing found'
           }
         </ListGroupItem>
       </ListGroup>

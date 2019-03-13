@@ -31,7 +31,6 @@ function Spinner({ spinColor, spinConfig, spinAlignment, ...rest }) {
     /* stylelint-disable */
     display: 'inline-block',
     float: `${spinAlignment} !important`,
-    // padding: '0 10px',
   };
 
   return (

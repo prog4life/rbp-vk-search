@@ -1,18 +1,23 @@
+$item-top-margin: 0.4em;
+$item-bottom-margin: 0.54em;
+
 .search-controls {
-  margin-top: 0.25em; // was 1.75em;
-  margin-bottom: 0.25em; // was 10px; equal to FormGroup margin-bottom ?
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
 }
 
 .search-controls__button-toolbar {
-  display: inline-block;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: $item-top-margin;
+  margin-bottom: $item-bottom-margin;
 }
 
 .search-controls__progress-viewer {
-  float: right;
-  min-width: 63%;
+  margin-top: $item-top-margin;
+  margin-bottom: $item-bottom-margin;
 }
 
-/* TODO: cut overflowing text if it is too long */
 .search-status {
   margin-bottom: 0;
   line-height: 1;
@@ -22,17 +27,10 @@
 
 .search-controls__progress-bar {
   margin-bottom: 0;
-}
 
-/* bootstrap class */
-.progress-bar {
-  color: #212121;
-
-  /* min-width: 2em; */
-}
-
-@media (max-width: 767px) {
-  .search-controls {
-    margin-top: 0.25em;
+  /* bootstrap class */
+  .progress-bar {
+    color: #212121;
   }
 }
+

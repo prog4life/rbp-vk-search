@@ -14,7 +14,7 @@ const SearchControlButtons = ({ isSearchActive, onStopClick }) => {
   );
   const stopButton = (
     <SpinnerButton
-      loading={!isSearchActive}
+      loading={isSearchActive}
       disabled={false}
       bsStyle="default"
       spinColor="#000"
@@ -27,26 +27,11 @@ const SearchControlButtons = ({ isSearchActive, onStopClick }) => {
 
   return (
     <ButtonToolbar className="search-controls__button-toolbar">
-      {/* TEMP add ! to test button with loader */}
-      {!isSearchActive
+      {isSearchActive
         ? stopButton
         : startButton
       }
     </ButtonToolbar>
-    // <ButtonToolbar className="search-controls__button-toolbar">
-    //   <Button
-    //     bsStyle="info"
-    //     disabled={isSearchActive}
-    //     type="submit"
-    //   >
-    //     {isSearchActive ? 'Searching...' : 'Start Search'}
-    //   </Button>
-    //   {isSearchActive &&
-    //     <Button onClick={onStopClick} type="button">
-    //       {'Stop Search'}
-    //     </Button>
-    //   }
-    // </ButtonToolbar>
   );
 };
 

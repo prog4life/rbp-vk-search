@@ -169,12 +169,9 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
                 isDisabled={isSearchActive}
               />
             </Col>
-            {/* <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4} >
-              <SearchControlsContainer itemsName="posts" />
-            </Col> */}
           </Row>
           <Row>
-            <Col xsOffset={1} smOffset={0} xs={10}>
+            <Col xsOffset={1} smOffset={0} xs={10} sm={12}>
               <SearchControlsContainer itemsName="posts" />
             </Col>
           </Row>
