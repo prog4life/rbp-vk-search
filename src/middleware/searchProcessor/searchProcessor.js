@@ -11,7 +11,10 @@ import openAPI from 'utils/openAPI';
 import { onSuccess, onFail } from './requestHandlers';
 import transformResponse from './transformResponse';
 import {
-  validateAction, validateOffsetModifier, validateOptions, validateParams
+  // validateAction,
+  // validateOffsetModifier,
+  validateOptions,
+  // validateParams,
 } from './validation';
 
 export const SEARCH_PARAMETERS = 'SEARCH::Parameters';
@@ -30,7 +33,7 @@ export const SEARCH_PARAMETERS = 'SEARCH::Parameters';
 //   return searchProcessor;
 // }
 
-const searchProcessor = ({ dispatch, getState }) => {
+const searchProcessor = ({ /* dispatch, */ getState }) => {
   let intervalId; // TODO: replace to top
   // const search = {
   //   isActive: false,

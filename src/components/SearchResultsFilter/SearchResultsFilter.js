@@ -14,6 +14,7 @@ class SearchResultsFilter extends React.Component {
     500,
     { leading: true, trailing: true },
   )
+
   handleFilterTextChange = (event) => {
     const inputValue = event.target.value;
 
@@ -22,11 +23,13 @@ class SearchResultsFilter extends React.Component {
     //   filterText: inputValue,
     // });
   }
+
   handleOrderChange = (event) => {
     const { setPostsSortOrder } = this.props;
 
     setPostsSortOrder(event.target.value);
   }
+
   render() {
     // const { sortOrder } = this.props;
     // const { filterText } = this.state;

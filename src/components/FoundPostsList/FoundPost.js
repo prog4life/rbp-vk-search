@@ -8,8 +8,8 @@ import './style.scss';
 
 function FoundPost({ post, number: resultNumber }) {
   const {
-    timestamp, authorId, authorName, id, text, link, photo50, photo100,
-    comments, likes, screenName, online, deactivated,
+    timestamp, authorId, authorName, id, text, link, photo50, // photo100,
+    comments, likes, screenName, // online, deactivated,
   } = post;
 
   // TODO: make all date and time formatting/computation in formatPosts or selectors
@@ -60,6 +60,7 @@ function FoundPost({ post, number: resultNumber }) {
           <a
             className="found-post__label-info"
             href={linkToUserPage}
+            rel="noopener noreferrer"
             target="_blank"
           >
             {authorName || authorIdLabel}
@@ -83,13 +84,13 @@ function FoundPost({ post, number: resultNumber }) {
         </div>
       </div>
       <div className="found-post__content">
-        {photo50 &&
+        {photo50 && (
           <div style={{ marginTop: '5px' }}>
-            <a href={linkToUserPage} target="_blank">
+            <a href={linkToUserPage} target="_blank" rel="noopener noreferrer">
               <img src={photo50} alt="user-avatar" />
             </a>
           </div>
-        }
+        )}
         <p style={{ flex: 9, padding: '0 8px' }}>
           {text}
         </p>
@@ -101,7 +102,7 @@ function FoundPost({ post, number: resultNumber }) {
           // paddingLeft: '8px',
         }}
         >
-          <a href={link} target="_blank">
+          <a href={link} target="_blank" rel="noopener noreferrer">
             {linkText}
           </a>
         </div>
@@ -113,11 +114,11 @@ function FoundPost({ post, number: resultNumber }) {
 FoundPost.propTypes = {
   number: PropTypes.number.isRequired,
   post: PropTypes.shape({
-    timestamp: PropTypes.number.isRequired,
     authorId: PropTypes.number.isRequired,
     id: PropTypes.number.isRequired,
-    text: PropTypes.string.isRequired,
     link: PropTypes.string.isRequired,
+    text: PropTypes.string.isRequired,
+    timestamp: PropTypes.number.isRequired,
   }).isRequired,
 };
 
