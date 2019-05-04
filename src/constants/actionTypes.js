@@ -26,7 +26,10 @@ export const LOGIN = 'LOGIN';
 export const LOGIN_CANCEL = 'LOGIN_CANCEL';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAIL = 'LOGIN_FAIL';
+
 export const LOGOUT = 'LOGOUT';
+export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS';
+export const LOGOUT_FAIL = 'LOGOUT_FAIL';
 
 export const SIGN_OUT = 'SIGN_OUT';
 export const NO_VALID_TOKEN = 'NO_VALID_TOKEN';

@@ -12,17 +12,26 @@ export const changeMssg = (error, newMessage) => {
 // TODO: change to more reusable form/create/extractError
 
 export const createError = (error) => {
-  const {
-    error_code: code = null,
-    error_msg: message = 'No error message',
-    request_params: params,
-  } = error;
-  const err = new Error(message);
+  let message = 'No error message';
+  let err = null;
 
-  err.code = code;
-  err.params = params ? JSON.stringify(params, null, 2) : null;
-
-  return err;
+  if (error && typeof error === 'object') {
+    // error_code, request_params, error_msg
+    const { error_msg: errorMsg, ...rest } = error;
+    try {
+      message = JSON.stringify(error, null, 2);
+    } catch (e) {
+      message = errorMsg || error.message || message;
+    }
+    err = new Error(message);
+    Object.keys(rest).forEach((key) => { err[key] = rest[key]; });
+  }
+  if (typeof error === 'string') {
+    message = error;
+  } else {
+    message = 'Incorrect error data was provided';
+  }
+  return err || new Error(message);
 };
 
 export const maybeThrowResponseError = (response) => {

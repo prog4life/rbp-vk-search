@@ -20,19 +20,17 @@ function callAPI(method, params) {
   });
 }
 
+// status:
+// 'connected',
+// 'not_authorized' - logged in but grants rejected,
+// 'unknown' - not authenticated
+
 function login(/* newSettings */) {
   return new Promise((resolve, reject) => {
     VK.Auth.login((response) => {
-      // status: 'connected', 'not_authorized' - logged in but grants rejected,
-      // 'unknown' - not authenticated
-      const { session, status, settings, error } = response;
+      const { session, status, settings } = response;
 
-      if (error) {
-        reject(createError(error));
-        return;
-      }
-
-      if (session) {
+      if (session && status === 'connected') {
         if (settings) {
           /* Выбранные настройки доступа пользователя, если они были запрошены */
           // resolve({ session, status, settings });
@@ -43,16 +41,40 @@ function login(/* newSettings */) {
         resolve(response);
       } else {
         /* Пользователь нажал кнопку Отмена в окне авторизации */
-        // resolve({ status });
-        resolve(response); // TODO: reject
+        reject(createError({ message: 'Login failed', ...response }));
       }
     } /* , newSettings: Integer */);
+  });
+}
+
+function logout() {
+  return new Promise((resolve, reject) => {
+    VK.Auth.logout((response) => {
+      const { session, status } = response;
+
+      if (!session || status === 'unknown') {
+        resolve(response);
+      } else {
+        reject(createError('Failed to logout'));
+      }
+    });
+  });
+}
+
+function onLogout() {
+  return new Promise((resolve) => {
+    VK.Observer.subscribe('auth.logout', (response) => {
+      // const { session, status } = response;
+      resolve(response);
+    });
   });
 }
 
 const openAPI = {
   call: callAPI,
   login,
+  logout,
+  onLogout,
 };
 
 export default openAPI;

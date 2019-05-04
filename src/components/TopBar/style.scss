@@ -24,8 +24,13 @@
   }
 }
 
-// modify bootstrap styles
 @media (min-width: 768px) {
+  #topbarnav-dropdown + ul {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  // modify bootstrap styles
   .navbar > .container .navbar-brand {
     margin-left: -5px; // -15px - default value in bootstrap styles
   }
