@@ -24,14 +24,13 @@ export const login = () => (dispatch, getState) => {
   dispatch({ type: LOGIN });
   // should be invoked in response to user action to prevent auth popup block
   return openAPI.login().then(delayedReturn(3000)).then(
-    (response) => {
-      if (response.status !== 'connected') {
-        return dispatch({ type: LOGIN_CANCEL, ...response });
-      }
-      return dispatch({ type: LOGIN_SUCCESS, ...response });
-    },
+    response => dispatch({ type: LOGIN_SUCCESS, ...response }),
     (error) => {
-      dispatch({ type: LOGIN_FAIL, error: error.message });
+      const { message, status } = error;
+      if (status) {
+        return dispatch({ type: LOGIN_CANCEL, status, error: message });
+      }
+      dispatch({ type: LOGIN_FAIL, error: message });
       return Promise.reject(error);
     },
   );

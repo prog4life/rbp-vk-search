@@ -35,7 +35,6 @@ const authReducer = (state = defaultState, action) => {
         userPageHref: user.href,
       };
     case LOGIN_FAIL:
-      return { ...state, isLoggedIn: false, isAuthenticating: false };
     case LOGIN_CANCEL:
       return { ...state, isLoggedIn: false, isAuthenticating: false };
     case LOGOUT: // or return defaultState?

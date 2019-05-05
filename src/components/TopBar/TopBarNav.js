@@ -30,7 +30,7 @@ const TopBarNav = ({ isLoggedIn, isAuthenticating, userPage, userName }) => {
           target="blank"
           title="Open your vk.com page in new tab"
         >
-          {'Your page'}
+          {'My page'}
         </MenuItem>,
         <MenuItem key="1.1.1" divider />,
       ]}
