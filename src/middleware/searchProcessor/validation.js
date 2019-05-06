@@ -23,6 +23,7 @@ export const validateOffsetModifier = (offMod) => {
   }
 };
 
+// NOTE: not used anymore as options will be not passed with action.meta further
 export const validateOptions = (meta) => {
   const { offsetModifier, requestInterval, maxAttempts } = meta;
 
@@ -55,9 +56,8 @@ export const validateParams = (params) => {
   }
   const { postAuthorId, postAuthorSex } = filters;
 
-  if (
-    (!Number.isInteger(postAuthorId) || postAuthorId < 1) &&
-    (postAuthorSex !== 1 && postAuthorSex !== 2)
+  if ((!Number.isInteger(postAuthorId) || postAuthorId < 1)
+    && (postAuthorSex !== 1 && postAuthorSex !== 2)
   ) {
     throw new Error(`Expected either postAuthorId (as positive integer number)
       or postAuthorSex (as 1 or 2) to be provided`);

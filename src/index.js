@@ -1,15 +1,17 @@
+import 'config/hotLoader';
 import 'config/polyfills'; // NOTE: import fetch and babel-polyfill separately ?
-import initPromise from 'config/openAPI';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap-theme.min.css';
 
+import initializeOpenAPI from 'config/initializeOpenAPI';
+
+import { OPEN_API_INITIALIZED } from 'constants/actionTypes';
 import configureStore from 'store/configureStore';
 
 import App from './App';
-
 import 'styles/main.scss';
 
 // import * as selectors from 'selectors'; // for reselect-tools
@@ -19,7 +21,9 @@ const reactPerfDevtool = env === 'development'
   ? require('react-perf-devtool')
   : null;
 
-if (env === 'development') {
+const enableMeasure = false;
+
+if (env === 'development' && enableMeasure) {
   const { registerObserver } = reactPerfDevtool;
 
   registerObserver({ // both options for logging to console with additional lib
@@ -29,15 +33,16 @@ if (env === 'development') {
   }, (measures) => {
     const componentsToCollect = [
       // 'Connect(FoundPostOptim)', 'FoundPost', 'FoundPostOptim',
-      'FoundPostsList', 'FoundPostsListOptim',
+      // 'FoundPostsList', 'FoundPostsListOptim',
     ];
     const result = !componentsToCollect.length
       ? measures
       : measures.filter(m => componentsToCollect.includes(m.componentName));
 
-    // console.log(result); // can log "measures" right to console
+    console.log(result); // can log "measures" right to console
   });
 }
+
 console.log('process.env.NODE_ENV: ', env);
 
 // TEMP
@@ -79,28 +84,20 @@ const preloadedState = { posts };
 
 const store = configureStore(preloadedState);
 
-initPromise.then(() => {
-  console.log('VK.init was called');
-  // VK.Auth.getLoginStatus((response) => {
-  //   console.info('VK.Auth.getLoginStatus RESPONSE: ', response);
-  //
-  //   if (response.session) {
-  //     console.log('User is authorized');
-  //   }
-  // });
-  store.dispatch({ type: 'OPEN_API_INITIALIZATION' });
+initializeOpenAPI().then(() => {
+  store.dispatch({ type: OPEN_API_INITIALIZED });
 });
 
-store.subscribe(() => console.log(
-  'State update ',
-  (new Date()).toLocaleTimeString('en-Gb'),
-));
+if (env === 'development') {
+  store.subscribe(() => console.log(
+    'State update ',
+    (new Date()).toLocaleTimeString('en-Gb'),
+  ));
 
-// if (env === 'development') {
-//   const { registerSelectors, getStateWith } = require('reselect-tools');
-//
-//   registerSelectors(selectors);
-//   getStateWith(() => store.getState());
-// }
+  //   const { registerSelectors, getStateWith } = require('reselect-tools');
+  //
+  //   registerSelectors(selectors);
+  //   getStateWith(() => store.getState());
+}
 
 ReactDOM.render(<App store={store} />, document.getElementById('app'));

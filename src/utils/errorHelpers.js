@@ -17,13 +17,20 @@ export const createError = (error) => {
 
   if (error && typeof error === 'object') {
     // error_code, request_params, error_msg
-    const { error_msg: errorMsg, ...rest } = error;
+    const {
+      error_code: code,
+      error_msg: errorMsg,
+      request_params: reqParams,
+      ...rest
+    } = error;
     try {
       message = JSON.stringify(error, null, 2);
     } catch (e) {
       message = errorMsg || error.message || message;
     }
     err = new Error(message);
+    err.code = code;
+    err.reqParams = reqParams;
     Object.keys(rest).forEach((key) => { err[key] = rest[key]; });
   }
   if (typeof error === 'string') {

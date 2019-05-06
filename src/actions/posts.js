@@ -3,7 +3,7 @@ import {
 } from 'constants/actionTypes';
 // import { WALL_POSTS_BY_SEX, WALL_POSTS_BY_AUTHOR_ID } from 'constants/searchModes';
 import { WALL_GET_BASE_URL } from 'constants/api';
-import { apiVersion, count, offsetModifier, requestInterval } from 'config/common';
+import { apiVersion, count } from 'config/common';
 import { validateActionCreator } from 'utils/validators';
 import { targets, SEARCH_PARAMETERS } from 'middleware/searchProcessor';
 import { getIdsOfPosts } from 'selectors';
@@ -69,12 +69,6 @@ export const startWallPostsSearch = (inputData) => { // pass accessToken here ?
       filters: { postAuthorId, postAuthorSex },
       resultsLimit,
     },
-    meta: {
-      // NOTE: next 3 is optional, defaults should be passed to middleware factory
-      offsetModifier, // must be equal to request url "count" param value !!!
-      requestInterval,
-      maxAttempts: 5,
-    },
   };
 };
 
@@ -110,11 +104,6 @@ export const startWallPostsSearch2 = (inputData) => { // pass accessToken here ?
       target: targets.WALL_POSTS,
       filters: { postAuthorId, postAuthorSex },
       resultsLimit,
-    },
-    meta: {
-      offsetModifier, // must be equal to request url "count" param value !!!
-      requestInterval,
-      maxAttempts: 5,
     },
   };
 };

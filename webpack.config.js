@@ -6,7 +6,7 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+// const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const DuplPkgCheckrPlugin = require('duplicate-package-checker-webpack-plugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
@@ -21,12 +21,13 @@ process.traceDeprecation = true; // or run process with --trace-deprecation flag
 
 const env = process.env.NODE_ENV || 'development';
 const isProduction = env === 'production';
-// const devMode = env !== 'production';
+const isDevMode = env === 'development';
 
+/* eslint-disable no-console */
 console.log('env: ', env);
 console.log('process.env.NODE_ENV: ', process.env.NODE_ENV);
-
 console.log('isTTY: ', process.stdout.isTTY);
+/* eslint-enable */
 
 module.exports = {
   mode: env,
@@ -75,7 +76,7 @@ module.exports = {
         // },
         base: {
           // test: /(react|react-dom|react-router|react-router-dom)/,
-          test(module, chunks) {
+          test(module) { // second arg 'chunks' is available
             const name = module.nameForCondition && module.nameForCondition();
             // TODO: use new RegExp(`re`) for multiline, but remember about
             // backslash in string
@@ -156,9 +157,10 @@ module.exports = {
     }),
     new DuplPkgCheckrPlugin(),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    // ...isProduction ? [] : [new webpack.HotModuleReplacementPlugin()],
+    isDevMode && new webpack.HotModuleReplacementPlugin(),
     // new VisualizerPlugin(),
-    ...isProduction ? [] : [new webpack.HotModuleReplacementPlugin()],
-  ],
+  ].filter(Boolean),
   // =============================== RESOLVE ==================================
   resolve: {
     alias: {
@@ -208,10 +210,10 @@ module.exports = {
                 preventFullImport: true,
               },
             }],
-          // TODO: replace next concat by .filter(Boolean)
-          // @babel/plugin-transform-react-jsx-self and next one are included
-          // to react preset with "development" option
-          ].concat(isProduction ? [] : ['transform-react-jsx-source']),
+            // @babel/plugin-transform-react-jsx-self and next one are included
+            // to react preset with "development" option
+            isDevMode && 'transform-react-jsx-source',
+          ].filter(Boolean),
           // // ------------------------ BABEL PRESETS ---------------------------
           presets: [
             ['env', {
@@ -271,7 +273,7 @@ module.exports = {
           {
             loader: 'file-loader',
             options: {
-              name(file) {
+              name() { // single 'file' argument is available
                 if (env === 'development') {
                   return '[path][name].[ext]';
                 }

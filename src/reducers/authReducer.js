@@ -4,6 +4,7 @@ import {
   LOGIN_FAIL,
   LOGIN_CANCEL,
   LOGOUT,
+  LOGOUT_SUCCESS,
   // OFFER_AUTH,
   REJECT_AUTH_OFFER,
 } from 'constants/actionTypes';
@@ -37,8 +38,15 @@ const authReducer = (state = defaultState, action) => {
     case LOGIN_FAIL:
     case LOGIN_CANCEL:
       return { ...state, isLoggedIn: false, isAuthenticating: false };
-    case LOGOUT: // or return defaultState?
-      return { ...state, isLoggedIn: false, userName: '', userPageHref: '' };
+    case LOGOUT:
+    case LOGOUT_SUCCESS:
+      return {
+        ...state,
+        isLoggedIn: false,
+        tokenExpiresAt: null,
+        userName: '',
+        userPageHref: '',
+      };
     // case OFFER_AUTH: // TODO: rename to AUTH_MISSING or NOT_AUTHENTICATED
     //   return {
     //     ...state,

@@ -47,8 +47,15 @@ export const logout = () => (dispatch) => {
   );
 };
 
-export const subscribeToLogout = () => dispatch => (
-  openAPI.onLogout(() => dispatch({ type: LOGOUT_SUCCESS }))
+export const subscribeToLogout = () => (dispatch) => {
+  const handler = response => dispatch({ type: LOGOUT_SUCCESS, ...response });
+  openAPI.onLogout(handler);
+  return handler;
+};
+
+// call without handler to remove all subscribers to 'auth.logout' event
+export const unsubscribeFromLogout = handler => () => (
+  openAPI.onLogout(handler, false)
 );
 
 // export const offerAuth = () => ({ type: OFFER_AUTH });

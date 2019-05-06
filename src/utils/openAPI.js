@@ -25,25 +25,21 @@ function callAPI(method, params) {
 // 'not_authorized' - logged in but grants rejected,
 // 'unknown' - not authenticated
 
-function login(/* newSettings */) {
+function login(newSettings) {
   return new Promise((resolve, reject) => {
     VK.Auth.login((response) => {
-      const { session, status, settings } = response;
+      const { session, status } = response;
 
       if (session && status === 'connected') {
-        if (settings) {
-          /* Выбранные настройки доступа пользователя, если они были запрошены */
-          // resolve({ session, status, settings });
-          resolve(response);
-          return;
-        }
-        // resolve({ session, status });
+        /* settings - Выбранные настройки доступа пользователя,
+        если они были запрошены */
+        // response: { session, status } | { session, status, settings };
         resolve(response);
       } else {
         /* Пользователь нажал кнопку Отмена в окне авторизации */
         reject(createError({ message: 'Login failed', ...response }));
       }
-    } /* , newSettings: Integer */);
+    }, newSettings);
   });
 }
 
@@ -61,13 +57,13 @@ function logout() {
   });
 }
 
-function onLogout() {
-  return new Promise((resolve) => {
-    VK.Observer.subscribe('auth.logout', (response) => {
-      // const { session, status } = response;
-      resolve(response);
-    });
-  });
+function onLogout(handler, subscribe = true) {
+  if (subscribe) {
+    VK.Observer.subscribe('auth.logout', handler);
+  } else {
+    // call without handler to remove all subscribers to this event
+    VK.Observer.unsubscribe('auth.logout', handler);
+  }
 }
 
 const openAPI = {

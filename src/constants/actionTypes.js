@@ -36,3 +36,6 @@ export const NO_VALID_TOKEN = 'NO_VALID_TOKEN';
 
 export const OFFER_AUTH = 'OFFER_AUTH';
 export const REJECT_AUTH_OFFER = 'REJECT_AUTH_OFFER';
+
+// shared
+export const OPEN_API_INITIALIZED = 'OPEN_API_INITIALIZED';

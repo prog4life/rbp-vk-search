@@ -1,7 +1,8 @@
 import {
   TERMINATE_SEARCH, SEARCH_START, SEARCH_SET_OFFSET, SEARCH_END, SEARCH_REQUEST,
 } from 'constants/actionTypes';
-import { AUTH_FAILED } from 'constants/api'; // TODO: pass with options ?
+import { AUTH_FAILED } from 'constants/api';
+import { maxAttempts, offsetModifier, requestInterval } from 'config/common';
 import {
   getSearchTotal, getSearchOffset, getSearchErrorCode,
   getRequestsByOffset, getFailedList, getPendingList,
@@ -11,10 +12,9 @@ import openAPI from 'utils/openAPI';
 import { onSuccess, onFail } from './requestHandlers';
 import transformResponse from './transformResponse';
 import {
-  // validateAction,
-  // validateOffsetModifier,
-  validateOptions,
-  // validateParams,
+// validateAction,
+// validateOffsetModifier,
+// validateParams,
 } from './validation';
 
 export const SEARCH_PARAMETERS = 'SEARCH::Parameters';
@@ -23,15 +23,6 @@ export const SEARCH_PARAMETERS = 'SEARCH::Parameters';
 
 // TODO: not repeat pending, just make them failed instead; Belated Overdue
 // const checkAndRepeatFailed = () => {}
-
-// TODO: middleware factory
-// export default function createSearchProcessorMiddleware(apiClient, options) {
-//   const { offsetModifier, requestInterval = 350, maxAttempts = 5 } = options;
-//
-//   validateOffsetModifier(offsetModifier);
-//
-//   return searchProcessor;
-// }
 
 const searchProcessor = ({ /* dispatch, */ getState }) => {
   let intervalId; // TODO: replace to top
@@ -67,10 +58,7 @@ const searchProcessor = ({ /* dispatch, */ getState }) => {
       clearInterval(intervalId);
       return next(action); // TODO: pass limit to cut extra results ?
     }
-    const { meta = {} } = action;
-
     // validateAction(action, SEARCH_PARAMETERS);
-    validateOptions(meta);
     // validateParams(searchParams); // TODO: validate filter names with constants
 
     const [resultsType] = types;
@@ -81,12 +69,6 @@ const searchProcessor = ({ /* dispatch, */ getState }) => {
       requestParams, method, target, filters, resultsLimit,
     } = searchParams;
     const { owner_id: ownerId } = requestParams;
-    const {
-      // TODO: retrieve next 3 from options passed to middleware factory
-      offsetModifier, // should be equal to request url "count" param value
-      requestInterval,
-      maxAttempts,
-    } = meta;
 
     if (!ownerId) {
       delete requestParams.owner_id;
