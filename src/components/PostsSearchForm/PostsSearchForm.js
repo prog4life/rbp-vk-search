@@ -9,7 +9,7 @@ import PostAuthorIdField from 'components/common/PostAuthorIdField';
 import WallOwnerIdField from 'components/common/WallOwnerIdField';
 import OwnerCustomIdField from 'components/common/OwnerCustomIdField';
 import WallOwnerTypeSelect from 'components/common/WallOwnerTypeSelect';
-import PostAuthorSexSelect from 'components/common/PostAuthorSexSelect';
+import PostAuthorGenderSelect from 'components/common/PostAuthorGenderSelect';
 import ResultsLimitField from 'components/common/ResultsLimitField';
 
 import './style.scss';
@@ -71,13 +71,13 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
     }
 
     // TODO: validate that either wallOwnerUsualId or wallOwnerCustomId is
-    // entered, same for postAuthorId and postAuthorSex
+    // entered, same for postAuthorId and postAuthorGender
 
     // TODO: looks like throttling is no more needed
 
     console.log('SUBMITTED values: ', values);
     const {
-      wallOwnerUsualId, wallOwnerCustomId, postAuthorId, postAuthorSex,
+      wallOwnerUsualId, wallOwnerCustomId, postAuthorId, postAuthorGender,
     } = values;
     // NOTE: will be executed once component is re-rendered
     // setState callbacks (second argument) now fire immediately after
@@ -87,7 +87,7 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
       wallOwnerUsualId: isCustomIdUsed ? null : Number(wallOwnerUsualId),
       wallOwnerCustomId: isCustomIdUsed ? wallOwnerCustomId : null,
       postAuthorId: searchType === 'byAuthorId' ? Number(postAuthorId) : null,
-      postAuthorSex: searchType === 'byAuthorId' ? null : Number(postAuthorSex),
+      postAuthorGender: searchType === 'byAuthorId' ? null : Number(postAuthorGender),
       resultsLimit: Number(values.resultsLimit) || null,
     });
   }
@@ -156,10 +156,10 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
               <Field
-                name="postAuthorSex"
-                component={PostAuthorSexSelect}
+                name="postAuthorGender"
+                component={PostAuthorGenderSelect}
                 onSearchTypeSwitch={this.handleSearchTypeSwitch}
-                isDisabled={isSearchActive || searchType !== 'bySex'}
+                isDisabled={isSearchActive || searchType !== 'byGender'}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
@@ -187,7 +187,7 @@ export default reduxForm({
   form: 'wall-posts',
   initialValues: {
     wallOwnerType: 'group',
-    postAuthorSex: '1',
+    postAuthorGender: '1',
   },
   // onSubmit: component.handleSubmit,
 })(PostsSearchForm);

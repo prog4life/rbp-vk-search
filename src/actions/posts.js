@@ -2,7 +2,7 @@ import {
   SET_POSTS_SORT_ORDER, SET_POSTS_FILTER_TEXT,
   START_WALL_POSTS_SEARCH, POSTS_RECEIVED,
 } from 'constants/actionTypes';
-// import { WALL_POSTS_BY_SEX, WALL_POSTS_BY_AUTHOR_ID } from 'constants/searchModes';
+// import { WALL_POSTS_BY_GENDER, WALL_POSTS_BY_AUTHOR_ID } from 'constants/searchModes';
 import { WALL_GET_BASE_URL } from 'constants/api';
 import { apiVersion, count } from 'config/common';
 import { targets, SEARCH_PARAMETERS } from 'middleware/searchProcessor';
@@ -23,12 +23,12 @@ export const setPostsFilterText = (filterText = '') => ({
 // includes: user_id, first_name, last_name, sex, online, online_mobile,
 // phot_50, photo_100, deactivated: "deleted", screen_name
 
-// NOTE: or create separate action creators: findWallPostsBySex/AuthorId
+// NOTE: or create separate action creators: findWallPostsByGender/AuthorId
 // will be utilized by searchProcessor middleware
 export const startWallPostsSearch = (inputData) => { // pass accessToken here ?
   const {
     wallOwnerType, wallOwnerUsualId, wallOwnerCustomId,
-    postAuthorId, postAuthorSex, resultsLimit,
+    postAuthorId, postAuthorGender, resultsLimit,
   } = inputData;
 
   const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
@@ -55,7 +55,7 @@ export const startWallPostsSearch = (inputData) => { // pass accessToken here ?
         extended: 1,
       },
       target: targets.WALL_POSTS,
-      filters: { postAuthorId, postAuthorSex },
+      filters: { postAuthorId, postAuthorGender },
       resultsLimit,
     },
   };
@@ -64,7 +64,7 @@ export const startWallPostsSearch = (inputData) => { // pass accessToken here ?
 // export const startWallPostsSearch = (inputData) => { // pass accessToken here ?
 //   const {
 //     wallOwnerType, wallOwnerUsualId, wallOwnerCustomId,
-//     postAuthorId, postAuthorSex, resultsLimit,
+//     postAuthorId, postAuthorGender, resultsLimit,
 //   } = inputData;
 
 //   const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
@@ -93,9 +93,9 @@ export const startWallPostsSearch = (inputData) => { // pass accessToken here ?
 //     // pass searchTarget/itemsName/searchedItems ('WallPosts' || 'WALL_POSTS')
 //     [SEARCH_PARAMETERS]: {
 //       baseRequestURL,
-//       // mode: postAuthorId ? WALL_POSTS_BY_AUTHOR_ID : WALL_POSTS_BY_SEX,
+//       // mode: postAuthorId ? WALL_POSTS_BY_AUTHOR_ID : WALL_POSTS_BY_GENDER,
 //       target: targets.WALL_POSTS,
-//       filters: { postAuthorId, postAuthorSex },
+//       filters: { postAuthorId, postAuthorGender },
 //       resultsLimit,
 //     },
 //   };

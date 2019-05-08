@@ -54,12 +54,12 @@ export const validateParams = (params) => {
   if (resultsLimit && (!Number.isInteger(resultsLimit) || resultsLimit < 1)) {
     throw new Error('Expected resultsLimit to be integer number that is > 0');
   }
-  const { postAuthorId, postAuthorSex } = filters;
+  const { postAuthorId, postAuthorGender } = filters;
 
   if ((!Number.isInteger(postAuthorId) || postAuthorId < 1)
-    && (postAuthorSex !== 1 && postAuthorSex !== 2)
+    && (postAuthorGender !== 1 && postAuthorGender !== 2)
   ) {
     throw new Error(`Expected either postAuthorId (as positive integer number)
-      or postAuthorSex (as 1 or 2) to be provided`);
+      or postAuthorGender (as 1 or 2) to be provided`);
   }
 };

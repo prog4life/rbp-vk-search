@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { InputGroup, FormControl } from 'react-bootstrap';
 import FormInputGroup from './FormInputGroup';
 
-const PostAuthorSexSelect = ({ input, isDisabled, onSearchTypeSwitch }) => {
+const PostAuthorGenderSelect = ({ input, isDisabled, onSearchTypeSwitch }) => {
   const { value, onChange } = input;
 
   return (
     <FormInputGroup
-      id="post-author-sex"
-      label="Post author sex"
+      id="post-author-gender"
+      label="Post author gender"
     >
       <InputGroup>
         <InputGroup.Addon>
@@ -18,11 +18,11 @@ const PostAuthorSexSelect = ({ input, isDisabled, onSearchTypeSwitch }) => {
             onChange={onSearchTypeSwitch}
             type="radio"
             name="searchType"
-            value="bySex"
+            value="byGender"
           />
         </InputGroup.Addon>
         <FormControl
-          // name="postAuthorSex"
+          // name="postAuthorGender"
           componentClass="select"
           disabled={isDisabled}
           onChange={onChange}
@@ -40,7 +40,7 @@ const PostAuthorSexSelect = ({ input, isDisabled, onSearchTypeSwitch }) => {
   );
 };
 
-PostAuthorSexSelect.propTypes = {
+PostAuthorGenderSelect.propTypes = {
   input: PropTypes.shape({
     onChange: PropTypes.func.isRequired,
     value: PropTypes.string.isRequired,
@@ -49,4 +49,4 @@ PostAuthorSexSelect.propTypes = {
   onSearchTypeSwitch: PropTypes.func.isRequired,
 };
 
-export default PostAuthorSexSelect;
+export default PostAuthorGenderSelect;

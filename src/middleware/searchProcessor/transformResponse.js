@@ -28,7 +28,7 @@ const formatPosts = ({ items: posts, profiles }) => (
       return {
         authorId,
         authorName: !first || !last ? authorName.trim() : authorName,
-        authorSex: profile.sex,
+        authorGender: profile.sex,
         screenName: profile.screen_name || null,
         online: profile.online, // 0 || 1    rename to isOnline later
         onlineMobile: profile.online_mobile,
@@ -51,22 +51,22 @@ function extractPostsByAuthorId(posts, authorId) {
   ));
 }
 
-function extractPostsBySex(posts, authorSex) {
-  return posts.filter(post => post.authorSex === authorSex);
+function extractPostsByGender(posts, authorGender) {
+  return posts.filter(post => post.authorGender === authorGender);
 
   // return posts.filter((post) => {
   //   const authorId = post.signer_id || post.from_id;
   //
   //   // return authorId && authorId > 0 && profiles.some(profile => (
   //   return profiles.some(profile => (
-  //     profile.id === authorId && profile.sex === authorSex
+  //     profile.id === authorId && profile.sex === authorGender
   //   ));
   // });
 }
 
 // const responseParsers = {
 //   authorId: extractPostsByAuthorId,
-//   sex: extractPostsBySex,
+//   gender: extractPostsByGender,
 // };
 
 export const normalizeShallowly = (items) => {
@@ -83,9 +83,9 @@ export const normalizeShallowly = (items) => {
 };
 
 const POST_AUTHOR_ID = 'Post-Author-Id';
-const POST_AUTHOR_SEX = 'Post-Author-Sex';
+const POST_AUTHOR_GENDER = 'Post-Author-Gender';
 
-export const responseFilters = { POST_AUTHOR_ID, POST_AUTHOR_SEX };
+export const responseFilters = { POST_AUTHOR_ID, POST_AUTHOR_GENDER };
 
 // TODO: change to more generic filterResponse ?
 
@@ -97,8 +97,8 @@ export const filterWallPosts = (posts, filters) => {
       return acc;
     }
     switch (filterName) {
-      case 'postAuthorSex':
-        return extractPostsBySex(acc, filterValue);
+      case 'postAuthorGender':
+        return extractPostsByGender(acc, filterValue);
       case 'postAuthorId':
         return extractPostsByAuthorId(acc, filterValue);
       default:

@@ -123,7 +123,7 @@ export const onFail = ({ next, getState, offset }) => (error) => {
 
 // if another request with such offset was completed and therefore removed
 // from store already
-// const throwIfRequestIsExcess = (request, offset) => {
+// const throwIfRequestIGENDERcess = (request, offset) => {
 //   if (!request) {
 //     throw new Error(`Request (offset: ${offset}) has been succeeded already`);
 //   }
