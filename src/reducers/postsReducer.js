@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import {
-  POSTS_RECEIVED, SEARCH_START, SET_POSTS_SORT_ORDER, SET_POSTS_FILTER_TEXT,
+  POSTS_RECEIVED, START_WALL_POSTS_SEARCH, SET_POSTS_SORT_ORDER, SET_POSTS_FILTER_TEXT,
 } from 'constants/actionTypes.js';
 import { createReducer, makeUnion } from './reducerUtils';
 
@@ -13,7 +13,7 @@ import { createReducer, makeUnion } from './reducerUtils';
 //         ...action.results,
 //       };
 //     }
-//     case SEARCH_START:
+//     case START_WALL_POSTS_SEARCH:
 //       return {};
 //     default:
 //       return state;
@@ -31,7 +31,7 @@ const byId = createReducer(null, {
       ? { ...state, ...action.itemsById }
       : state
   ),
-  [SEARCH_START]: () => ({}),
+  [START_WALL_POSTS_SEARCH]: () => ({}),
 });
 
 const ids = createReducer(null, {
@@ -40,11 +40,11 @@ const ids = createReducer(null, {
       ? makeUnion(state, action.ids)
       : state
   ),
-  [SEARCH_START]: () => ([]),
+  [START_WALL_POSTS_SEARCH]: () => ([]),
 });
 
 const limit = createReducer(null, {
-  [SEARCH_START]: (state, action) => action.limit,
+  [START_WALL_POSTS_SEARCH]: (state, action) => action.limit,
 });
 
 const sortOrder = createReducer('descend', {

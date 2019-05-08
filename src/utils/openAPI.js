@@ -1,5 +1,4 @@
-import { compose } from 'redux';
-import { changeMssg, createError } from 'utils/errorHelpers';
+import { createError } from 'utils/errorHelpers';
 
 function callAPI(method, params) {
   return new Promise((resolve, reject) => {

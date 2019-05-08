@@ -45,13 +45,11 @@ const searchProcessor = ({ /* dispatch, */ getState }) => {
   return next => (action) => {
     // TODO: destructure from action callAPI and transformResponse functions with
     // imported defaults
-    const { type, types, getNumberOfResults } = action;
+    const { type, resultsType, getNumberOfResults } = action;
     const searchParams = action[SEARCH_PARAMETERS];
+    const noSearchParamsObj = !searchParams || typeof searchParams !== 'object';
 
-    if (typeof searchParams === 'undefined' && type !== TERMINATE_SEARCH) {
-      return next(action);
-    }
-    if (!types && type !== TERMINATE_SEARCH) {
+    if (type !== TERMINATE_SEARCH && noSearchParamsObj) {
       return next(action);
     }
     if (type === TERMINATE_SEARCH) {
@@ -60,8 +58,6 @@ const searchProcessor = ({ /* dispatch, */ getState }) => {
     }
     // validateAction(action, SEARCH_PARAMETERS);
     // validateParams(searchParams); // TODO: validate filter names with constants
-
-    const [resultsType] = types;
 
     // TODO: not destructure postAuthorId here and pass whole searchParams obj
     // to transformResponse(transformResponse)
@@ -73,11 +69,12 @@ const searchProcessor = ({ /* dispatch, */ getState }) => {
     if (!ownerId) {
       delete requestParams.owner_id;
     }
-
     // doublecheck
     clearInterval(intervalId);
-    // will also clear "requests" in store
-    next({ type: SEARCH_START, limit: resultsLimit });
+    // notify specific results reducer that search is started
+    next({ type, limit: resultsLimit });
+    // clear "requests" and reset "search" state in store
+    next({ type: SEARCH_START });
 
     // TODO: cache posts and search in cache first if amount and last id
     // is the same
@@ -108,10 +105,12 @@ const searchProcessor = ({ /* dispatch, */ getState }) => {
         })
         .then(
           results => next({ type: resultsType, ...results }),
-          // results => results,
-          // TODO: consider if (eror.code === AUTH_FAILED) clearInterval() with
-          // replacing first makeCallToAPI() after setInterval
-          err => (err.isRefuse ? console.warn(err) : console.error(err)),
+          (error) => {
+            if (!error.isRefuse && process.env.NODE_ENV === 'development') {
+              console.error(error); // eslint-disable-line no-console
+            }
+            return { error };
+          },
         );
       // console.timeEnd('::: CALL API :::');
       return promise;

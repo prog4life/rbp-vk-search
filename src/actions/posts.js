@@ -1,21 +1,17 @@
 import {
-  SET_POSTS_SORT_ORDER, SET_POSTS_FILTER_TEXT, POSTS_RECEIVED,
+  SET_POSTS_SORT_ORDER, SET_POSTS_FILTER_TEXT,
+  START_WALL_POSTS_SEARCH, POSTS_RECEIVED,
 } from 'constants/actionTypes';
 // import { WALL_POSTS_BY_SEX, WALL_POSTS_BY_AUTHOR_ID } from 'constants/searchModes';
 import { WALL_GET_BASE_URL } from 'constants/api';
 import { apiVersion, count } from 'config/common';
-import { validateActionCreator } from 'utils/validators';
 import { targets, SEARCH_PARAMETERS } from 'middleware/searchProcessor';
 import { getIdsOfPosts } from 'selectors';
 
-export const setPostsSortOrder = (order = 'descend') => {
-  validateActionCreator('setPostsSortOrder', { order });
-
-  return {
-    type: SET_POSTS_SORT_ORDER,
-    order,
-  };
-};
+export const setPostsSortOrder = (order = 'descend') => ({
+  type: SET_POSTS_SORT_ORDER,
+  order,
+});
 
 export const setPostsFilterText = (filterText = '') => ({
   type: SET_POSTS_FILTER_TEXT,
@@ -35,52 +31,8 @@ export const startWallPostsSearch = (inputData) => { // pass accessToken here ?
     postAuthorId, postAuthorSex, resultsLimit,
   } = inputData;
 
+  const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
   // TODO: validate wallOwnerId with additional preceding request to API
-  validateActionCreator('startWallPostsSearch', inputData);
-
-  const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
-  const ownerId = wallOwnerUsualId
-    ? `owner_id=${wallOwnerTypePrefix}${wallOwnerUsualId}`
-    : '';
-  const domain = wallOwnerCustomId ? `&domain=${wallOwnerCustomId}` : '';
-
-  // TODO: use encodeURIComponent ?
-
-  // TODO: get value of count from offsetModifier and apply it internally        !!!
-
-  // with extended=1 can also set specific fields to be returned by API
-  const baseRequestURL = `${WALL_GET_BASE_URL}?`
-    + `${ownerId}${domain}&count=${count}&v=${apiVersion}&extended=1`;
-
-  return {
-    types: [
-      // SEARCH_START, FETCH_WALL_POSTS_REQUEST, FETCH_WALL_POSTS_FAIL,
-      POSTS_RECEIVED,
-    ],
-    // TODO: getEndpoint() or getToken() instead of endpoint
-    // state => number of searched items
-    getNumberOfResults: state => getIdsOfPosts(state).length, // OR:
-    // IDEA:
-    // pass searchTarget/itemsName/searchedItems ('WallPosts' || 'WALL_POSTS')
-    [SEARCH_PARAMETERS]: {
-      baseRequestURL,
-      // mode: postAuthorId ? WALL_POSTS_BY_AUTHOR_ID : WALL_POSTS_BY_SEX,
-      target: targets.WALL_POSTS,
-      filters: { postAuthorId, postAuthorSex },
-      resultsLimit,
-    },
-  };
-};
-
-export const startWallPostsSearch2 = (inputData) => { // pass accessToken here ?
-  const {
-    wallOwnerType, wallOwnerUsualId, wallOwnerCustomId,
-    postAuthorId, postAuthorSex, resultsLimit,
-  } = inputData;
-
-  validateActionCreator('startWallPostsSearch', inputData);
-
-  const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
   const ownerId = wallOwnerUsualId
     ? `${wallOwnerTypePrefix}${wallOwnerUsualId}`
     : '';
@@ -89,7 +41,8 @@ export const startWallPostsSearch2 = (inputData) => { // pass accessToken here ?
   //   + `${ownerId}${domain}&count=${count}&v=${apiVersion}&extended=1`;
 
   return {
-    types: [POSTS_RECEIVED],
+    type: START_WALL_POSTS_SEARCH,
+    resultsType: POSTS_RECEIVED,
     // state => number of searched items
     getNumberOfResults: state => getIdsOfPosts(state).length, // OR:
     [SEARCH_PARAMETERS]: {
@@ -107,6 +60,46 @@ export const startWallPostsSearch2 = (inputData) => { // pass accessToken here ?
     },
   };
 };
+
+// export const startWallPostsSearch = (inputData) => { // pass accessToken here ?
+//   const {
+//     wallOwnerType, wallOwnerUsualId, wallOwnerCustomId,
+//     postAuthorId, postAuthorSex, resultsLimit,
+//   } = inputData;
+
+//   const wallOwnerTypePrefix = wallOwnerType === 'user' ? '' : '-';
+//   const ownerId = wallOwnerUsualId
+//     ? `owner_id=${wallOwnerTypePrefix}${wallOwnerUsualId}`
+//     : '';
+//   const domain = wallOwnerCustomId ? `&domain=${wallOwnerCustomId}` : '';
+
+//   // TODO: use encodeURIComponent ?
+
+//   // TODO: get value of count from offsetModifier and apply it internally        !!!
+
+//   // with extended=1 can also set specific fields to be returned by API
+//   const baseRequestURL = `${WALL_GET_BASE_URL}?`
+//     + `${ownerId}${domain}&count=${count}&v=${apiVersion}&extended=1`;
+
+//   return {
+//     types: [
+//       // SEARCH_START, FETCH_WALL_POSTS_REQUEST, FETCH_WALL_POSTS_FAIL,
+//       POSTS_RECEIVED,
+//     ],
+//     // TODO: getEndpoint() or getToken() instead of endpoint
+//     // state => number of searched items
+//     getNumberOfResults: state => getIdsOfPosts(state).length, // OR:
+//     // IDEA:
+//     // pass searchTarget/itemsName/searchedItems ('WallPosts' || 'WALL_POSTS')
+//     [SEARCH_PARAMETERS]: {
+//       baseRequestURL,
+//       // mode: postAuthorId ? WALL_POSTS_BY_AUTHOR_ID : WALL_POSTS_BY_SEX,
+//       target: targets.WALL_POSTS,
+//       filters: { postAuthorId, postAuthorSex },
+//       resultsLimit,
+//     },
+//   };
+// };
 
 // export const startWallPostsSearch = (inputData, interval = requestInterval) => (
 //   (dispatch) => {

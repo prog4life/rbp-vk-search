@@ -54,14 +54,14 @@ class WallPostsPageContainer extends React.Component {
 
   handleSearchStart = (inputData) => {
     const {
-      startWallPostsSearch2, isLoggedIn, login,
+      startWallPostsSearch, isLoggedIn, login,
     } = this.props;
 
     // TODO: consider to dispatch startOrDeferPostsSearch thunk instead          !!!
 
     if (isLoggedIn) {
       console.log('FORM STATE: ', inputData); // TEMP
-      startWallPostsSearch2(inputData);
+      startWallPostsSearch(inputData);
       return;
     }
     // TODO: save input values to localStorage
@@ -71,7 +71,7 @@ class WallPostsPageContainer extends React.Component {
     login().then(() => {
       console.log('is search deferred ', this.isPostsSearchDeferred);
       if (this.isPostsSearchDeferred) {
-        startWallPostsSearch2(inputData);
+        startWallPostsSearch(inputData);
       }
     });
   }

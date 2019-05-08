@@ -11,20 +11,13 @@ import {
 const refuseSearchRequest = (next, reason, { offset, callbackId = null }) => {
   // const measureId = shortId.generate();
   // console.time(`--- REFUSE ${measureId} ---`);
-  let msg = 'Request was refused by unknown reason';
+  const errorMessages = {
+    'request-succeeded': `Request with ${offset} offset has been succeeded already`,
+    'offset-processed': `Offset ${offset} has been processed already`,
+    'search-is-over': `Needless request (offset: ${offset}), search is over already`,
+  };
+  const msg = errorMessages[reason];
 
-  switch (reason) {
-    case 'request-succeeded':
-      msg = `Request with ${offset} offset has been succeeded already`;
-      break;
-    case 'request-processed':
-      msg = `Offset ${offset} has been processed already`;
-      break;
-    case 'search-is-over':
-      msg = `Needless request (offset: ${offset}), search is over already`;
-      break;
-    default:
-  }
   next({
     type: SEARCH_REQUEST_REFUSE,
     offset,
@@ -62,10 +55,9 @@ export const onSuccess = ({ next, getState, offset }) => (response) => {
     type: SEARCH_REQUEST_SUCCESS,
     offset,
     total: response.count || null,
-    // NOTE: OR if can't get items length -> pass count (offsetModifier) ?
+    // NOTE: or if can't get items length - use count (offsetModifier) ?
     amount: response.items ? response.items.length : null,
   });
-
   // console.timeEnd(`--- ON SUCCESS ${measureId} ---`);
   return response;
 };
@@ -86,7 +78,7 @@ export const onFail = ({ next, getState, offset }) => (error) => {
     // console.timeEnd(`--- ON FAIL ${measureId} ---`);
     refuseSearchRequest(next, 'search-is-over', { offset });
   }
-  const { code = null, message = null, params } = error;
+  const { code = null, message = '', params } = error;
   const callbackId = Array.isArray(params) // OPTIONAL
     ? params.find(param => param.key === 'callback').value
     : null;
@@ -94,7 +86,7 @@ export const onFail = ({ next, getState, offset }) => (error) => {
   // if another request with such offset has succeeded or failed earlier
   if (!pending.includes(offset)) {
     // console.timeEnd(`--- ON FAIL ${measureId} ---`);
-    refuseSearchRequest(next, 'request-processed', { offset, callbackId });
+    refuseSearchRequest(next, 'offset-processed', { offset, callbackId });
   }
 
   if (code === AUTH_FAILED) { // invalid access_token
@@ -110,7 +102,7 @@ export const onFail = ({ next, getState, offset }) => (error) => {
     callbackId,
   });
   // console.timeEnd(`--- ON FAIL ${measureId} ---`);
-  throw error; // maybe add offset prop
+  throw error;
 };
 
 // ----------------- PRIOR HELPERS -------------------------------------------
