@@ -3,47 +3,47 @@ import PropTypes from 'prop-types';
 import { InputGroup, FormControl } from 'react-bootstrap';
 import FormInputGroup from './FormInputGroup';
 
-function getValidationState(value, isDisabled, validate) {
-  if (isDisabled || !validate) {
-    return undefined;
+function getValidationState(error, touched, disabled) {
+  if (disabled) {
+    return null;
   }
-  if (value.length < 1) {
-    validate('wallOwnerId', 'error');
-    return 'error';
-  }
-  return undefined;
+  return touched && error ? 'error' : null;
 }
 
-const WallOwnerIdField = ({
-  input: { value, onChange }, isDisabled, onIdTypeSwitch,
-}) => (
-  <FormInputGroup
-    id="wall-owner-usual-id"
-    label="Wall owner usual id"
-    validationState={null}
-  >
-    <InputGroup>
-      <InputGroup.Addon>
-        <input
-          checked={!isDisabled}
-          onChange={onIdTypeSwitch}
-          type="radio"
-          name="wallOwnerIdType"
-          value="usualId"
+const WallOwnerIdField = ({ input, isDisabled, onIdTypeSwitch, meta }) => {
+  const { value, onChange } = input;
+  const { error, touched } = meta;
+
+  return (
+    <FormInputGroup
+      id="wall-owner-usual-id"
+      label="Wall owner usual id"
+      validationState={getValidationState(error, touched, isDisabled)}
+    >
+      <InputGroup>
+        <InputGroup.Addon>
+          <input
+            checked={!isDisabled}
+            onChange={onIdTypeSwitch}
+            type="radio"
+            name="wallOwnerIdType"
+            value="usualId"
+          />
+        </InputGroup.Addon>
+        <FormControl
+          name="wallOwnerUsualId"
+          onChange={onChange}
+          placeholder="123456789"
+          // this or textual custom id must be entered
+          required={isDisabled === false}
+          disabled={isDisabled}
+          type="number"
+          value={value}
         />
-      </InputGroup.Addon>
-      <FormControl
-        name="wallOwnerUsualId"
-        onChange={onChange}
-        placeholder="123456789"
-        // required // TODO: this or short name must be entered, look below
-        disabled={isDisabled}
-        type="text"
-        value={value}
-      />
-    </InputGroup>
-  </FormInputGroup>
-);
+      </InputGroup>
+    </FormInputGroup>
+  );
+};
 
 WallOwnerIdField.propTypes = {
   input: PropTypes.shape({
@@ -90,3 +90,5 @@ export default WallOwnerIdField;
 //     <FormControl type="text" />
 //   </InputGroup>
 // </FormGroup>
+
+/* eslint-disable */

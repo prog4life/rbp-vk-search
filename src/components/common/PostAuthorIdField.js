@@ -3,25 +3,22 @@ import PropTypes from 'prop-types';
 import { InputGroup, FormControl } from 'react-bootstrap';
 import FormInputGroup from './FormInputGroup';
 
-function getValidationState(value, isDisabled, validate) {
-  if (isDisabled || !validate) {
-    return undefined;
+function getValidationState(error, touched, disabled) {
+  if (disabled) {
+    return null;
   }
-  if (value.length < 1) {
-    validate('postAuthorId', 'error');
-    return 'error';
-  }
-  return undefined;
+  return touched && error ? 'error' : null;
 }
 
-const PostAuthorIdField = ({ input, isDisabled, onSearchTypeSwitch }) => {
+const PostAuthorIdField = ({ input, isDisabled, onSearchTypeSwitch, meta }) => {
   const { value, onChange } = input;
+  const { error, touched } = meta;
 
   return (
     <FormInputGroup
       id="post-author-id"
       label="Post author id"
-      validationState={null}
+      validationState={getValidationState(error, touched, isDisabled)}
     >
       <InputGroup>
         <InputGroup.Addon>
@@ -36,7 +33,9 @@ const PostAuthorIdField = ({ input, isDisabled, onSearchTypeSwitch }) => {
         <FormControl
           // name="postAuthorId"
           placeholder="123456789"
-          type="text"
+          type="number"
+          // this or post author gender must be entered
+          required={isDisabled === false}
           disabled={isDisabled}
           onChange={onChange}
           value={value}

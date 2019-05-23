@@ -14,6 +14,30 @@ import ResultsLimitField from 'components/common/ResultsLimitField';
 
 import './style.scss';
 
+const required = value => (value ? undefined : 'Required');
+
+const isPositiveInt = (value) => {
+  const num = Number(value);
+  return !value || (Number.isInteger(num) && num > 0)
+    ? undefined
+    : 'Must be a positive integer';
+};
+
+const isCorrectId = (value) => {
+  const hasIdPrefix = value.slice(0, 2) === 'id';
+  return hasIdPrefix && isPositiveInt(value.slice(2)) === undefined
+    ? undefined
+    : 'Must be "id" word with numbers right after it';
+};
+
+const maxLength = max => value => (
+  value && value.length > max
+    ? `Must be ${max} characters or less`
+    : undefined
+);
+
+const maxLength18 = maxLength(18);
+
 const propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   isSearchActive: PropTypes.bool.isRequired,
@@ -116,6 +140,8 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
 
     this.renderCount = this.renderCount + 1;
 
+    // TODO: extract IdField component for WallOwnerIdField and OwnerCustomIdField
+
     return (
       <Grid>
         <form
@@ -129,6 +155,7 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
                 component={WallOwnerIdField}
                 onIdTypeSwitch={this.handleIdTypeSwitch}
                 isDisabled={isSearchActive || isCustomIdUsed}
+                validate={[required, isPositiveInt, maxLength18]}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
@@ -137,6 +164,7 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
                 component={OwnerCustomIdField}
                 onIdTypeSwitch={this.handleIdTypeSwitch}
                 isDisabled={isSearchActive || !isCustomIdUsed}
+                validate={[required, isPositiveInt, maxLength18]}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>
@@ -166,6 +194,7 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
               <Field
                 name="resultsLimit"
                 component={ResultsLimitField}
+                validate={[isPositiveInt]}
                 isDisabled={isSearchActive}
               />
             </Col>

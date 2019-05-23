@@ -7,6 +7,7 @@ import DelayedRender from 'components/common/DelayedRender';
 import AuthErrorBoundary from 'components/common/AuthErrorBoundary';
 import AuthOfferModal from 'components/AuthOfferModal';
 import PostsPanelContainer from 'containers/PostsPanelContainer';
+
 // import { AUTH_OFFER_DELAY } from 'constants/ui';
 
 import './style.scss';
