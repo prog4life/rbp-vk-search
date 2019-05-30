@@ -67,3 +67,4 @@ export const getAllById = state => state.byId;
 export const getIds = state => state.ids;
 export const getSortOrder = state => state.sortOrder;
 export const getFilterText = state => state.filterText;
+export const getLimit = state => state.limit;

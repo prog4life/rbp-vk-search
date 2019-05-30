@@ -164,7 +164,7 @@ class PostsSearchForm extends React.Component { // TODO: use PureComponent ?
                 component={OwnerCustomIdField}
                 onIdTypeSwitch={this.handleIdTypeSwitch}
                 isDisabled={isSearchActive || !isCustomIdUsed}
-                validate={[required, isPositiveInt, maxLength18]}
+                // validate={[required, isPositiveInt, maxLength18]}
               />
             </Col>
             <Col xsOffset={1} smOffset={0} xs={10} sm={6} lg={4}>

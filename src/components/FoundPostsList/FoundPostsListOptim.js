@@ -20,7 +20,7 @@ function FoundPostsListOptim({ postIds }) {
     );
   }
 
-  // console.log('FPL Optim, postIds: ', postIds);
+  // console.log('FoundPostsListOptim, postIds: ', postIds);
 
   return (
     <ListGroup>

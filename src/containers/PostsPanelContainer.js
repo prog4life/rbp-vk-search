@@ -6,13 +6,13 @@ import { getVisiblePosts, getVisiblePostsIds, getPostsSortOrder } from 'selector
 
 import ResultsPanel from 'components/ResultsPanel';
 import SearchResultsFilter from 'components/SearchResultsFilter';
-import FoundPostsList from 'components/FoundPostsList';
-// import FoundPostsListOptim from 'components/FoundPostsList/FoundPostsListOptim';
+// import FoundPostsList from 'components/FoundPostsList';
+import FoundPostsListOptim from 'components/FoundPostsList/FoundPostsListOptim';
 
 const PostsPanelContainer = props => (
   <ResultsPanel heading={<SearchResultsFilter {...props} />}>
-    <FoundPostsList {...props} />
-    {/* <FoundPostsListOptim {...props} /> */}
+    {/* <FoundPostsList {...props} /> */}
+    <FoundPostsListOptim {...props} />
   </ResultsPanel>
 );
 

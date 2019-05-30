@@ -91,6 +91,7 @@ export const getPostById = (state, id) => getPostsById(state)[id];
 export const getIdsOfPosts = state => fromPosts.getIds(state.posts);
 export const getPostsSortOrder = state => fromPosts.getSortOrder(state.posts);
 export const getPostsFilterText = state => fromPosts.getFilterText(state.posts);
+export const getPostsLimit = state => fromPosts.getLimit(state.posts);
 
 // NOTE: consider alternative: sorting by timestamp before filtering by text
 
@@ -137,18 +138,19 @@ export const getSortedByTimestampPosts = createSelector(
 );
 
 export const getVisiblePosts = createSelector(
-  [getSortedByTimestampPosts, getPostsSortOrder],
+  [getSortedByTimestampPosts, getPostsSortOrder, getPostsLimit],
   // (state, sortOrder = 'descend') => sortOrder,
-  (sortedPosts, sortOrder) => {
+  (sortedPosts, sortOrder, limit) => {
     console.time('--- REVERSE ---');
 
     if (!sortedPosts) {
       console.timeEnd('--- REVERSE ---');
       return null;
     }
+    const limitedPosts = limit ? sortedPosts.slice(0, limit) : sortedPosts;
     const result = sortOrder === 'descend'
-      ? [].concat(sortedPosts).reverse() // NOTE: think over lodash's "orderBy"
-      : sortedPosts;
+      ? [].concat(limitedPosts).reverse() // NOTE: think over lodash's "orderBy"
+      : limitedPosts;
 
     console.timeEnd('--- REVERSE ---');
 

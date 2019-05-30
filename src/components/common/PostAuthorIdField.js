@@ -51,6 +51,10 @@ PostAuthorIdField.propTypes = {
     value: PropTypes.string.isRequired,
   }).isRequired,
   isDisabled: PropTypes.bool.isRequired,
+  meta: PropTypes.shape({
+    error: PropTypes.string,
+    touched: PropTypes.bool,
+  }).isRequired,
   onSearchTypeSwitch: PropTypes.func.isRequired,
 };
 

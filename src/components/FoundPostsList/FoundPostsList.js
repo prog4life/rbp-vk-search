@@ -21,7 +21,7 @@ function FoundPostsList({ posts }) {
     );
   }
 
-  // console.log('FPL, post ids: ', posts.map(post => post.id));
+  // console.log('FoundPostsList, post ids: ', posts.map(post => post.id));
 
   return (
     <ListGroup>
@@ -33,6 +33,7 @@ function FoundPostsList({ posts }) {
             <FoundPostOptim
               number={index + 1}
               post={post}
+              usual
             />
           </ListGroupItem>
         ))

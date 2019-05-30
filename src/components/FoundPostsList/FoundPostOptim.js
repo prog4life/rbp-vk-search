@@ -6,18 +6,37 @@ import { makeTextualMonth, makeZeroedMinutes } from 'utils/dateFormat';
 
 import './style.scss';
 
+// NOTE: number prop is one that cases component rerendering/updating
+
 class FoundPostOptim extends React.Component {
   componentDidMount() {
     // this.notify('MOUNTED');
   }
-  componentDidUpdate() {
-    // this.notify('UPDATED');
-  }
-  notify(op) {
-    const { post: { id }, number: resultNumber } = this.props;
 
-    console.log(`Optim ${op}, number: ${resultNumber}, id: ${id}`);
+  // componentDidUpdate(prevProps) {
+  //   this.notify('UPDATED');
+
+  //   const keys = Object.keys(prevProps);
+
+  //   keys.forEach((propKey) => {
+  //     const prevProp = prevProps[propKey];
+  //     const currProp = this.props[propKey];
+
+  //     if (prevProp === currProp) return;
+  //     console.log(`${propKey} `, prevProp, ' !== ', currProp);
+  //   });
+  // }
+
+  // componentWillUnmount() {
+  //   this.notify('UNMOUNT');
+  // }
+
+  notify(op) {
+    const { post: { id }, number: resultNumber, usual } = this.props;
+
+    console.log(`FoundPostOptim ${usual ? 'USUAL' : ''} ${op}, number: ${resultNumber}, id: ${id}`)
   }
+
   render() {
     const { post, number: resultNumber } = this.props;
     const {
@@ -73,6 +92,7 @@ class FoundPostOptim extends React.Component {
               className="found-post__label-info"
               href={linkToUserPage}
               target="_blank"
+              rel="noopener noreferrer"
             >
               {authorName || authorIdLabel}
             </a>
@@ -95,13 +115,13 @@ class FoundPostOptim extends React.Component {
           </div>
         </div>
         <div className="found-post__content">
-          {photo50 &&
+          {photo50 && (
             <div style={{ marginTop: '5px' }}>
-              <a href={linkToUserPage} target="_blank">
+              <a href={linkToUserPage} target="_blank" rel="noopener noreferrer">
                 <img src={photo50} alt="user-avatar" />
               </a>
             </div>
-          }
+          )}
           <p style={{ flex: 9, padding: '0 8px' }}>
             {text}
           </p>
@@ -113,7 +133,7 @@ class FoundPostOptim extends React.Component {
             // paddingLeft: '8px',
           }}
           >
-            <a href={link} target="_blank">
+            <a href={link} target="_blank" rel="noopener noreferrer">
               {linkText}
             </a>
           </div>
@@ -126,11 +146,11 @@ class FoundPostOptim extends React.Component {
 FoundPostOptim.propTypes = {
   number: PropTypes.number.isRequired,
   post: PropTypes.shape({
-    timestamp: PropTypes.number.isRequired,
     authorId: PropTypes.number.isRequired,
     id: PropTypes.number.isRequired,
-    text: PropTypes.string.isRequired,
     link: PropTypes.string.isRequired,
+    text: PropTypes.string.isRequired,
+    timestamp: PropTypes.number.isRequired,
   }).isRequired,
 };
 

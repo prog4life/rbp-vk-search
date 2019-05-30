@@ -12,12 +12,13 @@ const FormInputGroup = ({
     <ControlLabel>
       {label}
     </ControlLabel>
+    {/* eslint-disable-next-line react/jsx-props-no-spreading */}
     {children || <FormControl {...restProps} />}
-    {help &&
+    {help && (
       <HelpBlock>
         {help}
       </HelpBlock>
-    }
+    )}
   </FormGroup>
 );
 
@@ -25,15 +26,16 @@ FormInputGroup.propTypes = {
   children: PropTypes.node,
   help: PropTypes.string,
   id: PropTypes.string.isRequired,
-  // isRequired: PropTypes.bool,
   label: PropTypes.string.isRequired,
+  // eslint-disable-next-line react/boolean-prop-naming
+  required: PropTypes.bool,
   validationState: PropTypes.string,
 };
 
 FormInputGroup.defaultProps = {
   children: null,
-  help: null,
-  // isRequired: false,
+  help: '',
+  required: false,
   validationState: null,
 };
 
